@@ -1,0 +1,166 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_LOGIN DIALOG DISCARDABLE  0, 0, 169, 99
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "用户登录"
+FONT 10, "System"
+BEGIN
+    DEFPUSHBUTTON   "确      定",IDOK,30,68,50,14
+    PUSHBUTTON      "取      消",IDCANCEL,91,68,50,14
+    LTEXT           "用户名:",IDC_STATIC,20,22,36,11
+    LTEXT           "密    码:",IDC_STATIC,20,46,36,11
+    EDITTEXT        IDC_USERNAME,63,22,60,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,63,46,60,12,ES_PASSWORD | ES_AUTOHSCROLL
+END
+
+IDD_STAFF_EDIT DIALOG DISCARDABLE  0, 0, 197, 232
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "编辑员工信息"
+FONT 10, "System"
+BEGIN
+    DEFPUSHBUTTON   "增加",ID_ADD_STAFF,19,195,28,14
+    PUSHBUTTON      "删除",ID_DELETE_STAFF,60,195,28,14
+    CTEXT           "姓名",IDC_STATIC,13,35,40,14
+    CTEXT           "编号",IDC_STATIC,12,15,40,14
+    CTEXT           "性别",IDC_STATIC,13,54,40,14
+    CTEXT           "工资",IDC_STATIC,13,92,40,14
+    CTEXT           "部门",IDC_STATIC,13,111,40,14
+    CTEXT           "年龄",IDC_STATIC,13,73,40,14
+    CTEXT           "联系电话",IDC_STATIC,13,149,40,14
+    CTEXT           "联系地址",IDC_STATIC,13,168,40,14
+    CTEXT           "邮箱",IDC_STATIC,13,130,40,14
+    PUSHBUTTON      "修改",ID_MOTIFY_STAFF,101,195,28,14
+    PUSHBUTTON      "取消",ID_CANCEL_STAFF,142,195,28,14
+    EDITTEXT        IDC_STAFF_ID,53,16,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_NAME,53,35,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_AGE,53,71,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_SALARY,53,90,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_DEPT,53,109,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_EMAIL,53,128,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_PHONE,53,147,117,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STAFF_ADDRESS,53,166,121,14,ES_MULTILINE | 
+                    ES_AUTOHSCROLL
+    CONTROL         "男",IDC_SEX_MAN,"Button",BS_AUTORADIOBUTTON,51,54,23,14
+    CONTROL         "女",IDC_SEX_WOMAN,"Button",BS_AUTORADIOBUTTON,80,54,26,
+                    14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_LOGIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 162
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 92
+    END
+
+    IDD_STAFF_EDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 225
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICONLOGIN           ICON    DISCARDABLE     "res\\icon1.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_PERSONNEL MENU DISCARDABLE 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "增加员工",                    IDR_ADD
+        MENUITEM "删除员工",                    IDR_DELETE
+        MENUITEM "修改员工",                    IDR_MODIFY
+    END
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
