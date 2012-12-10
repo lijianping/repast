@@ -7,7 +7,7 @@
 #include "MyListView.h"
 #include "StaffForm.h"
 #include "DBConnect.h" 
-#include "LoginForm.h"  /* for a test */
+#include "childwindowid.h"
 #include <WINDOWS.H>
 
 /* 引入外部变量，以下变量定义在main.cpp */
@@ -30,26 +30,6 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
         {
             CMyListView list_view;
             CreateList(g_hinstance, hwnd, list_view);
-            
-           
-            /* get data from database */
-/*            StaffForm staff;
-            if (!staff.Initialize(database.hdbc()))
-            {
-                return 0;
-            }
-            staff.GetRecordSet();
-            staff.MoveFirst();
-            int i = 0;
-            while (!staff.IsEOF())
-            {
-                list_view.InsertItem(staff.id(), i);
-                list_view.SetItem(staff.name(), i, 1);
-                staff.MoveNext();
-                i++;
-            } */
-
-            
             int count = list_view.column_count();
             char str[10];
  
@@ -83,7 +63,6 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
             char str[10];
             sprintf(str, "%d", count);
             MessageBox(hwnd, str, TEXT("LISTVIEW"), MB_OK | MB_ICONINFORMATION);
-/*          MessageBox(hwnd, TEXT("默认窗口处理函数"), TEXT("WIND"), MB_OK);*/
             return 0;
         }
  

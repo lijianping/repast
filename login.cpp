@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "LoginForm.h"
 #include "DBConnect.h"
+#include "childwindowid.h"
 
 
 /* 引入外部变量，以下变量定义在main.cpp */

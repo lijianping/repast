@@ -32,12 +32,6 @@
 #define IDR_MODIFY                      40003
 
 
-// user custom define
-
-#define ID_SERVICE_FOUNDING				90000      // service founding list view
-#define ID_PERSONNEL_INFO				90001      // personnel staff's information
-
-
 
 // user permission define
 #define PERMISSION_SERVICE				1   // Service Management
