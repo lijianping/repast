@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "LoginForm.h"
 #include "DBConnect.h"
+#include "childwindowid.h"
 
 
 /* 引入外部变量，以下变量定义在main.cpp */
@@ -65,11 +66,17 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                     {
                         /* get permission from database */
                         CLoginForm login;
-                        login.Initialize(database.hdbc());
+                        std::string error_information;
+                        if (!login.Initialize(database.hdbc(), error_information))
+                        {
+                            MessageBox(hwnd, error_information.c_str(),
+                                TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
+                            return FALSE;
+                        }
                         std::string name(user_name);
                         std::string password(user_password);
-                        std::string error_information;
-                        g_user_permission = login.GetUserPermission(name, password, error_information);
+                        g_user_permission = login.GetUserPermission(name, password,
+                                                                    error_information);
                         if (0 == g_user_permission)
                         {
                             MessageBox(hwnd, error_information.c_str(),

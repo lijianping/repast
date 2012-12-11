@@ -2,6 +2,7 @@
 #include "MyListView.h"
 #include "DBConnect.h"
 #include "resource.h"
+#include "childwindowid.h"
 
 /*#include <WINDOWS.H>*/
 
@@ -19,7 +20,10 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
 /* The Service Management window processes */
 LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam);
-/* The Personnel Management window process */
+/* 
+ * 说明: 人事部门窗口过程处理函数
+ * The Personnel Management window process
+ **/
 LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK ListProcesses(HWND hwnd, UINT message,
@@ -64,7 +68,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         {
             CWind user;
             DWORD style = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+            
             user.SetWindowInfo(hInstance, TEXT("人事管理"), style);
+            user.set_window_width(800);
+            user.set_window_height(600);
             user.set_window_processes((LONG)PersonnelProcesses);
             user.set_show_state(nShowCmd);
             user.UserCreateWindow();
