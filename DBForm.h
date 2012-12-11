@@ -16,7 +16,7 @@ class CDBForm
 public:
 	CDBForm();
 	virtual ~CDBForm();
-    bool Initialize(SQLHDBC hdbc);
+    bool Initialize(SQLHDBC hdbc, std::string &information);
     bool IsEOF();
     bool MoveFirst();
     bool MoveNext();

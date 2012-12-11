@@ -25,14 +25,14 @@ CDBForm::~CDBForm()
  * 说明: 初始化基类
  * 参数:
  *       hdbc    [in] 数据库连接句柄
+ *       information [out] 连接错误信息
  * 返回值: 执行成功返回true，否则返回false
  */
-bool CDBForm::Initialize(SQLHDBC hdbc)
+bool CDBForm::Initialize(SQLHDBC hdbc, std::string &information)
 {
     if (NULL == hdbc)
     {
-        MessageBox(NULL, TEXT("连接断开，请先连接数据库！"),
-                   TEXT("DBForm"), MB_OK | MB_ICONERROR);
+        information = "连接断开，请先连接数据库！";
         return false;
     }
     m_hdbc_ = hdbc;
@@ -41,8 +41,7 @@ bool CDBForm::Initialize(SQLHDBC hdbc)
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        MessageBox(NULL, TEXT("分配数据库语句句柄失败！"),
-                   TEXT("DBForm"), MB_OK | MB_ICONERROR);
+        information = "分配数据库语句句柄失败！";
         return false;
     }
     /* 设置滚动游标 */
@@ -52,8 +51,7 @@ bool CDBForm::Initialize(SQLHDBC hdbc)
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        MessageBox (NULL, TEXT("设置数据库滚动游标失败！"),
-                    TEXT("DBForm"), MB_OK | MB_ICONERROR);
+        information = "设置数据库滚动游标失败！";
         return false;
 	}
     /*设置并发性*/
@@ -63,8 +61,7 @@ bool CDBForm::Initialize(SQLHDBC hdbc)
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        MessageBox (NULL, TEXT("设置数据库并发性失败！"),
-                    TEXT("DBForm"), MB_OK | MB_ICONERROR);
+        information = "设置数据库并发性失败！";
         return false;
     }
 	return true;
