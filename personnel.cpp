@@ -37,6 +37,18 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
         return 0;
     case WM_LBUTTONDOWN:
         {
+            MessageBox(hwnd, TEXT("Left button down!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
+                break;
+            return 0;
+        }
+    case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))  
+            {
+             case ID_PERSONNEL_QUERY:
+                MessageBox(hwnd, TEXT("Start query!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
+                break;
+            }
             return 0;
         }
  
@@ -528,9 +540,9 @@ bool CreatePersonnelQuery(HWND hwnd, std::string &error_info)
     }
     HWND query_hwnd(NULL);
     query_hwnd = CreateWindow(TEXT("button"), TEXT("开始查询"), WS_CHILD | WS_VISIBLE | WS_TABSTOP |
-        ES_CENTER | BS_PUSHBUTTON, 450, 50, 8 * width,
-        height + 10, hwnd, (HMENU)ID_PERSONNEL_QUERY,
-        g_hinstance, NULL);
+                              ES_CENTER | BS_PUSHBUTTON, 450, 50, 8 * width,
+                              height + 10, hwnd, (HMENU)ID_PERSONNEL_QUERY,
+                              g_hinstance, NULL);
     if (NULL == query_hwnd)
     {
         error_info = "创建“开始查询”按钮失败！";
