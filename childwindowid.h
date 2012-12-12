@@ -19,4 +19,4 @@
 #define ID_WOMAN                        90013      /* woman sex */
 #define	ID_QUERY              			65536     /* personnel query button */
 
-#define  ID_TEST 		0x00000001L      
+    
