@@ -24,49 +24,38 @@ bool CreateList(HINSTANCE hinstance, HWND hwnd, CMyListView &list_view);
 LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
 {
-    static HINSTANCE hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
+    HINSTANCE hinstance;
     switch (message)
     {
     case WM_CREATE:
         {
+            hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
             CMyListView list_view;
-            CreateList(hinstance, hwnd, list_view);
-            int count = list_view.column_count();
-            char str[10];
- 
-            sprintf(str, "%d", count);
-            if (g_is_connect)
-            {
-                MessageBox(hwnd, TEXT("connect to database"), TEXT("LISTVIEW"), MB_OK | MB_ICONINFORMATION);
-            }
-            MessageBox(hwnd, str, TEXT("LISTVIEW"), MB_OK | MB_ICONINFORMATION);
-            
+            CreateList(hinstance, hwnd, list_view); /* Create list view */
             return 0;
         }
     case WM_SETFOCUS:
-        SetFocus(GetDlgItem(hwnd, ID_SERVICE_FOUNDING));
-        return 0;
+        {
+            SetFocus(GetDlgItem(hwnd, ID_SERVICE_FOUNDING));
+            return 0;
+        }
     case WM_LBUTTONDOWN:
         {
-            CMyListView list_view;
-            list_view.set_hwnd(GetDlgItem(hwnd, ID_SERVICE_FOUNDING));
-            std::string name;
-            std::string age, grade;
-            list_view.GetItem(0, 0, name);
-            list_view.GetItem(0, 1, age);
-            list_view.GetItem(0, 2, grade);
-            std::string data;
-            data += name;
-            data += age; 
-            data += grade;
-            MessageBox(hwnd, data.c_str(), TEXT("LISTVIEW"), MB_OK | MB_ICONINFORMATION);
-            int count = list_view.GetItemCount();
-            char str[10];
-            sprintf(str, "%d", count);
-            MessageBox(hwnd, str, TEXT("LISTVIEW"), MB_OK | MB_ICONINFORMATION);
             return 0;
         }
  
+    case WM_COMMAND:
+        {
+            if (LOWORD (wParam) == ID_SERVICE_FOUNDING && HIWORD (wParam) == LBN_SELCHANGE)
+            {
+                HWND list_hwnd = GetDlgItem(hwnd, ID_SERVICE_FOUNDING);
+                int index = SendMessage(list_hwnd, LB_GETCURSEL, 0, 0);
+                TCHAR select[20];
+                sprintf(select, TEXT("You choiced %d!"), index);
+                MessageBox(hwnd, select, TEXT("SERVICE"), MB_ICONINFORMATION | MB_OK);
+            }
+            return 0;
+        }
     case WM_DESTROY:
         {
             PostQuitMessage(0);
@@ -86,32 +75,14 @@ LRESULT CALLBACK ListProcesses(HWND hwnd, UINT message,
 {
     switch (message)
     {
-    case WM_LBUTTONDOWN:
-        {
-            
-            break;
-        }
-    case WM_RBUTTONDOWN:
+    case WM_LBUTTONDBLCLK:
         {
             CMyListView list_view;
             list_view.set_hwnd(hwnd);
-            int index = list_view.GetCursor();
-            char str[10];
-            sprintf(str, "%d", index);
+            int index = list_view.GetCurSel();
+            char str[20];
+            sprintf(str, "You choiced %d", index);
             MessageBox(hwnd, str, TEXT("list"), MB_ICONINFORMATION | MB_OK);
-            break;
-        }
-    case WM_COMMAND:
-        {
-            if (LOWORD(wParam) == ID_SERVICE_FOUNDING && HIWORD(wParam) == LBN_SELCHANGE)
-            {
-                CMyListView list_view;
-                list_view.set_hwnd(hwnd);
-                int index = list_view.GetCursor();
-                char str[10];
-                sprintf(str, "%d", index);
-                MessageBox(hwnd, str, TEXT("list"), MB_ICONINFORMATION | MB_OK);
-            }
             break;
         }
     }

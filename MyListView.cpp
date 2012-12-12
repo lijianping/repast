@@ -257,16 +257,16 @@ int CMyListView::GetItemCount()
 
 void CMyListView::SetSelectd(const int index)
 {
-    ListView_SetItemState(m_hwnd_,index,LVIS_SELECTED,LVIS_SELECTED);
+    ListView_SetItemState(m_hwnd_, index, LVIS_SELECTED, LVIS_SELECTED);
 }
 
 /*
  * 说明: 获取list view中光标中的行号
- * 返回值: 返回所获取的行号
+ * 返回值: 返回所获取的行号，由0开始
  * **/
-int CMyListView::GetCursor()
+int CMyListView::GetCurSel() const
 {
-    return SendMessage(m_hwnd_, LB_GETCURSEL, 0, 0);
+    return ListView_GetSelectionMark(m_hwnd_);
 }
 
 

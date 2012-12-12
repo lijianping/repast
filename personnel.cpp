@@ -11,7 +11,7 @@ extern CDBConnect database;
 
 /* only used in this file */
 WNDPROC old_list_processes;
-HINSTANCE g_hinstance;
+
 
 LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
@@ -22,7 +22,6 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
     case WM_CREATE:
         {
             hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
-            g_hinstance = hinstance;
             std::string error_info;
             if (!CreateStaffListView(hinstance, hwnd, error_info))
             {
@@ -30,14 +29,14 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
                            TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
                 return 0;
             }
-            /* TODO: add button of find user.
-             **/
             InitWindow(hinstance, hwnd, error_info);
             return 0;
         }
     case WM_SETFOCUS:
-        SetFocus(GetDlgItem(hwnd, ID_SERVICE_FOUNDING));
-        return 0;
+        {
+            SetFocus(GetDlgItem(hwnd, ID_PERSONNEL_INFO));
+            return 0;
+        }
     case WM_LBUTTONDOWN:
         {
             MessageBox(hwnd, TEXT("Left button down!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
@@ -72,7 +71,9 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
 LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
                                WPARAM wParam, LPARAM lParam)
 {
-    static HMENU menu;
+    HMENU menu;
+    HINSTANCE hinstance = (HINSTANCE)GetWindowLong(GetParent(hwnd), GWL_HINSTANCE);
+    static int selected_row; /* current selected row */
     switch (message)
     {
     case WM_LBUTTONDOWN:
@@ -82,8 +83,11 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
         }
     case WM_RBUTTONDOWN:
         {
-            menu = LoadMenu(g_hinstance, MAKEINTRESOURCE(IDR_PERSONNEL));
+            menu = LoadMenu(hinstance, MAKEINTRESOURCE(IDR_PERSONNEL));
             menu = GetSubMenu(menu, 0);
+            CMyListView list;
+            list.set_hwnd(hwnd);
+            selected_row = list.GetCurSel();
             POINT point;
             point.x = LOWORD(lParam);
             point.y = HIWORD(lParam);
@@ -103,18 +107,18 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
                     STAFFINFO staff_info;
                     list.set_hwnd(hwnd);
                     std::string text;
-                    list.GetItem(1, 0, text); /* Get staff's id */
+                    list.GetItem(selected_row, 0, text); /* Get staff's id */
                     staff_info.id = text; 
-                    list.GetItem(1, 1, text); /* Get staff's name */
+                    list.GetItem(selected_row, 1, text); /* Get staff's name */
                     staff_info.name = text;
-                    list.GetItem(1, 2, text); /* Get staff's sex */
+                    list.GetItem(selected_row, 2, text); /* Get staff's sex */
                     staff_info.sex = text;
-                    list.GetItem(1, 3, text); /* Get staff's age */
+                    list.GetItem(selected_row, 3, text); /* Get staff's age */
                     staff_info.age = text;
                     list.GetItem(1, 4, text); /* Get staff's salary */
                     staff_info.salary = text;
   
-                    DialogBoxParam(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+                    DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
                               (DLGPROC)EditStaff, (long)&staff_info);
                     break;
                 }
@@ -245,6 +249,7 @@ bool CreateStaffListView(HINSTANCE hinstance, HWND hwnd, std::string &informatio
         staff.MoveNext();
         i++;
     }
+    list_view.SetSelectd(0);
     return true;
  }
 
