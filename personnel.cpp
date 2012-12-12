@@ -39,29 +39,20 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
         return 0;
     case WM_LBUTTONDOWN:
         {
+            MessageBox(hwnd, TEXT("Left button down!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
+                break;
             return 0;
         }
-	case WM_COMMAND:
-		{	
-			char tmp[50];
-// 		 sprintf(tmp, "w=%o, l= %o,lw=%d,hl= %d", wParam, lParam, LOWORD(wParam), HIWORD(lParam));
-// 			MessageBox(NULL, tmp, "FD",0);
-		switch(wParam)
-		{
-			case ID_PERSONNEL_STAFF_SEX:
-			{
-				SendMessage (GetDlgItem(hwnd, ID_QUERY), BM_GETCHECK, 0, 0);
-				MessageBox(NULL, "FDF", "FD",0);
-				break;
-			}
-			case ID_QUERY:
-				{
-					MessageBox(hwnd, "test", "test", 0);
-					break;
-				}
-		}
-	    return 0;
-		}
+    case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))  
+            {
+             case ID_PERSONNEL_QUERY:
+                MessageBox(hwnd, TEXT("Start query!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
+                break;
+            }
+            return 0;
+        }
  
     case WM_DESTROY:
         {
@@ -107,9 +98,21 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
             {
             case IDR_ADD:
                 /* TODO: send the list view content to dialog */
-                DialogBox(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
-                          (DLGPROC)EditStaff);
-                break;
+                {
+                    CMyListView list;
+                    list.set_hwnd(hwnd);
+                    std::string text;
+                    list.GetItem(1, 1, text);
+                    STAFFINFO staff_info;
+                    staff_info.name = text;
+                    MessageBox(hwnd, text.c_str(), TEXT("PERSONNEL"), MB_ICONINFORMATION | MB_OK);
+                    STAFFINFO* pstaff = &staff_info;
+                    SetWindowLong(GetDlgItem(hwnd, IDD_STAFF_EDIT), GWL_USERDATA, (long)pstaff);
+                    DialogBox(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+                              (DLGPROC)EditStaff);
+                    break;
+                }
+                
             case IDR_DELETE:
                 MessageBox(hwnd, TEXT("You choiced delete staff"), TEXT("PERSONNEL"), MB_OK | MB_ICONINFORMATION);
                 break;
@@ -127,6 +130,7 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
 BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
 {
+   
     switch (message)
     {
       case WM_INITDIALOG:
@@ -145,6 +149,10 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
             MoveWindow(hwnd, (screen_width - login_width) / 2,
                       (screen_height - login_height) / 2, login_width,
                       login_height, TRUE);
+            STAFFINFO *staff_info;
+            staff_info = (STAFFINFO *)GetWindowLong(hwnd, GWL_USERDATA);
+            SetDlgItemText(hwnd, IDC_STAFF_NAME, /*staff_info->name.c_str()*/TEXT("example"));
+            /* HIT: This is used to modify windows icon. */
 //             HICON login_icon = LoadIcon(g_hinstance, MAKEINTRESOURCE(IDI_ICONLOGIN));
 //             if (login_icon)
 //             {
@@ -551,9 +559,9 @@ bool CreatePersonnelQuery(HWND hwnd, std::string &error_info)
     }
     HWND query_hwnd(NULL);
     query_hwnd = CreateWindow(TEXT("button"), TEXT("开始查询"), WS_CHILD | WS_VISIBLE | WS_TABSTOP |
-        ES_CENTER | BS_PUSHBUTTON, 450, 50, 8 * width,
-        height + 10, hwnd, (HMENU)ID_QUERY,
-        g_hinstance, NULL);
+                              ES_CENTER | BS_PUSHBUTTON, 450, 50, 8 * width,
+                              height + 10, hwnd, (HMENU)ID_PERSONNEL_QUERY,
+                              g_hinstance, NULL);
     if (NULL == query_hwnd)
     {
         error_info = "创建“开始查询”按钮失败！";
