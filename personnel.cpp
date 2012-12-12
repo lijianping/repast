@@ -96,9 +96,21 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
             {
             case IDR_ADD:
                 /* TODO: send the list view content to dialog */
-                DialogBox(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
-                          (DLGPROC)EditStaff);
-                break;
+                {
+                    CMyListView list;
+                    list.set_hwnd(hwnd);
+                    std::string text;
+                    list.GetItem(1, 1, text);
+                    STAFFINFO staff_info;
+                    staff_info.name = text;
+                    MessageBox(hwnd, text.c_str(), TEXT("PERSONNEL"), MB_ICONINFORMATION | MB_OK);
+                    STAFFINFO* pstaff = &staff_info;
+                    SetWindowLong(GetDlgItem(hwnd, IDD_STAFF_EDIT), GWL_USERDATA, (long)pstaff);
+                    DialogBox(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+                              (DLGPROC)EditStaff);
+                    break;
+                }
+                
             case IDR_DELETE:
                 MessageBox(hwnd, TEXT("You choiced delete staff"), TEXT("PERSONNEL"), MB_OK | MB_ICONINFORMATION);
                 break;
@@ -116,6 +128,7 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
 BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
 {
+   
     switch (message)
     {
       case WM_INITDIALOG:
@@ -134,6 +147,10 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
             MoveWindow(hwnd, (screen_width - login_width) / 2,
                       (screen_height - login_height) / 2, login_width,
                       login_height, TRUE);
+            STAFFINFO *staff_info;
+            staff_info = (STAFFINFO *)GetWindowLong(hwnd, GWL_USERDATA);
+            SetDlgItemText(hwnd, IDC_STAFF_NAME, /*staff_info->name.c_str()*/TEXT("example"));
+            /* HIT: This is used to modify windows icon. */
 //             HICON login_icon = LoadIcon(g_hinstance, MAKEINTRESOURCE(IDI_ICONLOGIN));
 //             if (login_icon)
 //             {

@@ -118,3 +118,14 @@ bool CreatePersonnelQuery(HWND hwnd, std::string &error_info);
  * 返回值: 若执行成功，返回true；否则返回false。
  **/
 bool InitWindow(HWND hwnd, std::string &error_info);
+
+
+/* struct define */
+typedef struct StaffInfo
+{
+    std::string id;
+    std::string name;
+    std::string sex;
+    short age;
+    double salary;
+}STAFFINFO;
