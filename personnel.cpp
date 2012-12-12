@@ -6,22 +6,25 @@
 #include "personnel.h"
 
 /* 引入外部变量，以下变量定义在main.cpp */
-extern HINSTANCE g_hinstance;
 extern bool g_is_connect;
 extern CDBConnect database;
 
 /* only used in this file */
 WNDPROC old_list_processes;
+HINSTANCE g_hinstance;
 
 LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
 {
+    static HINSTANCE hinstance;
     switch (message)
     {
     case WM_CREATE:
         {
+            hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
+            g_hinstance = hinstance;
             std::string error_info;
-            if (!CreateStaffListView(hwnd, error_info))
+            if (!CreateStaffListView(hinstance, hwnd, error_info))
             {
                 MessageBox(hwnd, error_info.c_str(),
                            TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
@@ -29,7 +32,7 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
             }
             /* TODO: add button of find user.
              **/
-            InitWindow(hwnd, error_info);
+            InitWindow(hinstance, hwnd, error_info);
             return 0;
         }
     case WM_SETFOCUS:
@@ -70,7 +73,6 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
                                WPARAM wParam, LPARAM lParam)
 {
     static HMENU menu;
-
     switch (message)
     {
     case WM_LBUTTONDOWN:
@@ -98,16 +100,22 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
                 /* TODO: send the list view content to dialog */
                 {
                     CMyListView list;
+                    STAFFINFO staff_info;
                     list.set_hwnd(hwnd);
                     std::string text;
-                    list.GetItem(1, 1, text);
-                    STAFFINFO staff_info;
+                    list.GetItem(1, 0, text); /* Get staff's id */
+                    staff_info.id = text; 
+                    list.GetItem(1, 1, text); /* Get staff's name */
                     staff_info.name = text;
-                    MessageBox(hwnd, text.c_str(), TEXT("PERSONNEL"), MB_ICONINFORMATION | MB_OK);
-                    STAFFINFO* pstaff = &staff_info;
-                    SetWindowLong(GetDlgItem(hwnd, IDD_STAFF_EDIT), GWL_USERDATA, (long)pstaff);
-                    DialogBox(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
-                              (DLGPROC)EditStaff);
+                    list.GetItem(1, 2, text); /* Get staff's sex */
+                    staff_info.sex = text;
+                    list.GetItem(1, 3, text); /* Get staff's age */
+                    staff_info.age = text;
+                    list.GetItem(1, 4, text); /* Get staff's salary */
+                    staff_info.salary = text;
+  
+                    DialogBoxParam(g_hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+                              (DLGPROC)EditStaff, (long)&staff_info);
                     break;
                 }
                 
@@ -128,7 +136,7 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
 BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
 {
-   
+    
     switch (message)
     {
       case WM_INITDIALOG:
@@ -147,9 +155,13 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
             MoveWindow(hwnd, (screen_width - login_width) / 2,
                       (screen_height - login_height) / 2, login_width,
                       login_height, TRUE);
-            STAFFINFO *staff_info;
-            staff_info = (STAFFINFO *)GetWindowLong(hwnd, GWL_USERDATA);
-            SetDlgItemText(hwnd, IDC_STAFF_NAME, /*staff_info->name.c_str()*/TEXT("example"));
+            STAFFINFO *info = (STAFFINFO *)lParam;
+            SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
+            SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
+           
+            SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
+            SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
+//            SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age);
             /* HIT: This is used to modify windows icon. */
 //             HICON login_icon = LoadIcon(g_hinstance, MAKEINTRESOURCE(IDI_ICONLOGIN));
 //             if (login_icon)
@@ -180,7 +192,7 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
 }
 
 
-bool CreateStaffListView(HWND hwnd, std::string &information)
+bool CreateStaffListView(HINSTANCE hinstance, HWND hwnd, std::string &information)
 {
     CMyListView list_view;
     RECT service_rect;
@@ -190,7 +202,7 @@ bool CreateStaffListView(HWND hwnd, std::string &information)
     list_view.set_list_view_id(ID_PERSONNEL_INFO);
     list_view.set_list_view_height(height / 4 * 3 - 40);
     list_view.set_list_view_width(width - 40 );
-    list_view.set_hinstance(g_hinstance);
+    list_view.set_hinstance(hinstance);
     list_view.set_parent_hwnd(hwnd);
     POINT origin;
     origin.x = 20;
@@ -269,14 +281,14 @@ bool GetTextInfo(HWND hwnd, int &width, int &height)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateGroupBox(HWND hwnd, std::string &error_info)
+bool CreateGroupBox(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	HWND group_hwnd;
 	bool is_ok = true;
 	group_hwnd = CreateWindow(TEXT("button"), TEXT("查询条件"), 
                               WS_CHILD | WS_VISIBLE | BS_GROUPBOX,
                               20, 10, 400, 125, hwnd, NULL,
-                              g_hinstance, NULL);
+                              hinstance, NULL);
 	if (NULL == group_hwnd)
 	{
 		error_info = "创建“查询条件”组合框失败！";
@@ -292,7 +304,7 @@ bool CreateGroupBox(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateNumEdit(HWND hwnd, std::string &error_info)
+bool CreateNumEdit(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -303,7 +315,7 @@ bool CreateNumEdit(HWND hwnd, std::string &error_info)
 	HWND number_hwnd(NULL);
 	number_hwnd = CreateWindow(TEXT("static"), TEXT("编号"), WS_CHILD | WS_BORDER |
                                ES_CENTER | WS_VISIBLE, 30, 50, 4 * width, height + 5, hwnd,
-                               NULL, g_hinstance, NULL);
+                               NULL, hinstance, NULL);
 	if (NULL == number_hwnd)
 	{
 		error_info = "创建“编号”提示失败！";
@@ -312,7 +324,7 @@ bool CreateNumEdit(HWND hwnd, std::string &error_info)
 	number_hwnd = CreateWindow(TEXT("edit"), NULL, WS_CHILD | WS_VISIBLE |
                                WS_BORDER | WS_TABSTOP | ES_LEFT, 100, 50,
 							   10 * width, height + 5, hwnd, 
-							   (HMENU)ID_PERSONNEL_STAFF_ID, g_hinstance, NULL);
+							   (HMENU)ID_PERSONNEL_STAFF_ID, hinstance, NULL);
 	if (NULL == number_hwnd)
 	{
 		error_info = "创建“编号”编辑框失败！";
@@ -328,7 +340,7 @@ bool CreateNumEdit(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateNameEdit(HWND hwnd, std::string &error_info)
+bool CreateNameEdit(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -339,7 +351,7 @@ bool CreateNameEdit(HWND hwnd, std::string &error_info)
 	HWND name_hwnd(NULL);
 	name_hwnd = CreateWindow(TEXT("button"), TEXT("姓名"),WS_CHILD | /*WS_BORDER |*/
                              ES_CENTER | WS_TABSTOP | WS_VISIBLE | BS_AUTOCHECKBOX, 225, 50,
-							 6 * width, height + 5, hwnd, NULL, g_hinstance, NULL);
+							 6 * width, height + 5, hwnd, NULL, hinstance, NULL);
 	if (NULL == name_hwnd)
 	{
 		error_info = "创建“姓名”复选框失败！";
@@ -347,7 +359,7 @@ bool CreateNameEdit(HWND hwnd, std::string &error_info)
 	}
 	name_hwnd = CreateWindow(TEXT("edit"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER |
                           	 WS_TABSTOP | ES_LEFT, 295, 50, 10 * width, height + 5,
-							 hwnd, (HMENU)ID_PERSONNEL_STAFF_NAME, g_hinstance, NULL);
+							 hwnd, (HMENU)ID_PERSONNEL_STAFF_NAME, hinstance, NULL);
 	if (NULL == name_hwnd)
 	{
 		error_info = "创建“姓名”编辑框失败！";
@@ -363,7 +375,7 @@ bool CreateNameEdit(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateSexBox(HWND hwnd, std::string &error_info)
+bool CreateSexBox(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -374,7 +386,7 @@ bool CreateSexBox(HWND hwnd, std::string &error_info)
 	HWND sex_hwnd(NULL);
 	sex_hwnd = CreateWindow(TEXT("button"), TEXT("性别"),WS_CHILD | /*WS_BORDER |*/
                             ES_CENTER | WS_VISIBLE | BS_AUTOCHECKBOX, 30, 90, 6 * width,
-                            height + 5, hwnd, NULL, g_hinstance, NULL);
+                            height + 5, hwnd, NULL, hinstance, NULL);
     if (NULL == sex_hwnd)
 	{
 		error_info = "创建“性别”复选框失败！";
@@ -383,7 +395,7 @@ bool CreateSexBox(HWND hwnd, std::string &error_info)
 	sex_hwnd = CreateWindow(TEXT("button"), TEXT("男"), WS_CHILD | WS_VISIBLE | ES_CENTER |
 							WS_TABSTOP | /*WS_BORDER |*/ BS_AUTORADIOBUTTON, 100,
 							90, 4 * width, height + 5, hwnd,(HMENU)ID_MAN,
-							g_hinstance, NULL);
+							hinstance, NULL);
 	if (NULL == sex_hwnd)
 	{
 		error_info = "创建“男”选择按钮失败！";
@@ -392,7 +404,7 @@ bool CreateSexBox(HWND hwnd, std::string &error_info)
 	sex_hwnd = CreateWindow(TEXT("button"), TEXT("女"), WS_CHILD | WS_VISIBLE | WS_TABSTOP |
                               ES_CENTER | /*WS_BORDER |*/ BS_AUTORADIOBUTTON, 100 + 4 * width + 10,
 							  90, 4 * width, height + 5, hwnd, (HMENU)ID_WOMAN,
-							  g_hinstance, NULL);
+							  hinstance, NULL);
     if (NULL == sex_hwnd)
     {
         error_info = "创建“女”选择按钮失败！";
@@ -408,7 +420,7 @@ bool CreateSexBox(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateDeptCombo(HWND hwnd, std::string &error_info)
+bool CreateDeptCombo(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -420,7 +432,7 @@ bool CreateDeptCombo(HWND hwnd, std::string &error_info)
 	dept_hwnd = CreateWindow(TEXT("button"), TEXT("部门"),WS_CHILD | /*WS_BORDER |*/
                              ES_CENTER | WS_TABSTOP | WS_VISIBLE | BS_AUTOCHECKBOX, 225, 90,
 							 6 * width, height + 5, hwnd, (HMENU)ID_PERSONNEL_DEPT,
-							 g_hinstance, NULL);
+							 hinstance, NULL);
     if (NULL == dept_hwnd)
     {
 		error_info = "创建“部门”复选框失败！";
@@ -430,7 +442,7 @@ bool CreateDeptCombo(HWND hwnd, std::string &error_info)
                              ES_CENTER | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS |
                              CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL, 295, 90, 10 * width,
                              height + 5, hwnd, (HMENU)ID_PERSONNEL_DEPT_COMBO,
-                             g_hinstance, NULL);
+                             hinstance, NULL);
     if (NULL == dept_hwnd)
     {
         error_info = "创建“部门”下拉框失败！";
@@ -446,7 +458,7 @@ bool CreateDeptCombo(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateStaffSum(HWND hwnd, std::string &error_info)
+bool CreateStaffSum(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -457,7 +469,7 @@ bool CreateStaffSum(HWND hwnd, std::string &error_info)
 	HWND sum_hwnd(NULL);
 	sum_hwnd = CreateWindow(TEXT("static"), TEXT("员工人数"),WS_CHILD  | WS_VISIBLE | 
 							ES_CENTER | WS_BORDER, 600, 10, 7 * width, height + 5, hwnd,
-							NULL, g_hinstance, NULL);
+							NULL, hinstance, NULL);
 	if (NULL == sum_hwnd)
 	{
 		error_info = "创建“员工人数”提示失败！";
@@ -466,7 +478,7 @@ bool CreateStaffSum(HWND hwnd, std::string &error_info)
 	sum_hwnd = CreateWindow(TEXT("edit"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER |
 							WS_TABSTOP | ES_READONLY | ES_LEFT, 680, 10, 10 * width,
 							height + 5, hwnd, (HMENU)ID_PERSONNEL_STAFF_SUM,
-							g_hinstance, NULL);
+							hinstance, NULL);
 	if (NULL == sum_hwnd)
 	{
 		error_info = "创建“员工人数”编辑框失败！";
@@ -482,7 +494,7 @@ bool CreateStaffSum(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateDeptSum(HWND hwnd, std::string &error_info)
+bool CreateDeptSum(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -493,7 +505,7 @@ bool CreateDeptSum(HWND hwnd, std::string &error_info)
 	HWND sum_hwnd(NULL);
 	sum_hwnd = CreateWindow(TEXT("static"), TEXT("部门总数"), WS_CHILD | WS_VISIBLE |
 							ES_CENTER | WS_BORDER, 600, 50, 7 * width, height + 5, hwnd,
-							NULL, g_hinstance, NULL);
+							NULL, hinstance, NULL);
 	if (NULL == sum_hwnd)
 	{
 		error_info = "创建“部门总数”提示失败！";
@@ -502,7 +514,7 @@ bool CreateDeptSum(HWND hwnd, std::string &error_info)
 	sum_hwnd = CreateWindow(TEXT("edit"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER |
 							WS_TABSTOP | ES_READONLY | ES_LEFT, 680, 50, 10 * width,
 							height + 5, hwnd, (HMENU)ID_PERSONNEL_DEPT_SUM,
-							g_hinstance, NULL);
+							hinstance, NULL);
 	if (NULL == sum_hwnd)
 	{
 		error_info = "创建“部门总数”编辑框失败！";
@@ -518,7 +530,7 @@ bool CreateDeptSum(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  */
-bool CreateCurrentSum(HWND hwnd, std::string &error_info)
+bool CreateCurrentSum(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
 	int width(0), height(0);
 	if (!GetTextInfo(hwnd, width, height))
@@ -529,7 +541,7 @@ bool CreateCurrentSum(HWND hwnd, std::string &error_info)
 	HWND sum_hwnd(NULL);
 	sum_hwnd = CreateWindow(TEXT("static"), TEXT("当前人数"), WS_CHILD  | WS_VISIBLE |
 							ES_CENTER | WS_BORDER, 600, 90, 7 * width, height + 5, hwnd, NULL,
-							g_hinstance, NULL);
+							hinstance, NULL);
 	if (NULL == sum_hwnd)
 	{
 		error_info = "创建“当前人数”提示失败！";
@@ -538,7 +550,7 @@ bool CreateCurrentSum(HWND hwnd, std::string &error_info)
 	sum_hwnd = CreateWindow(TEXT("edit"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER |
 							WS_TABSTOP | ES_READONLY | ES_LEFT, 680, 90, 10 * width,
 							height + 5, hwnd, (HMENU)ID_CURRENT_RECORD_SUM,
-							g_hinstance, NULL);
+							hinstance, NULL);
 	if (NULL == sum_hwnd)
 	{
 		error_info = "创建“当前人数”编辑框失败！";
@@ -547,7 +559,7 @@ bool CreateCurrentSum(HWND hwnd, std::string &error_info)
 	return true;
 }
 
-bool CreatePersonnelQuery(HWND hwnd, std::string &error_info)
+bool CreatePersonnelQuery(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
     int width(0), height(0);
     if (!GetTextInfo(hwnd, width, height))
@@ -559,7 +571,7 @@ bool CreatePersonnelQuery(HWND hwnd, std::string &error_info)
     query_hwnd = CreateWindow(TEXT("button"), TEXT("开始查询"), WS_CHILD | WS_VISIBLE | WS_TABSTOP |
                               ES_CENTER | BS_PUSHBUTTON, 450, 50, 8 * width,
                               height + 10, hwnd, (HMENU)ID_PERSONNEL_QUERY,
-                              g_hinstance, NULL);
+                              hinstance, NULL);
     if (NULL == query_hwnd)
     {
         error_info = "创建“开始查询”按钮失败！";
@@ -575,41 +587,41 @@ bool CreatePersonnelQuery(HWND hwnd, std::string &error_info)
  *       error_info [out] 创建失败时的错误信息
  * 返回值: 若执行成功，返回true；否则返回false。
  **/
-bool InitWindow(HWND hwnd, std::string &error_info)
+bool InitWindow(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
-    if (!CreateGroupBox(hwnd, error_info))
+    if (!CreateGroupBox(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateNumEdit(hwnd, error_info))
+    if (!CreateNumEdit(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateNameEdit(hwnd, error_info))
+    if (!CreateNameEdit(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateSexBox(hwnd, error_info))
+    if (!CreateSexBox(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateDeptCombo(hwnd, error_info))
+    if (!CreateDeptCombo(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateStaffSum(hwnd, error_info))
+    if (!CreateStaffSum(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateDeptSum(hwnd, error_info))
+    if (!CreateDeptSum(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreateCurrentSum(hwnd, error_info))
+    if (!CreateCurrentSum(hinstance, hwnd, error_info))
     {
         return false;
     }
-    if (!CreatePersonnelQuery(hwnd, error_info))
+    if (!CreatePersonnelQuery(hinstance, hwnd, error_info))
     {
         return false;
     }

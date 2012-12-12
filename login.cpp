@@ -9,13 +9,13 @@
 
 
 /* 引入外部变量，以下变量定义在main.cpp */
-extern int g_user_permission;
-extern HINSTANCE g_hinstance;
 extern CDBConnect database;
 
 BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
 {
+    HINSTANCE hinstance = (HINSTANCE)lParam;  /* The program handle */
+    long return_value = 0;
     switch (message)
     {
     case WM_INITDIALOG:
@@ -34,7 +34,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
             MoveWindow(hwnd, (screen_width - login_width) / 2,
                        (screen_height - login_height) / 2, login_width,
                        login_height, TRUE);
-            HICON login_icon = LoadIcon(g_hinstance, MAKEINTRESOURCE(IDI_ICONLOGIN));
+            HICON login_icon = LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICONLOGIN));
             if (login_icon)
             {
                 SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)login_icon);
@@ -75,16 +75,17 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                         }
                         std::string name(user_name);
                         std::string password(user_password);
-                        g_user_permission = login.GetUserPermission(name, password,
+                        return_value = login.GetUserPermission(name, password,
                                                                     error_information);
-                        if (0 == g_user_permission)
+                     
+                        if (0 == return_value)
                         {
                             MessageBox(hwnd, error_information.c_str(),
                                        TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
                             return FALSE;
                         }
                     }
-                    EndDialog(hwnd, LOWORD(wParam));
+                    EndDialog(hwnd, return_value);
                     break;
                 }
             case IDCANCEL:

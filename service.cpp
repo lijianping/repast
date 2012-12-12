@@ -11,7 +11,7 @@
 #include <WINDOWS.H>
 
 /* 引入外部变量，以下变量定义在main.cpp */
-extern HINSTANCE g_hinstance;
+/*extern HINSTANCE g_hinstance;*/
 extern bool g_is_connect;
 extern CDBConnect database;
 WNDPROC g_old_list_processes;
@@ -24,12 +24,13 @@ bool CreateList(HINSTANCE hinstance, HWND hwnd, CMyListView &list_view);
 LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
 {
+    static HINSTANCE hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
     switch (message)
     {
     case WM_CREATE:
         {
             CMyListView list_view;
-            CreateList(g_hinstance, hwnd, list_view);
+            CreateList(hinstance, hwnd, list_view);
             int count = list_view.column_count();
             char str[10];
  

@@ -9,8 +9,8 @@
 
 /* global variable */
 
-int g_user_permission = 0;
-HINSTANCE g_hinstance;
+// int g_user_permission = 0;
+/*HINSTANCE g_hinstance;*/
 bool g_is_connect;
 CDBConnect database;
 
@@ -34,6 +34,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nShowCmd)
 {
     std::string information;
+    int user_permission = 0;  /* The user permission flag */
     g_is_connect = database.Connect("repast", "repast", "repast", information);
     if (!g_is_connect)
     {
@@ -41,10 +42,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    TEXT("WINMAIN"), MB_OK | MB_ICONWARNING);
         return 0;
     }
-    g_hinstance = hInstance;
-    DialogBox(hInstance, MAKEINTRESOURCE(IDD_LOGIN), NULL,
-              (DLGPROC)LoginProcesses);
-    switch (g_user_permission)
+/*    g_hinstance = hInstance;*/
+    user_permission = DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_LOGIN), NULL,
+                                     (DLGPROC)LoginProcesses, (long)&hInstance);
+    switch (user_permission)
     {
     case PERMISSION_SERVICE:
         {
