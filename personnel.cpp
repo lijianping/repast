@@ -5,6 +5,7 @@
 #include "childwindowid.h"
 #include "personnel.h"
 
+
 /* 引入外部变量，以下变量定义在main.cpp */
 extern HINSTANCE g_hinstance;
 extern bool g_is_connect;
@@ -21,7 +22,8 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
     case WM_CREATE:
         {
             std::string error_info;
-            if (!CreateStaffListView(hwnd, error_info))
+            if (!CreateStaffListView(hwnd, error_info) ||
+				!InitWindow(hwnd, error_info))
             {
                 MessageBox(hwnd, error_info.c_str(),
                            TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
@@ -29,7 +31,7 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
             }
             /* TODO: add button of find user.
              **/
-            InitWindow(hwnd, error_info);
+            
             return 0;
         }
     case WM_SETFOCUS:
@@ -39,6 +41,27 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
         {
             return 0;
         }
+	case WM_COMMAND:
+		{	
+			char tmp[50];
+// 		 sprintf(tmp, "w=%o, l= %o,lw=%d,hl= %d", wParam, lParam, LOWORD(wParam), HIWORD(lParam));
+// 			MessageBox(NULL, tmp, "FD",0);
+		switch(wParam)
+		{
+			case ID_PERSONNEL_STAFF_SEX:
+			{
+				SendMessage (GetDlgItem(hwnd, ID_QUERY), BM_GETCHECK, 0, 0);
+				MessageBox(NULL, "FDF", "FD",0);
+				break;
+			}
+			case ID_QUERY:
+				{
+					MessageBox(hwnd, "test", "test", 0);
+					break;
+				}
+		}
+	    return 0;
+		}
  
     case WM_DESTROY:
         {
@@ -58,7 +81,7 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
                                WPARAM wParam, LPARAM lParam)
 {
     static HMENU menu;
-
+	
     switch (message)
     {
     case WM_LBUTTONDOWN:
@@ -529,7 +552,7 @@ bool CreatePersonnelQuery(HWND hwnd, std::string &error_info)
     HWND query_hwnd(NULL);
     query_hwnd = CreateWindow(TEXT("button"), TEXT("开始查询"), WS_CHILD | WS_VISIBLE | WS_TABSTOP |
         ES_CENTER | BS_PUSHBUTTON, 450, 50, 8 * width,
-        height + 10, hwnd, (HMENU)ID_PERSONNEL_QUERY,
+        height + 10, hwnd, (HMENU)ID_QUERY,
         g_hinstance, NULL);
     if (NULL == query_hwnd)
     {

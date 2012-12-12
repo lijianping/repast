@@ -207,7 +207,7 @@ bool CDBForm::ReportError(SQLHSTMT &hstmt, int handle_type, char *alert)
     char error_info[100] = "\0";
     SQLGetDiagRec(handle_type, hstmt, 1, sql_state, NULL,
                   (unsigned char *)message, 500, &message_length);
-    sprintf(error_info, "%s, %s", alert, message);
+    sprintf(error_info, " %s, %s", alert, message);
     MessageBox(NULL, error_info, TEXT("执行SQL时发生错误"),
                MB_OK | MB_ICONERROR);
     delete [] sql_state;

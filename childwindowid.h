@@ -17,4 +17,6 @@
 #define ID_PERSONNEL_DEPT_COMBO         90011      /* department select combo box */
 #define ID_MAN							90012      /* man sex */
 #define ID_WOMAN                        90013      /* woman sex */
-#define ID_PERSONNEL_QUERY              90014      /* personnel query button */
+#define	ID_QUERY              			65536     /* personnel query button */
+
+#define  ID_TEST 		0x00000001L      
