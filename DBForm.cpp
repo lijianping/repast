@@ -66,7 +66,6 @@ bool CDBForm::Initialize(SQLHDBC hdbc, std::string &information)
     }
 	return true;
 }
-
 /*
  * 说明: 判断是否到了记录集的结尾
  * 返回值: 到了结尾返回true，否则返回false
@@ -193,24 +192,139 @@ bool CDBForm::ExecuteSQL(char *sql_statement)
 /*
  * 说明: 报告错误信息
  **/
-bool CDBForm::ReportError(SQLHSTMT &hstmt, int handle_type, char *alert)
+bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &information)
 {
+	char message[500] = "\0";
+	short message_length(0);
+	char error_info[500] = "\0";
+	SQLINTEGER native_error = 0;
+    SQLSMALLINT record_number = 1;
     unsigned char *sql_state = new unsigned char[6];
     if (NULL == sql_state)
     {
-        MessageBox(NULL, TEXT("报告错误发生的原因是，分配sqlstate内存失败"),
-                   TEXT("错误"), MB_OK | MB_ICONERROR);
+		information = TEXT("报告错误发生的原因是，分配sqlstate内存失败");
 		return false;
     }
-    char message[500] = "\0";
-    short message_length(0);
-    char error_info[100] = "\0";
-    SQLGetDiagRec(handle_type, hstmt, 1, sql_state, NULL,
+ 
+    SQLGetDiagRec(handle_type, hdbc, record_number, sql_state, &native_error,
                   (unsigned char *)message, 500, &message_length);
-    sprintf(error_info, " %s, %s", alert, message);
-    MessageBox(NULL, error_info, TEXT("执行SQL时发生错误"),
-               MB_OK | MB_ICONERROR);
+	switch(native_error)
+	{
+	case 2627:
+		{
+			information +=  TEXT("不能输入重复的编号");
+		break;
+		}
+		/*TODO: Add other error infomation*/
+	default:
+		{
+			information += message;
+			break;
+		}
+	}
+//	alert = error_info;
     delete [] sql_state;
     sql_state = NULL;
     return true;
+}
+
+bool CDBForm::Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &information)
+{
+	/* 分配环境句柄 */
+    m_return_code_ = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &m_henv_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "分配环境句柄失败!";
+        return false;
+    }
+    /* 设置ODBC版本的环境属性 */
+    m_return_code_ = SQLSetEnvAttr(m_henv_, SQL_ATTR_ODBC_VERSION,
+        (void *)SQL_OV_ODBC3, 0);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "设置ODBC版本的环境属性失败!";
+        return false;
+    }
+    /* 分配连接句柄 */
+    m_return_code_ = SQLAllocHandle(SQL_HANDLE_DBC, m_henv_, &m_hdbc_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		information = "分配连接句柄失败!";
+        return false;
+    }
+    /* 连接数据源 */
+    m_return_code_ = SQLConnect(m_hdbc_, (SQLCHAR *)dsn, 
+        SQL_NTS,(SQLCHAR *)id, SQL_NTS,
+        (SQLCHAR *)password, SQL_NTS);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "连接数据源失败!";
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, information);
+        return false;
+    }
+	/* 分配语句句柄 */
+    m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "分配数据库语句句柄失败！";
+        return false;
+    }
+    /* 设置滚动游标 */
+    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
+		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
+		SQL_IS_INTEGER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "设置数据库滚动游标失败！";
+        return false;
+	}
+    /*设置并发性*/
+    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
+		(SQLPOINTER)SQL_CONCUR_ROWVER, 
+		SQL_IS_INTEGER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "设置数据库并发性失败！";
+        return false;
+    }
+	m_is_connect_ = true;
+    return m_is_connect_;
+}
+
+
+/*
+ * 功能: 断开与数据源的连接，释放资源
+ **/
+void CDBForm::Disconnect()
+{
+    /*
+     * HIT: There has something that we are not 
+     *      clear. When you disconnect database,
+     *      if has something wrong, you can check
+     *      here.
+     **/
+	if (NULL != m_hstmt_)
+	{
+		SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
+		m_hstmt_ = NULL;
+	}
+    if (NULL != m_hdbc_)
+    {
+        SQLDisconnect(m_hdbc_);
+        SQLFreeHandle(SQL_HANDLE_DBC, m_hdbc_);
+		m_hdbc_ = NULL;
+		m_is_connect_ = false;
+    }
+    if (NULL != m_henv_)
+    {
+        SQLFreeHandle(SQL_HANDLE_ENV, m_henv_);
+		m_henv_ = NULL;
+    }
 }

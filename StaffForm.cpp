@@ -71,7 +71,7 @@ bool StaffForm::InsertInfo(char *user_id, char *user_name,
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        ReportError(m_hstmt_, SQL_HANDLE_STMT, "执行SQL语句失败，不能执行");
+    //    ReportError(m_hstmt_, SQL_HANDLE_STMT, "执行SQL语句失败，不能执行");
         SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
         m_hstmt_ = NULL;
         return false;

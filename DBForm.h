@@ -14,6 +14,11 @@
 class CDBForm  
 {
 public:
+	bool Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &information);
+	inline bool is_connect();
+    inline SQLHENV henv() const;
+    inline SQLHDBC hdbc() const;
+    void Disconnect();
 	CDBForm();
 	virtual ~CDBForm();
     bool Initialize(SQLHDBC hdbc, std::string &information);
@@ -25,13 +30,42 @@ public:
     bool GetRecordSet();
     bool ExecuteSQL(char *sql_statement);
     virtual bool BindingParameter();
-    bool ReportError(SQLHSTMT &hstmt, int handle_type, char *alert);
+    bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &information);
+
 
 protected:
+	SQLHENV m_henv_;           /* 环境句柄 */
+    SQLHDBC m_hdbc_;           /* 连接句柄 */ 
+	SQLHSTMT m_hstmt_;         /* 语句句柄 */
+    SQLRETURN m_return_code_;  /* 执行SQL语句返回码 */ 
+	bool m_is_connect_;        /* 是否连接数据库，true表示已连上 */
     std::string m_query_sql_;  /* SQL查询语句 */
-    SQLHSTMT m_hstmt_;         /* 语句句柄 */
-    SQLHDBC m_hdbc_;           /* 连接句柄 */
-    SQLRETURN m_return_code_;  /* 执行SQL语句返回码 */
 };
 
+/*
+ * 功能: 获取数据库连接状态
+ * 返回值: 返回当前数据库连接状态
+ **/
+bool CDBForm::is_connect()
+{
+    return m_is_connect_;
+}
+
+/*
+ * 功能: 获取数据源环境句柄
+ * 返回值: 返回数据源环境句柄
+ **/
+SQLHENV CDBForm::henv() const
+{
+    return m_henv_;
+}
+
+/*
+ * 功能: 获取数据源连接句柄
+ * 返回值: 返回数据源连接句柄
+ **/
+SQLHDBC CDBForm::hdbc() const
+{
+    return m_hdbc_;
+}
 #endif /* end #define REPAST_DBFORM_H_ */

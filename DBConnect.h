@@ -11,11 +11,11 @@ class CDBConnect
 {
 public:
 	CDBConnect();
-	virtual ~CDBConnect();
+	virtual ~CDBConnect();  
+	bool Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &information);
     inline bool is_connect();
     inline SQLHENV henv() const;
     inline SQLHDBC hdbc() const;
-    bool Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &information);
     void Disconnect();
 
 private:

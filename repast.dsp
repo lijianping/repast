@@ -90,10 +90,6 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\DBConnect.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\DBForm.cpp
 # End Source File
 # Begin Source File
@@ -115,10 +111,6 @@ SOURCE=.\MyListView.cpp
 # Begin Source File
 
 SOURCE=.\personnel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\RecordSet.cpp
 # End Source File
 # Begin Source File
 
@@ -146,10 +138,6 @@ SOURCE=.\childwindowid.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\DBConnect.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\DBForm.h
 # End Source File
 # Begin Source File
@@ -159,10 +147,6 @@ SOURCE=.\LoginForm.h
 # Begin Source File
 
 SOURCE=.\MyListView.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\RecordSet.h
 # End Source File
 # Begin Source File
 
