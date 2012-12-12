@@ -28,7 +28,16 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
                            TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
                 return 0;
             }
-            InitWindow(hinstance, hwnd, error_info);
+            if (!InitWindow(hinstance, hwnd, error_info) ||
+                !ShowInfo(hinstance, hwnd, error_info))
+            {
+                MessageBox(hwnd, error_info.c_str(),
+                    TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
+                return 0;
+            }
+            EnableWindow(GetDlgItem(hwnd, ID_MAN), FALSE);
+            EnableWindow(GetDlgItem(hwnd, ID_WOMAN), FALSE);
+
             return 0;
         }
     case WM_SETFOCUS:
@@ -38,14 +47,29 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
         }
     case WM_LBUTTONDOWN:
         {
-            MessageBox(hwnd, TEXT("Left button down!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
-                break;
             return 0;
         }
     case WM_COMMAND:
         {
             switch(LOWORD(wParam))  
             {
+            case ID_PERSONNEL_STAFF_SEX:
+                {
+                    int is_checked(0);
+                    is_checked = (int)SendMessage(GetDlgItem(hwnd, ID_PERSONNEL_STAFF_SEX), BM_GETCHECK, 0, 0);
+                    if (is_checked == BST_CHECKED)
+                    {
+                        EnableWindow(GetDlgItem(hwnd, ID_MAN), TRUE);
+                        EnableWindow(GetDlgItem(hwnd, ID_WOMAN), TRUE);
+                    }
+                    else
+                    {
+                        EnableWindow(GetDlgItem(hwnd, ID_MAN), FALSE);
+                        EnableWindow(GetDlgItem(hwnd, ID_WOMAN), FALSE);
+                    }
+              
+                    break;
+                }
              case ID_PERSONNEL_QUERY:
                 MessageBox(hwnd, TEXT("Start query!"), TEXT("personnel"), MB_ICONINFORMATION | MB_OK);
                 break;
@@ -122,8 +146,17 @@ LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
                 }
                 
             case IDR_DELETE:
-                MessageBox(hwnd, TEXT("You choiced delete staff"), TEXT("PERSONNEL"), MB_OK | MB_ICONINFORMATION);
-                break;
+                {
+                    int colnum;
+                    CMyListView list;
+                    list.set_hwnd(hwnd);
+                    colnum = list.GetColumnCount();
+                    TCHAR str[10];
+                    sprintf(str, "There has %d column", colnum);
+                    MessageBox(hwnd, /*TEXT("You choiced delete staff")*/str, TEXT("PERSONNEL"), MB_OK | MB_ICONINFORMATION);
+                    break;
+                }
+                
             case IDR_MODIFY:
                 MessageBox(hwnd, TEXT("You choiced modify staff"), TEXT("PERSONNEL"), MB_OK | MB_ICONINFORMATION);
                 break;
@@ -390,7 +423,7 @@ bool CreateSexBox(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 	HWND sex_hwnd(NULL);
 	sex_hwnd = CreateWindow(TEXT("button"), TEXT("性别"),WS_CHILD | /*WS_BORDER |*/
                             ES_CENTER | WS_VISIBLE | BS_AUTOCHECKBOX, 30, 90, 6 * width,
-                            height + 5, hwnd, NULL, hinstance, NULL);
+                            height + 5, hwnd, (HMENU)ID_PERSONNEL_STAFF_SEX, hinstance, NULL);
     if (NULL == sex_hwnd)
 	{
 		error_info = "创建“性别”复选框失败！";
@@ -593,40 +626,32 @@ bool CreatePersonnelQuery(HINSTANCE hinstance, HWND hwnd, std::string &error_inf
  **/
 bool InitWindow(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 {
-    if (!CreateGroupBox(hinstance, hwnd, error_info))
+    if (CreateGroupBox(hinstance, hwnd, error_info) &&
+        CreateNumEdit(hinstance, hwnd, error_info) &&
+        CreateNameEdit(hinstance, hwnd, error_info) &&
+        CreateSexBox(hinstance, hwnd, error_info) &&
+        CreateDeptCombo(hinstance, hwnd, error_info) &&
+        CreateStaffSum(hinstance, hwnd, error_info) &&
+        CreateDeptSum(hinstance, hwnd, error_info) &&
+        CreateCurrentSum(hinstance, hwnd, error_info) &&
+        CreatePersonnelQuery(hinstance, hwnd, error_info))
     {
-        return false;
+        return true;
     }
-    if (!CreateNumEdit(hinstance, hwnd, error_info))
+    return false;
+}
+
+
+bool ShowInfo(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
+{
+    CMyListView list;
+    list.set_hwnd(GetDlgItem(hwnd, ID_PERSONNEL_INFO));
+    int number = list.GetItemCount();
+    TCHAR sum[10];
+    sprintf(sum, "%d 人", number); 
+    if (!SetDlgItemText(hwnd, ID_CURRENT_RECORD_SUM, sum))
     {
-        return false;
-    }
-    if (!CreateNameEdit(hinstance, hwnd, error_info))
-    {
-        return false;
-    }
-    if (!CreateSexBox(hinstance, hwnd, error_info))
-    {
-        return false;
-    }
-    if (!CreateDeptCombo(hinstance, hwnd, error_info))
-    {
-        return false;
-    }
-    if (!CreateStaffSum(hinstance, hwnd, error_info))
-    {
-        return false;
-    }
-    if (!CreateDeptSum(hinstance, hwnd, error_info))
-    {
-        return false;
-    }
-    if (!CreateCurrentSum(hinstance, hwnd, error_info))
-    {
-        return false;
-    }
-    if (!CreatePersonnelQuery(hinstance, hwnd, error_info))
-    {
+        error_info = "设置“当前人数”文本失败！";
         return false;
     }
     return true;
