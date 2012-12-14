@@ -159,6 +159,34 @@ bool ShowInfo(HINSTANCE hinstance, HWND hwnd,
  **/
 bool InitComboBox(HWND hwnd, int id);
 
+/*
+ *说明：   点击“查询”按钮，根据输入条件，执行查询
+ *参数：  
+ *         hwnd        [in]  主窗口句柄
+ *         error_info  [out] 错误信息
+ *返回值：若执行成功，返回true；否则返回false。
+ */
+bool OnStartQuery(HWND hwnd, std::string error_info);
+
+/*
+ *说明：   执行查询语句
+ *参数：  
+ *         sql_query   [in]  查询语句
+ *         error_info  [out] 错误信息
+ *返回值：若执行成功，返回true；否则返回false。
+ */
+bool ExecQuery(char * sql_query, std::string error_info);
+
+std::string GetID(HWND hwnd);
+std::string GetName(HWND hwnd);
+std::string GetSex(HWND hwnd);
+std::string GetDept(HWND hwnd);
+
+bool IsCheckName(HWND hwnd);
+bool IsCheckSex(HWND hwnd);
+bool IsCheckDept(HWND hwnd);
+
+bool InitChildWind(HWND hwnd);
 
 
 /* struct define */
@@ -170,3 +198,5 @@ typedef struct StaffInfo
     std::string age;
     std::string salary;
 }STAFFINFO;
+
+
