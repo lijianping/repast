@@ -150,6 +150,17 @@ bool InitWindow(HINSTANCE hinstance, HWND hwnd,
  **/
 bool ShowInfo(HINSTANCE hinstance, HWND hwnd,
               std::string &error_info);
+/*
+ * 说明: 初始化下拉组合框
+ * 参数:
+ *       hwnd [in] 下拉组合框父窗口句柄
+ *       id [in] 组合框id
+ * 返回值: 若成功返回true，否则返回false。
+ **/
+bool InitComboBox(HWND hwnd, int id);
+
+
+
 /* struct define */
 typedef struct StaffInfo
 {
