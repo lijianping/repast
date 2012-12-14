@@ -50,6 +50,8 @@ public:
     int GetColumnCount();
     void SetSelectd(const int index);
     int GetCurSel() const;
+    bool DeleteItem(const int index);
+    bool DeleteAllItems();
  
 private:
     int m_list_view_id_;         /* list view's id */

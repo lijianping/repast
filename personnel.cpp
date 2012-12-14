@@ -51,7 +51,9 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
     case WM_LBUTTONDOWN:
         {
             /* Get the content which is in the combo box's edit box */
-            
+            CMyListView list;
+            list.set_hwnd(GetDlgItem(hwnd, ID_PERSONNEL_INFO));
+            list.DeleteItem(0);
             return 0;
         }
     case WM_COMMAND:
@@ -314,27 +316,7 @@ bool CreateStaffListView(HINSTANCE hinstance, HWND hwnd, std::string &informatio
         information = "插入表头失败!";
         return false;
     }
-    list_view.SetSelectd(0);
-    /* Get staff's information from Staff form in database. */
-    StaffForm staff;
-    std::string error_information;
-	staff.Connect("repast", "repast", "repast", error_information);
-    staff.GetRecordSet();
-    staff.MoveFirst();
-    int i = 0;
-    while (!staff.IsEOF())
-    {
-        list_view.InsertItem(staff.id(), i);
-        list_view.SetItem(staff.name(), i, 1);
-        list_view.SetItem(staff.sex(), i, 2);
-        list_view.SetItem(staff.age(), i, 3);
-        list_view.SetItem(staff.salary(), i, 4);
-        list_view.SetItem(staff.dept_num(), i, 5);
-        staff.MoveNext();
-        i++;
-    }
-	staff.Disconnect();
-    list_view.SetSelectd(0);
+    SetListViewData(hwnd);
     return true;
  }
 
@@ -755,10 +737,11 @@ bool OnStartQuery(HWND hwnd, std::string error_info)
 	    sql_str += tmp;/*并追加在查询语句中 */
 	}
 	MessageBox(hwnd, sql_str.c_str(), "result", 0);
-	return true;
+    
+	return ExecQuery(hwnd, const_cast<char *>(sql_str.c_str()), error_info);
 }
 
-bool ExecQuery(char * sql_query, std::string error_info)
+bool ExecQuery(HWND hwnd, char * sql_query, std::string error_info)
 {
 	StaffForm staff;
 	staff.Connect("repast", "repast", "repast", error_info);
@@ -771,9 +754,20 @@ bool ExecQuery(char * sql_query, std::string error_info)
 	}
 	else
 	{
+        CMyListView list_view;
+        list_view.set_hwnd(GetDlgItem(hwnd, ID_PERSONNEL_INFO));
+        list_view.DeleteAllItems();
+        staff.MoveFirst();
+        int i = 0;
 		while (!staff.IsEOF())
 		{
 			char result[100];
+            list_view.InsertItem(staff.id(), i);
+            list_view.SetItem(staff.name(), i, 1);
+            list_view.SetItem(staff.sex(), i, 2);
+            list_view.SetItem(staff.age(), i, 3);
+            list_view.SetItem(staff.salary(), i, 4);
+            list_view.SetItem(staff.dept_num(), i, 5);
 			sprintf(result, TEXT("%s %s %s"), staff.id(), staff.name(), staff.sex());
 			MessageBox(NULL, result, TEXT("查询结果"), MB_OK);
 			staff.MoveNext();
@@ -809,6 +803,7 @@ std::string GetSex(HWND hwnd)
     }
 	return std::string(sex);
 }
+
 std::string GetDept(HWND hwnd)
 {
 	char dept[40] = "\0";
@@ -836,6 +831,7 @@ bool IsCheckSex(HWND hwnd)
     }
     return false;
 }
+
 bool IsCheckDept(HWND hwnd)
 {
     long ret = SendMessage(GetDlgItem(hwnd, ID_PERSONNEL_DEPT), BM_GETCHECK, 0, 0);
@@ -854,4 +850,30 @@ bool InitChildWind(HWND hwnd)
 	EnableWindow(GetDlgItem(hwnd, ID_WOMAN), FALSE);                 /* 禁用姓名“女” */
 	EnableWindow(GetDlgItem(hwnd, ID_PERSONNEL_DEPT_COMBO), FALSE);  /* 禁用部门下拉列表 */	
 	return true;
+}
+
+void SetListViewData(HWND hwnd)
+{
+    /* Get staff's information from Staff form in database. */
+    CMyListView list_view;
+    list_view.set_hwnd(GetDlgItem(hwnd, ID_PERSONNEL_INFO));
+    StaffForm staff;
+    std::string error_information;
+    staff.Connect("repast", "repast", "repast", error_information);
+    staff.GetRecordSet();
+    staff.MoveFirst();
+    int i = 0;
+    while (!staff.IsEOF())
+    {
+        list_view.InsertItem(staff.id(), i);
+        list_view.SetItem(staff.name(), i, 1);
+        list_view.SetItem(staff.sex(), i, 2);
+        list_view.SetItem(staff.age(), i, 3);
+        list_view.SetItem(staff.salary(), i, 4);
+        list_view.SetItem(staff.dept_num(), i, 5);
+        staff.MoveNext();
+        i++;
+    }
+    staff.Disconnect();
+    list_view.SetSelectd(0);
 }

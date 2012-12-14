@@ -71,7 +71,7 @@ bool CMyListView::CreateListView()
     InitCommonControlsEx(&icex);
     m_hwnd_ = CreateWindowEx(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
                              WC_LISTVIEW, NULL,
-                             WS_CHILD | WS_VISIBLE | LVS_SHOWSELALWAYS | m_list_view_style_,
+                             WS_CHILD | WS_VISIBLE |WS_VSCROLL | LVS_SHOWSELALWAYS | m_list_view_style_,
                              m_origin_point_.x, m_origin_point_.y,
                              m_list_view_width_, m_list_view_height_,
                              m_parent_hwnd_, (HMENU)m_list_view_id_, m_hinstance_, NULL);
@@ -284,4 +284,31 @@ int CMyListView::GetCurSel() const
     return ListView_GetSelectionMark(m_hwnd_);
 }
 
+/*
+ * 说明: 删除list view中指定行
+ * 参数:
+ *       index [in] 待删除的行号，由0开始
+ * 返回值: 若成功，返回true，否则返回false。
+ * **/
+bool CMyListView::DeleteItem(const int index)
+{
+    if (TRUE == ListView_DeleteItem(m_hwnd_, index))
+    {
+        return true;
+    }
+    return false;
+}
+
+/*
+ * 说明: 删除list view中的所有项目
+ * 返回值: 若成功，返回true，否则返回false。
+ * **/
+bool CMyListView::DeleteAllItems()
+{
+    if (TRUE == ListView_DeleteAllItems(m_hwnd_))
+    {
+        return true;
+    }
+    return false;
+}
 

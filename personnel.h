@@ -175,7 +175,7 @@ bool OnStartQuery(HWND hwnd, std::string error_info);
  *         error_info  [out] 错误信息
  *返回值：若执行成功，返回true；否则返回false。
  */
-bool ExecQuery(char * sql_query, std::string error_info);
+bool ExecQuery(HWND hwnd, char * sql_query, std::string error_info);
 
 std::string GetID(HWND hwnd);
 std::string GetName(HWND hwnd);
@@ -187,6 +187,8 @@ bool IsCheckSex(HWND hwnd);
 bool IsCheckDept(HWND hwnd);
 
 bool InitChildWind(HWND hwnd);
+
+void SetListViewData(HWND hwnd);
 
 
 /* struct define */
