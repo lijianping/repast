@@ -48,7 +48,7 @@ public:
     int GetItem(int row, int column, std::string &text);
     int GetItemCount();
     void SetSelectd(const int index);
-    int GetCursor();
+    int GetCurSel() const;
  
 private:
     int m_list_view_id_;         /* list view's id */
