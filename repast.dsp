@@ -150,6 +150,10 @@ SOURCE=.\MyListView.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\personnel.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\StaffForm.h
 # End Source File
 # Begin Source File
