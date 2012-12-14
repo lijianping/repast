@@ -29,7 +29,18 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
                            TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
                 return 0;
             }
-            InitWindow(hinstance, hwnd, error_info);
+            if (!InitWindow(hinstance, hwnd, error_info) ||
+                !ShowInfo(hinstance, hwnd, error_info))
+            {
+                MessageBox(hwnd, error_info.c_str(),
+                    TEXT("PERSONNEL"), MB_OK | MB_ICONERROR);
+                return 0;
+            }
+            EnableWindow(GetDlgItem(hwnd, ID_MAN), FALSE);
+            EnableWindow(GetDlgItem(hwnd, ID_WOMAN), FALSE);
+            InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO);
+            /* Select the first item */
+            SendMessage(GetDlgItem(hwnd, ID_PERSONNEL_DEPT_COMBO), CB_SETCURSEL, 0, 0);
             return 0;
         }
     case WM_SETFOCUS:
@@ -39,7 +50,6 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
         }
     case WM_LBUTTONDOWN:
         {
-                break;
             return 0;
         }
     case WM_COMMAND:
@@ -517,9 +527,9 @@ bool CreateDeptCombo(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
 		return false;
 	}	
 	dept_hwnd = CreateWindow(TEXT("combobox"), NULL, WS_CHILD | WS_VISIBLE |/* WS_BORDER |*/ 
-                             ES_CENTER | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS |
+                             ES_CENTER | WS_TABSTOP | CBS_DROPDOWN | CBS_HASSTRINGS |
                              CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL, 295, 90, 10 * width,
-                             height + 5, hwnd, (HMENU)ID_PERSONNEL_DEPT_COMBO,
+                             100, hwnd, (HMENU)ID_PERSONNEL_DEPT_COMBO,
                              hinstance, NULL);
     if (NULL == dept_hwnd)
     {
@@ -683,7 +693,6 @@ bool InitWindow(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
     return false;
 }
 
-
 bool OnStartQuery(HWND hwnd, std::string error_info)
 {
 	char sql_query[500];
@@ -805,4 +814,31 @@ bool InitChildWind(HWND hwnd)
 	EnableWindow(GetDlgItem(hwnd, ID_WOMAN), FALSE);                 /* 禁用姓名“女” */
 	EnableWindow(GetDlgItem(hwnd, ID_PERSONNEL_DEPT_COMBO), FALSE);  /* 禁用部门下拉列表 */	
 	return true;
+}
+
+bool ShowInfo(HINSTANCE hinstance, HWND hwnd, std::string &error_info)
+{
+    CMyListView list;
+    list.set_hwnd(GetDlgItem(hwnd, ID_PERSONNEL_INFO));
+    int number = list.GetItemCount();
+    TCHAR sum[10];
+    sprintf(sum, "%d 人", number); 
+    if (!SetDlgItemText(hwnd, ID_CURRENT_RECORD_SUM, sum))
+    {
+        error_info = "设置“当前人数”文本失败！";
+        return false;
+    }
+    return true;
+}
+
+
+bool InitComboBox(HWND hwnd, int id)
+{
+    if (CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"人事部") ||
+        CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"财务部") ||
+        CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"后勤部"))
+    {
+        return false;
+    }
+    return true;
 }

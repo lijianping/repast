@@ -255,6 +255,21 @@ int CMyListView::GetItemCount()
     return SendMessage(m_hwnd_, LVM_GETITEMCOUNT, 0, 0);
 }
 
+int CMyListView::GetColumnCount()
+{
+    int count(0);
+    TCHAR data[128] = "\0";
+    LVCOLUMN col;
+    col.mask = LVIF_TEXT | LVCF_WIDTH;
+    col.cchTextMax = 128;
+    col.pszText = data;
+    while (TRUE == ListView_GetColumn(m_hwnd_, count, &col))
+    {
+        count++;
+    }
+    return count;
+}
+
 void CMyListView::SetSelectd(const int index)
 {
     ListView_SetItemState(m_hwnd_, index, LVIS_SELECTED, LVIS_SELECTED);

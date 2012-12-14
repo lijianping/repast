@@ -140,6 +140,26 @@ bool CreatePersonnelQuery(HINSTANCE hinstance, HWND hwnd,
 bool InitWindow(HINSTANCE hinstance, HWND hwnd,
                 std::string &error_info);
 
+/*
+ * 说明: 初始化窗口信息
+ * 参数:
+ *       hinstance [in] 程序实例句柄
+ *       hwnd [in] 窗口句柄
+ *       error_info [out] 创建失败时的错误信息
+ * 返回值: 若执行成功，返回true；否则返回false。
+ **/
+bool ShowInfo(HINSTANCE hinstance, HWND hwnd,
+              std::string &error_info);
+/*
+ * 说明: 初始化下拉组合框
+ * 参数:
+ *       hwnd [in] 下拉组合框父窗口句柄
+ *       id [in] 组合框id
+ * 返回值: 若成功返回true，否则返回false。
+ **/
+bool InitComboBox(HWND hwnd, int id);
+
+
 
 /* struct define */
 typedef struct StaffInfo

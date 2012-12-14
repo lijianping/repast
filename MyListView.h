@@ -47,6 +47,7 @@ public:
     void SetSelectAndGrid(const DWORD style);
     int GetItem(int row, int column, std::string &text);
     int GetItemCount();
+    int GetColumnCount();
     void SetSelectd(const int index);
     int GetCurSel() const;
  
