@@ -173,7 +173,7 @@ bool CDBForm::BindingParameter()
  *       sql_statement [in]  结构化查询语句
  * 返回值: 执行成功返回true,否则返回false。
  */
-bool CDBForm::ExecuteSQL(char *sql_statement)
+bool CDBForm::ExecuteSQL(const char *sql_statement)
 {
     /* 执行语句 */
     m_return_code_ = SQLExecDirect(m_hstmt_, 

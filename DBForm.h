@@ -28,7 +28,7 @@ public:
     bool MovePrior(); 
     bool MoveLast();
     bool GetRecordSet();
-    bool ExecuteSQL(char *sql_statement);
+    bool ExecuteSQL(const char *sql_statement);
     virtual bool BindingParameter();
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &information);
 

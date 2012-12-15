@@ -738,10 +738,10 @@ bool OnStartQuery(HWND hwnd, std::string error_info)
 	}
 	MessageBox(hwnd, sql_str.c_str(), "result", 0);
     
-	return ExecQuery(hwnd, const_cast<char *>(sql_str.c_str()), error_info);
+	return ExecQuery(hwnd, sql_str.c_str(), error_info);
 }
 
-bool ExecQuery(HWND hwnd, char * sql_query, std::string error_info)
+bool ExecQuery(HWND hwnd, const char * sql_query, std::string error_info)
 {
 	StaffForm staff;
 	staff.Connect("repast", "repast", "repast", error_info);
