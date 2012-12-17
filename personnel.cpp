@@ -235,7 +235,7 @@ bool CreateGroupBox(HWND parent_hwnd)
 }
 
 /* 
- * @ Description: Create a group box.
+ * @ Description: Create child windows.
  * @ Parameters:
  *		parent_hwnd [in] Specifies the list view's parent window.
  *		error [out] Return the error information.
@@ -426,7 +426,7 @@ bool InitComboBox(HWND hwnd, int id)
 }
 
 /* 
- * @ Description: Judge the name is checked.
+ * @ Description: Judging whether the name is checked.
  * @ Parameters:
  *		hwnd [in] Specifies the name check box's parent window.
  * @ Return Value:
@@ -444,7 +444,7 @@ bool IsCheckName(HWND parent_hwnd)
 }
 
 /* 
- * @ Description: Judge the sex is checked.
+ * @ Description: Judging whether the sex is checked.
  * @ Parameters:
  *		hwnd [in] Specifies the sex check box's parent window.
  * @ Return Value:
@@ -461,7 +461,7 @@ bool IsCheckSex(HWND parent_hwnd)
 	return false;
 }
 /* 
- * @ Description: Judge the department is checked.
+ * @ Description: Judging whether the department is checked.
  * @ Parameters:
  *		hwnd [in] Specifies the department check box's parent window.
  * @ Return Value:
