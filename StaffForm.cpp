@@ -1,4 +1,4 @@
-// StaffForm.cpp: implementation of the StaffForm class.
+// CStaffForm.cpp: implementation of the CStaffForm class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -8,7 +8,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-StaffForm::StaffForm()
+CStaffForm::CStaffForm()
 : m_age_(0),
   m_salary_(0)
 {
@@ -20,7 +20,7 @@ StaffForm::StaffForm()
     m_query_sql_ = "select * from Staff";
 }
 
-StaffForm::~StaffForm()
+CStaffForm::~CStaffForm()
 {
 
 }
@@ -29,7 +29,7 @@ StaffForm::~StaffForm()
  * 说明: 绑定记录集参数
  * 返回值: 执行成功返回true, 否则返回false
  */
-bool StaffForm::BindingParameter()
+bool CStaffForm::BindingParameter()
 {
     /* 绑定列 */
     SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_id_, sizeof(m_id_), &m_sql_id_);
@@ -41,7 +41,7 @@ bool StaffForm::BindingParameter()
     return true;
 }
 
-bool StaffForm::InsertInfo(char *user_id, char *user_name,
+bool CStaffForm::InsertInfo(char *user_id, char *user_name,
                            char *user_sex, short user_age,
                            double user_salary, char *user_dept_num)
 {

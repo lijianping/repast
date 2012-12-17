@@ -1,12 +1,12 @@
-#ifndef REPAST_STAFFFORM_H_
-#define REPAST_STAFFFORM_H_
+#ifndef REPAST_StaffForm_H_
+#define REPAST_StaffForm_H_
 #include "DBForm.h"
 
-class StaffForm : public CDBForm
+class CStaffForm : public CDBForm
 {
 public:
-	StaffForm();
-	virtual ~StaffForm();
+	CStaffForm();
+	virtual ~CStaffForm();
     inline char* id();
     inline char* name();
     inline char* sex();
@@ -40,7 +40,7 @@ private:
  * 说明: 获取员工编号
  * 返回值: 员工编号字符串
  **/
-char* StaffForm::id()
+char* CStaffForm::id()
 {
     return m_id_;
 }
@@ -49,7 +49,7 @@ char* StaffForm::id()
  * 说明: 获取员工姓名
  * 返回值: 员工姓名字符串
  **/
-char* StaffForm::name()
+char* CStaffForm::name()
 {
     return m_name_;
 }
@@ -58,7 +58,7 @@ char* StaffForm::name()
  * 说明: 获取员工性别
  * 返回值: 员工性别字符串
  **/
-char* StaffForm::sex()
+char* CStaffForm::sex()
 {
     return m_sex_;
 }
@@ -67,7 +67,7 @@ char* StaffForm::sex()
  * 说明: 获取员工所在部门编号
  * 返回值: 员工所在部门编号字符串
  **/
-char* StaffForm::dept_num()
+char* CStaffForm::dept_num()
 {
     return m_dept_num_;
 }
@@ -76,7 +76,7 @@ char* StaffForm::dept_num()
  * 说明: 获取员工所在部门名称
  * 返回值: 员工所在部门名称字符串
  **/
-char* StaffForm::dept_name()
+char* CStaffForm::dept_name()
 {
     return m_dept_name_;
 }
@@ -85,7 +85,7 @@ char* StaffForm::dept_name()
  * 说明: 获取员工年龄
  * 返回值: 员工年龄
  **/
-short StaffForm::age() const
+short CStaffForm::age() const
 {
     return m_age_;
 }
@@ -94,10 +94,10 @@ short StaffForm::age() const
  * 说明: 获取员工工资
  * 返回值: 员工工资
  **/
-double StaffForm::salary() const
+double CStaffForm::salary() const
 {
     return m_salary_;
 }
 
 
-#endif /* end #define REPAST_STAFFFORM_H_ */
+#endif /* end #define REPAST_CStaffForm_H_ */

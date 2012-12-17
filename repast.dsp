@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
@@ -90,7 +90,23 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\Button.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ComboBox.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DBForm.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Edit.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ListView.cpp
 # End Source File
 # Begin Source File
 
@@ -106,11 +122,11 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\MyListView.cpp
+SOURCE=.\personnel.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\personnel.cpp
+SOURCE=.\RecordSet.cpp
 # End Source File
 # Begin Source File
 
@@ -126,6 +142,10 @@ SOURCE=.\StaffForm.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Static.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Wind.cpp
 # End Source File
 # End Group
@@ -134,7 +154,15 @@ SOURCE=.\Wind.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\Button.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\childwindowid.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ComboBox.h
 # End Source File
 # Begin Source File
 
@@ -142,11 +170,15 @@ SOURCE=.\DBForm.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\LoginForm.h
+SOURCE=.\Edit.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\MyListView.h
+SOURCE=.\ListView.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\LoginForm.h
 # End Source File
 # Begin Source File
 
@@ -154,7 +186,23 @@ SOURCE=.\personnel.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\RecordSet.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\resource.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\service.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\StaffForm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Static.h
 # End Source File
 # Begin Source File
 

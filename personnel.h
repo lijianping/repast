@@ -1,204 +1,48 @@
-/* 
- * 说明: 显示员工信息的list view处理过程函数
- * */
-LRESULT CALLBACK PersonnelList(HWND hwnd, UINT message,
-                               WPARAM wParam, LPARAM lParam);
+#ifndef REPAST_PERSONNEL_H_
+#define REPAST_PERSONNEL_H_
 
-/*
- * 说明: 员工添加、删除、修改编辑对话框处理过程函数
- **/
-BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
-                             WPARAM wParam, LPARAM lParam);
-/*
- * 说明: 初始化员工信息列表
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] list view父窗口句柄
- *       information [out] 错误信息
- * 返回值: 若成功，返回true，否则返回false。
- **/
-bool CreateStaffListView(HINSTANCE hinstance, HWND hwnd,
-                         std::string &information);
+#include "ListView.h"
+#include "Button.h"
+#include "Static.h"
+#include "ComboBox.h"
+#include "Edit.h"
+#include "StaffForm.h"
+#include "childwindowid.h"
+#include "resource.h"
 
-/*
- * 说明: 获取字符宽度与高度
- * 参数:
- *       hwnd [in] 窗口句柄
- *       width [out] 字符宽度
- *       height [out] 字符高度
- * 返回值: 若执行成功，返回true；否则返回false。
- */
+LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-bool GetTextInfo(HWND hwnd, int &width, int &height);
+LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-/*
- * 说明: 创建‘查询条件’组合框
- * 参数:
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateGroupBox(HINSTANCE hinstance, HWND hwnd,
-                    std::string &error_info);
+bool CreateStaffListView(HWND parent_hwnd);
 
-/*
- * 说明: 创建‘编号’查询条件选项
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateNumEdit(HINSTANCE hinstance, HWND hwnd,
-                   std::string &error_info);
+bool InitListView(HWND parent_hwnd, UINT id);
 
-/*
- * 说明: 创建‘姓名’查询条件选项
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateNameEdit(HINSTANCE hinstance, HWND hwnd,
-                    std::string &error_info);
+void SetListViewData(HWND parent_hwnd, UINT id);
 
-/*
- * 说明: 创建‘性别’查询条件选项
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateSexBox(HINSTANCE hinstance, HWND hwnd,
-                  std::string &error_info);
+bool CreateGroupBox(HWND parent_hwnd);
 
-/*
- * 说明: 创建‘部门’查询条件选项
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateDeptCombo(HINSTANCE hinstance, HWND hwnd,
-                     std::string &error_info);
+bool CreateChildWindow(HWND parent_hwnd, std::string &error);
 
-/*
- * 说明: 创建‘员工人数’查询显示
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateStaffSum(HINSTANCE hinstance, HWND hwnd,
-                    std::string &error_info);
+bool InitComboBox(HWND parent_hwnd, int id);
 
-/*
- * 说明: 创建‘部门总数’查询显示
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateDeptSum(HINSTANCE hinstance, HWND hwnd,
-                   std::string &error_info);
+bool IsCheckName(HWND parent_hwnd);
 
-/*
- * 说明: 创建‘当前人数’查询显示
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreateCurrentSum(HINSTANCE hinstance, HWND hwnd,
-                      std::string &error_info);
+bool IsCheckSex(HWND parent_hwnd);
 
-/*
- * 说明: 创建‘开始查询’按钮
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- */
-bool CreatePersonnelQuery(HINSTANCE hinstance, HWND hwnd,
-                          std::string &error_info);
+bool IsCheckDept(HWND parent_hwnd);
 
-/*
- * 说明: 初始化窗口
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- **/
-bool InitWindow(HINSTANCE hinstance, HWND hwnd,
-                std::string &error_info);
+std::string GetID(const HWND parent_hwnd);
 
-/*
- * 说明: 初始化窗口信息
- * 参数:
- *       hinstance [in] 程序实例句柄
- *       hwnd [in] 窗口句柄
- *       error_info [out] 创建失败时的错误信息
- * 返回值: 若执行成功，返回true；否则返回false。
- **/
-bool ShowInfo(HINSTANCE hinstance, HWND hwnd,
-              std::string &error_info);
-/*
- * 说明: 初始化下拉组合框
- * 参数:
- *       hwnd [in] 下拉组合框父窗口句柄
- *       id [in] 组合框id
- * 返回值: 若成功返回true，否则返回false。
- **/
-bool InitComboBox(HWND hwnd, int id);
+std::string GetName(const HWND parent_hwnd);
 
-/*
- *说明：   点击“查询”按钮，根据输入条件，执行查询
- *参数：  
- *         hwnd        [in]  主窗口句柄
- *         error_info  [out] 错误信息
- *返回值：若执行成功，返回true；否则返回false。
- */
-bool OnStartQuery(HWND hwnd, std::string error_info);
+std::string GetSex(const HWND parent_hwnd);
 
-/*
- *说明：   执行查询语句
- *参数：  
- *         sql_query   [in]  查询语句
- *         error_info  [out] 错误信息
- *返回值：若执行成功，返回true；否则返回false。
- */
-bool ExecQuery(HWND hwnd, const char * sql_query, std::string error_info);
+std::string GetDept(const HWND parent_hwnd);
 
-std::string GetID(HWND hwnd);
-std::string GetName(HWND hwnd);
-std::string GetSex(HWND hwnd);
-std::string GetDept(HWND hwnd);
+std::string GetQueryStatement(const HWND parent_hwnd);
 
-bool IsCheckName(HWND hwnd);
-bool IsCheckSex(HWND hwnd);
-bool IsCheckDept(HWND hwnd);
+bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error);
 
-bool InitChildWind(HWND hwnd);
-
-void SetListViewData(HWND hwnd);
-
-
-/* struct define */
-typedef struct StaffInfo
-{
-    std::string id;
-    std::string name;
-    std::string sex;
-    std::string age;
-    std::string salary;
-}STAFFINFO;
-
-
+bool OnStartQuery(const HWND parent_hwnd);
+#endif
