@@ -174,8 +174,7 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			/* Get the staff's information */
 			STAFFINFO *info = (STAFFINFO *)lParam;
             SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
-            SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
-			
+            SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());			
             SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
             SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
 			return TRUE;
@@ -499,6 +498,7 @@ bool CreateChildWindow(HWND parent_hwnd, std::string &error)
 	return true;
 }
 
+
 /* 
  * @ Description: Initialization the combo box.
  * @ Parameters:
@@ -692,12 +692,12 @@ std::string GetQueryStatement(const HWND parent_hwnd)
  *		If there has some record, the return value is true; otherwise, the 
  *		return value is false.
  */
-bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error)
+bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &error)
 {
 	CStaffForm staff;
 	/* Connect to the database */
 	staff.Connect("repast", "repast", "repast", error);
-	staff.ExecuteSQL(sql_query);
+	staff.ExecuteSQL(sql_query, error);
 	staff.BindingParameter();
 	/* Move to the first of the record set */
 	staff.MoveFirst();  
@@ -711,14 +711,16 @@ bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error)
 	{
 		CListView staff_list;
 		/* Initialization the list view object */
+		HWND list_hwnd = GetDlgItem(hwnd, id);
 		staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
+	/*	staff_list.SetHwnd(list_hwnd);*/
 		/* Clean the list view */
 		staff_list.DeleteAllItems();
 		int item = 0;
 		while (!staff.IsEOF())
 		{
 			/* Insert item(s) into the list view */
-			staff_list.SetItem(item, 0, staff.id());
+			staff_list.InsertItem(item, staff.id());
 			staff_list.SetItem(item, 1, staff.name());
 			staff_list.SetItem(item, 2, staff.sex());
 			staff_list.SetItem(item, 3, staff.age());
@@ -741,54 +743,15 @@ bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error)
  *		If succeed, the return value is true; otherwise, the return
  *		value is false.
  */
-bool OnStartQuery(const HWND parent_hwnd)
+bool OnStartQuery(const HWND hwnd)
 {
-	std::string sql_statement = GetQueryStatement(parent_hwnd);
+	std::string sql_statement = GetQueryStatement(hwnd);
 	std::string error;
-	if (!ExecQuery(parent_hwnd, sql_statement.c_str(), error))
+	if (!ExecQuery(hwnd, ID_PERSONNEL_INFO, sql_statement.c_str(), error))
 	{
-		MessageBox(parent_hwnd, error.c_str(), TEXT("≤È—Ø¥ÌŒÛ"),
+		MessageBox(hwnd, error.c_str(), TEXT("≤È—Ø¥ÌŒÛ"),
 			       MB_ICONINFORMATION | MB_OK);
 		return false;
 	}
 	return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

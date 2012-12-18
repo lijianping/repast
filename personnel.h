@@ -44,9 +44,9 @@ std::string GetDept(const HWND parent_hwnd);
 
 std::string GetQueryStatement(const HWND parent_hwnd);
 
-bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error);
+bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &error);
 
-bool OnStartQuery(const HWND parent_hwnd);
+bool OnStartQuery(const HWND hwnd);
 
 
 /* struct define */
@@ -60,3 +60,4 @@ typedef struct StaffInfo
 }STAFFINFO;
 
 #endif
+
