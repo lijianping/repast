@@ -106,10 +106,103 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				           point.x, point.y, 0, hwnd, NULL);
 			break;
 		}
+	case WM_COMMAND:
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDR_ADD:
+				{
+					/* TODO: add a staff in the staff table. */
+					break;
+				}
+			case IDR_DELETE:
+				{
+					CListView list;
+					list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
+					STAFFINFO staff_info;
+					select_row = list.GetSelectionMark();
+					staff_info.id = list.GetItem(select_row, 0);
+					staff_info.name = list.GetItem(select_row, 1);
+					staff_info.sex = list.GetItem(select_row, 2);
+					staff_info.age = list.GetItem(select_row, 3);
+					staff_info.salary = list.GetItem(select_row, 4);
+					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+                                   (DLGPROC)EditStaff, (long)&staff_info);
+					break;
+				}
+			case IDR_MODIFY:
+				{
+					CListView list;
+					list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
+					STAFFINFO staff_info;
+					select_row = list.GetSelectionMark();
+					staff_info.id = list.GetItem(select_row, 0);
+					staff_info.name = list.GetItem(select_row, 1);
+					staff_info.sex = list.GetItem(select_row, 2);
+					staff_info.age = list.GetItem(select_row, 3);
+					staff_info.salary = list.GetItem(select_row, 4);
+					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+						(DLGPROC)EditStaff, (long)&staff_info);
+					break;
+				}
+			}
+			return 0;
+		}
 	}
 	return CallWindowProc(g_OldListProc, hwnd, msg, wParam, lParam);
 }
 
+BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		{
+			RECT rect;
+			if (!GetWindowRect(hwnd, &rect))
+			{
+				MessageBox(hwnd, TEXT("Get rect failed!"), TEXT("ERROR"), MB_ICONINFORMATION | MB_OK);
+				return FALSE;
+			}
+			int width = rect.right - rect.left;
+			int height = rect.bottom - rect.top;
+			int screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
+			int screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
+			MoveWindow(hwnd, (screen_width - width) / 2,
+				       (screen_height - height) / 2,
+					   width, height, TRUE);
+			/* Get the staff's information */
+			STAFFINFO *info = (STAFFINFO *)lParam;
+            SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
+            SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
+			
+            SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
+            SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch (LOWORD(wParam))
+			{
+				/* TODO: Insert add staff function, delete staff function and 
+				 *       modify staff information function.
+				 **/
+			case ID_CANCEL_STAFF:
+				{
+					EndDialog(hwnd, LOWORD(wParam));
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_CLOSE:
+		{
+			EndDialog(hwnd, HIWORD(wParam));
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 /* 
  * @ Description: Create the staffs list view in personnel main window.
  * @ Parameters:
@@ -625,7 +718,7 @@ bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error)
 		while (!staff.IsEOF())
 		{
 			/* Insert item(s) into the list view */
-			staff_list.InsertItem(item, staff.id());
+			staff_list.SetItem(item, 0, staff.id());
 			staff_list.SetItem(item, 1, staff.name());
 			staff_list.SetItem(item, 2, staff.sex());
 			staff_list.SetItem(item, 3, staff.age());

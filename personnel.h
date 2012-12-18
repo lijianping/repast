@@ -14,6 +14,8 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 bool CreateStaffListView(HWND parent_hwnd);
 
 bool InitListView(HWND parent_hwnd, UINT id);
@@ -45,4 +47,16 @@ std::string GetQueryStatement(const HWND parent_hwnd);
 bool ExecQuery(const HWND hwnd, const char *sql_query, std::string &error);
 
 bool OnStartQuery(const HWND parent_hwnd);
+
+
+/* struct define */
+typedef struct StaffInfo
+{
+    std::string id;
+    std::string name;
+    std::string sex;
+    std::string age;
+    std::string salary;
+}STAFFINFO;
+
 #endif

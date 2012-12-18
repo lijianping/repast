@@ -3,7 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ListView.h"
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -40,7 +39,7 @@ bool CListView::Create(DWORD style, const RECT &rect,
 {
     m_hwnd_ = CreateWindowEx(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
                              WC_LISTVIEW, NULL,
-                             WS_CHILD | WS_VISIBLE | style,
+                             WS_CHILD | WS_VISIBLE | WS_BORDER | style,
                              rect.left, rect.top, rect.right, rect.bottom,
                              parent_hwnd, (HMENU)id,
                              (HINSTANCE)GetWindowLong(parent_hwnd, GWL_HINSTANCE),
@@ -199,6 +198,12 @@ bool CListView::SetItem(int item, int subitem, double item_text)
     return false;
 }
 
+std::string CListView::GetItem(int item, int subitem)
+{
+	char data[512] = "\0";
+	ListView_GetItemText(m_hwnd_, item, subitem, data, 512);
+	return std::string(data);
+}
 /*
  * @Description: Get the number of items in a list view control.
  * @Return Value:
@@ -237,7 +242,8 @@ int CListView::GetColumnCount()
  **/
 int CListView::GetSelectionMark()
 {
-    return SendMessage(m_hwnd_, LVM_GETSELECTIONMARK, 0, 0);
+    /*return SendMessage(m_hwnd_, LVM_GETSELECTIONMARK, 0, 0);*/
+	return ListView_GetSelectionMark(m_hwnd_);
 }
 
 /*

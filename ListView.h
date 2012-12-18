@@ -22,6 +22,7 @@ public:
     bool SetItem(int item, int subitem, std::string item_text);
 	bool SetItem(int item, int subitem, int item_text);
 	bool SetItem(int item, int subitem, double item_text);
+	std::string GetItem(int item, int subitem);
     int GetItemCount();
     int GetColumnCount();
     int GetSelectionMark();
