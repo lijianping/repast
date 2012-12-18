@@ -57,9 +57,6 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
     case WM_COMMAND:
         {
 			bool is_check = false;
-// 			char test[50];
-// 			sprintf(test, "w%d, l%d, lw%d", wParam, lParam,LOWORD(wParam));
-// 				 MessageBox(hwnd, test, "dfdfdsf",0);
             switch(LOWORD(wParam))  
             {
 			case ID_PERSONNEL_NAME:
@@ -106,7 +103,10 @@ LRESULT CALLBACK PersonnelProcesses(HWND hwnd, UINT message,
              case ID_PERSONNEL_QUERY:
 				 {
 				     std::string error_info;
-					 OnStartQuery(hwnd, error_info);
+					 if (false == OnStartQuery(hwnd, error_info))
+					 {
+						 MessageBox(hwnd, error_info.c_str(), TEXT("错误"), MB_OK | MB_ICONINFORMATION);
+					 }
                      break;
 				 }
             }
@@ -246,7 +246,6 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
             STAFFINFO *info = (STAFFINFO *)lParam;
             SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
             SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
-           
             SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
             SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
 //            SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age);
@@ -266,6 +265,34 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT message,
                 /*TODO: add staff add function, delete function,
                  *      modify function and update database.
                  **/
+			case ID_ADD_STAFF:
+				{
+				/*just for test*/	
+				std::string error_info;
+				StaffForm sf;
+				sf.Connect("repast", "repast", "repast", error_info);
+				if(false == sf.InsertInfo("20100004", "frank", "",34, 3432, "05", error_info))
+				{
+					MessageBox(hwnd, error_info.c_str(), TEXT("错误"), MB_OK);
+				}
+					sf.Disconnect();		
+					MessageBox(hwnd, "you selected add option", "add",MB_OK);
+					break;
+				}
+			case ID_DELETE_STAFF:
+				{	
+						/*just for test*/
+					MessageBox(hwnd, "you selected delete option", "delete", MB_OK);
+					std::string error_info;
+					StaffForm sf;
+					sf.Connect("repast", "repast", "repast", error_info);
+					if(false == sf.DeleteInfo("20101001", error_info))
+					{
+						MessageBox(hwnd, error_info.c_str(), TEXT("错误"), MB_OK);
+					}
+					sf.Disconnect();		
+					break;
+				}
             case ID_CANCEL_STAFF:
                 EndDialog(hwnd,  LOWORD(wParam));
                 break;
@@ -309,7 +336,10 @@ bool CreateStaffListView(HINSTANCE hinstance, HWND hwnd, std::string &informatio
         !list_view.InsertColumn("员工性别", 2, width / 6) ||
         !list_view.InsertColumn("员工年龄", 3, width / 6) ||
         !list_view.InsertColumn("员工工资", 4, width / 6) ||
-        !list_view.InsertColumn("员工部门", 5, width / 6))
+        !list_view.InsertColumn("员工部门", 5, width / 6) ||
+		!list_view.InsertColumn("员工邮箱", 6, width / 6) ||
+		!list_view.InsertColumn("员工电话", 7, width / 6) ||
+		!list_view.InsertColumn("员工住址", 8, width / 6))
     {
         information = "插入表头失败!";
         return false;
@@ -330,6 +360,9 @@ bool CreateStaffListView(HINSTANCE hinstance, HWND hwnd, std::string &informatio
         list_view.SetItem(staff.age(), i, 3);
         list_view.SetItem(staff.salary(), i, 4);
         list_view.SetItem(staff.dept_num(), i, 5);
+		list_view.SetItem(staff.mailbox(), i, 6);
+		list_view.SetItem(staff.phone_num(), i, 7);
+		list_view.SetItem(staff.address(), i, 8);
         staff.MoveNext();
         i++;
     }
@@ -723,10 +756,9 @@ bool InitComboBox(HWND hwnd, int id)
     }
     return true;
 }
-bool OnStartQuery(HWND hwnd, std::string error_info)
+bool OnStartQuery(HWND hwnd, std::string &error_info)
 {
 	char sql_query[500];
-
 	char Sno[20] = "\0";
 	std::string id, name, sex, dept;
 	id = GetID(hwnd);/* 获取编辑框里输入id */
@@ -754,20 +786,24 @@ bool OnStartQuery(HWND hwnd, std::string error_info)
 		std::string tmp(sql_query);
 	    sql_str += tmp;/*并追加在查询语句中 */
 	}
-	MessageBox(hwnd, sql_str.c_str(), "result", 0);
-	return true;
+	MessageBox(hwnd, sql_str.c_str(), "result", MB_OK);
+	return ExecQuery(sql_str.c_str(), error_info);
 }
 
-bool ExecQuery(char * sql_query, std::string error_info)
+bool ExecQuery(const char * sql_query, std::string &error_info)
 {
 	StaffForm staff;
 	staff.Connect("repast", "repast", "repast", error_info);
-	staff.ExecuteSQL(sql_query);
+	if (false == staff.ExecuteSQL(sql_query, error_info))
+	{
+		return false;
+	}
 	staff.BindingParameter();
 	staff.MoveFirst();
 	if (0 ==strcmp("",staff.id()))
 	{
-		MessageBox(NULL, TEXT("无匹配结果"), TEXT("查询结果"), MB_OK);
+		error_info = TEXT("无匹配结果");
+		return false;
 	}
 	else
 	{
@@ -798,7 +834,6 @@ std::string GetName(HWND hwnd)
 std::string GetSex(HWND hwnd)
 {
 	char sex[2] = "\0";
-	bool is_check = false;
     if (BST_CHECKED == SendMessage(GetDlgItem(hwnd, ID_MAN), BM_GETCHECK, 0, 0))
     {
         strcpy(sex, "男");

@@ -38,12 +38,15 @@ bool StaffForm::BindingParameter()
     SQLBindCol(m_hstmt_, 4, SQL_C_SSHORT, &m_age_, 0, &m_sql_age_);
     SQLBindCol(m_hstmt_, 5, SQL_C_DOUBLE, &m_salary_, 0, &m_sql_salary_);
     SQLBindCol(m_hstmt_, 6, SQL_C_CHAR, m_dept_num_, sizeof(m_dept_num_), &m_sql_dept_num_);
+	SQLBindCol(m_hstmt_, 7, SQL_C_CHAR, m_mailbox_, sizeof(m_mailbox_), &m_sql_mailbox_);
+	SQLBindCol(m_hstmt_, 8, SQL_C_CHAR, m_phone_num_, sizeof(m_phone_num_), &m_sql_phone_num_);
+	SQLBindCol(m_hstmt_, 9, SQL_C_CHAR, m_address_, sizeof(m_address_), &m_sql_address_);
     return true;
 }
 
 bool StaffForm::InsertInfo(char *user_id, char *user_name,
                            char *user_sex, short user_age,
-                           double user_salary, char *user_dept_num)
+                           double user_salary, char *user_dept_num, std::string &error_info)
 {
     char insert_sql[200];
     /* 格式化插入语句 */
@@ -51,30 +54,35 @@ bool StaffForm::InsertInfo(char *user_id, char *user_name,
             "insert into Staff values('%s', '%s', '%s', %d, %f, '%s')",
             user_id, user_name, user_sex, user_age,
             user_salary, user_dept_num);
-    if (NULL == m_hdbc_)
-    {
-        MessageBox(NULL, "请先连接数据库", "错误", MB_OK | MB_ICONERROR);
-        return false;
-    }
-    /* 分配语句句柄 */
-    m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        MessageBox(NULL, "分配语句句柄失败", "错误", MB_OK | MB_ICONERROR);
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
-        m_hstmt_ = NULL;
-        return false;
-    }
-    /* 执行语句 */
-    m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)insert_sql, SQL_NTS);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-    //    ReportError(m_hstmt_, SQL_HANDLE_STMT, "执行SQL语句失败，不能执行");
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
-        m_hstmt_ = NULL;
-        return false;
-    }
+	if (false == ExecuteSQL(insert_sql, error_info))
+	{
+		return false;
+	}
     return true;
+}
+
+bool StaffForm::DeleteInfo(char *user_id, std::string &error_info)
+{
+	char delete_sql[500];
+	char query_sql[500];
+	sprintf (delete_sql, "delete from Staff where Sno='%s'", user_id);   /*格式化查询语句*/
+	sprintf (query_sql, "select Sno from Staff where Sno='%s'", user_id);/*格式化删除语句*/
+	/*先查询是否有此记录，若有，则删除*/
+	if (false == ExecuteSQL(query_sql, error_info))
+	{
+		return false;
+	}
+	BindingParameter();
+	MoveFirst();
+	if (0 == strcmp("", id()))
+	{
+		error_info = "删除失败：无此记录";
+		return false;
+	}
+	/* 执行语句 */
+    if (false == ExecuteSQL(delete_sql, error_info))
+    {
+        return false;
+    }
+	return true;
 }

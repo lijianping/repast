@@ -166,7 +166,7 @@ bool InitComboBox(HWND hwnd, int id);
  *         error_info  [out] 错误信息
  *返回值：若执行成功，返回true；否则返回false。
  */
-bool OnStartQuery(HWND hwnd, std::string error_info);
+bool OnStartQuery(HWND hwnd, std::string &error_info);
 
 /*
  *说明：   执行查询语句
@@ -175,17 +175,71 @@ bool OnStartQuery(HWND hwnd, std::string error_info);
  *         error_info  [out] 错误信息
  *返回值：若执行成功，返回true；否则返回false。
  */
-bool ExecQuery(char * sql_query, std::string error_info);
+bool ExecQuery(const char * sql_query, std::string &error_info);
 
+/*
+ *说明：   获取用户在编辑框中输入的id号
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：若执行成功，返回ID字符串；否则返回空串
+ */
 std::string GetID(HWND hwnd);
+
+/*
+ *说明：   获取用户在编辑框中输入的姓名
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：若执行成功，返回姓名字符串；否则返回空串
+ */
 std::string GetName(HWND hwnd);
+
+/*
+ *说明：   获取用户选择的性别
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：若执行成功，返回性别字符串；否则返回空串
+ */
 std::string GetSex(HWND hwnd);
+
+/*
+ *说明：   获取用户选择的部门
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：若执行成功，返回部门字符串；否则返回空串
+ */
 std::string GetDept(HWND hwnd);
 
+/*
+ *说明：   判断用户是否选择“姓名”选择框
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：返回选择情况，选中返回ture,否则返回false
+ */
 bool IsCheckName(HWND hwnd);
+
+/*
+ *说明：   判断用户是否选择“性别”选择框
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：返回选择情况，选中返回ture,否则返回false
+ */
 bool IsCheckSex(HWND hwnd);
+
+/*
+ *说明：   判断用户是否选择“部门”选择框
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：返回选择情况，选中返回ture,否则返回false
+ */
 bool IsCheckDept(HWND hwnd);
 
+/*
+ *说明：   初始化子窗口：默认选择“男”性别按钮，禁用姓名编辑框，
+ *                       禁用性别选择按钮，禁用部门下来列表            
+ *参数：  
+ *         hwnd   [in]  主窗口句柄  
+ *返回值：若执行成功，返回ture, 否则返回false;
+ */
 bool InitChildWind(HWND hwnd);
 
 

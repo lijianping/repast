@@ -173,7 +173,7 @@ bool CDBForm::BindingParameter()
  *       sql_statement [in]  结构化查询语句
  * 返回值: 执行成功返回true,否则返回false。
  */
-bool CDBForm::ExecuteSQL(char *sql_statement)
+bool CDBForm::ExecuteSQL(const char *sql_statement, std::string &error_info )
 {
     /* 执行语句 */
     m_return_code_ = SQLExecDirect(m_hstmt_, 
@@ -182,8 +182,8 @@ bool CDBForm::ExecuteSQL(char *sql_statement)
     if ((m_return_code_ != SQL_SUCCESS) && 
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        MessageBox(NULL, TEXT("执行数据库操作语句失败！"),
-                   TEXT("错误"), MB_OK| MB_ICONERROR);
+		error_info = "执行数据库操作语句失败: ";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
 		return false;
     }
     return true;
@@ -192,37 +192,38 @@ bool CDBForm::ExecuteSQL(char *sql_statement)
 /*
  * 说明: 报告错误信息
  **/
-bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &information)
+bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_info)
 {
 	char message[500] = "\0";
 	short message_length(0);
-	char error_info[500] = "\0";
 	SQLINTEGER native_error = 0;
     SQLSMALLINT record_number = 1;
-    unsigned char *sql_state = new unsigned char[6];
+     unsigned char *sql_state = new unsigned char[6];
     if (NULL == sql_state)
     {
-		information = TEXT("报告错误发生的原因是，分配sqlstate内存失败");
+		error_info = TEXT("报告错误发生的原因是，分配sqlstate内存失败");
 		return false;
     }
- 
+	/*获取错误*/
     SQLGetDiagRec(handle_type, hdbc, record_number, sql_state, &native_error,
                   (unsigned char *)message, 500, &message_length);
 	switch(native_error)
 	{
 	case 2627:
 		{
-			information +=  TEXT("不能输入重复的编号");
-		break;
+			error_info +=  TEXT("不能输入重复的编号");
+	    	break;
 		}
-		/*TODO: Add other error infomation*/
+		/*TODO: Add other error information*/
 	default:
 		{
-			information += message;
+			error_info += message;
 			break;
 		}
 	}
-//	alert = error_info;
+	char tmp[200]="\0";
+	sprintf(tmp, "%s, %ld", sql_state, native_error);
+	MessageBox(NULL, tmp, "sql_state, native_error", MB_OK);
     delete [] sql_state;
     sql_state = NULL;
     return true;
@@ -255,6 +256,14 @@ bool CDBForm::Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &informat
 		information = "分配连接句柄失败!";
         return false;
     }
+	/*设置连接属性（登录超时：10s)*/
+    m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_LOGIN_TIMEOUT, (void *)10, 0);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "设置数据库并发性失败！";
+        return false;
+    }
     /* 连接数据源 */
     m_return_code_ = SQLConnect(m_hdbc_, (SQLCHAR *)dsn, 
         SQL_NTS,(SQLCHAR *)id, SQL_NTS,
@@ -272,6 +281,7 @@ bool CDBForm::Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &informat
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         information = "分配数据库语句句柄失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
         return false;
     }
     /* 设置滚动游标 */
@@ -282,6 +292,7 @@ bool CDBForm::Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &informat
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         information = "设置数据库滚动游标失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
         return false;
 	}
     /*设置并发性*/
@@ -292,6 +303,7 @@ bool CDBForm::Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &informat
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         information = "设置数据库并发性失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
         return false;
     }
 	m_is_connect_ = true;
