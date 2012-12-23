@@ -24,6 +24,7 @@
 #define ID_SERVICE_START                60016      /* service management start table button id */
 #define ID_SERVICE_CHANGE               60017      /* service management change table button id */
 #define ID_SERVICE_ORDER                60018      /* order dishes button id */
-#define ID_SERVICE_RETREAT              60018      /* customer retreat dish button id */
-#define ID_SERVICE_CHECKOUT             60019      /* customer checkout button id */
-
+#define ID_SERVICE_RETREAT              60019      /* customer retreat dish button id */
+#define ID_SERVICE_CHECKOUT             60020      /* customer checkout button id */
+#define ID_SERVICE_COMBO				60021      /* the tables where is locate */
+#define ID_SERVICE_CHANGE_PASSWD		60022	   /* change the user password button id */

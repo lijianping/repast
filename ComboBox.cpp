@@ -72,7 +72,6 @@ bool CComboBox::Initialization(HWND parent_hwnd, UINT id)
  *                in the list box of combo box.
  * @ Parameters:
  *       item [in] Specifies the string that is to be added.
- *       id [in] Specifies the combo box control identifier.
  * @ Return Value:
  *       Ture if it is successful; otherwise, it is false.
  **/
@@ -86,6 +85,24 @@ bool CComboBox::AddString(const std::string item)
     return false;
 }
 
+/*
+ * @ Description: This method adds a string to the end of list
+ *                in the list box of combo box.
+ * @ Parameters:
+ *		 index [in] Specifies the zero-based index of the position at which to insert the string.
+ *       item [in] Specifies the string that is to be added.
+ * @ Return Value:
+ *       Ture if it is successful; otherwise, it is false.
+ **/
+bool CComboBox::InsertString(const int index, const std::string item)
+{
+	int ret = SendMessage(m_hwnd_, CB_INSERTSTRING, index, (LPARAM)item.c_str());
+	if (CB_ERR != ret && CB_ERRSPACE != ret)
+	{
+		return true;
+	}
+	return false;
+}
 /*
  * @ Description: This method deletes a string in the list
  *                box of combo box.
@@ -150,4 +167,21 @@ bool CComboBox::GetComboBoxText(std::string &text)
         return true;
     }
     return false;
+}
+
+/*
+ * @ Description: This method set the selected item.
+ * @ Parameters:
+ *       index [in] Specifies the zero-based index of the string to select.
+ * @ Return Value:
+ *       Ture if it is successful; otherwise, it is false.
+ **/
+bool CComboBox::SetCurSel(const int index)
+{
+	int ret = SendMessage(m_hwnd_, CB_SETCURSEL, index, 0);
+	if (ret != CB_ERR)
+	{
+		return true;
+	}
+	return false;
 }

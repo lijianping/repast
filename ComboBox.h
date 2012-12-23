@@ -15,10 +15,11 @@ public:
                 HWND parent_hwnd, UINT id);
     bool Initialization(HWND parent_hwnd, UINT id);
     bool AddString(const std::string item);
+	bool InsertString(const int index, const std::string item);
     bool DeleteString(int index);
     bool EnableWindow(BOOL enable = TRUE);
     bool GetComboBoxText(std::string &text);
-
+	bool SetCurSel(const int index);
 private:
     UINT m_id_;
     HWND m_hwnd_;

@@ -71,7 +71,15 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				}
 			case ID_PERSONNEL_QUERY:
 				{
-					OnStartQuery(hwnd);
+					if (OnStartQuery(hwnd))
+					{
+						CListView list;
+						list.Initialization(hwnd, ID_PERSONNEL_INFO);
+						int count = list.GetItemCount();
+						char number[10];
+						sprintf(number, "%d 人", count);
+						SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);
+					}
 					break;
 				}
 			}
@@ -305,6 +313,10 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 	staff_info.Disconnect();
 	/* The default selected line */
 	staff_list.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
+	int count = staff_list.GetItemCount();
+	char number[10];
+	sprintf(number, "%d 人", count);
+	SetWindowText(GetDlgItem(parent_hwnd, ID_CURRENT_RECORD_SUM), number);
 }
 
 /* 
@@ -406,7 +418,7 @@ bool CreateChildWindow(HWND parent_hwnd, std::string &error)
 	CButton woman;
 	sex_rect.left = col2 + 4 * width + 10;
 	if (!woman.Create("女", ES_CENTER | BS_AUTORADIOBUTTON, sex_rect,
-		              parent_hwnd, ID_MAN))
+		              parent_hwnd, ID_WOMAN))
 	{
 		error = "创建“女”选择按钮失败！";
 		return false;
@@ -696,9 +708,15 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 {
 	CStaffForm staff;
 	/* Connect to the database */
-	staff.Connect("repast", "repast", "repast", error);
-	staff.ExecuteSQL(sql_query, error);
-	staff.BindingParameter();
+	if (!staff.Connect("repast", "repast", "repast", error))
+	{
+		return false;
+	}
+	if (!staff.ExecuteSQL(sql_query, error))
+	{
+		return false;
+	}
+	staff.BindingParameter();  /* In this function, there no error judge. */
 	/* Move to the first of the record set */
 	staff.MoveFirst();  
 	if (0 == strcmp("",staff.id()))
@@ -713,7 +731,6 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 		/* Initialization the list view object */
 		HWND list_hwnd = GetDlgItem(hwnd, id);
 		staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
-	/*	staff_list.SetHwnd(list_hwnd);*/
 		/* Clean the list view */
 		staff_list.DeleteAllItems();
 		int item = 0;
