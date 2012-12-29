@@ -71,8 +71,8 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					SYSTEMTIME current_time;
 					char time_str[512] = "\0";
 					GetLocalTime(&current_time);   /* User can change the system time. */
-					sprintf(time_str, "%d-%d-%d %d:%d", current_time.wYear, current_time.wMonth, 
-						    current_time.wDay, current_time.wHour, current_time.wMinute);
+					sprintf(time_str, "%d-%d-%d %d:%d:%d", current_time.wYear, current_time.wMonth, 
+						    current_time.wDay, current_time.wHour, current_time.wMinute, current_time.wSecond);
 					MessageBox(hwnd, time_str, TEXT("Current Time"), MB_ICONINFORMATION);
 					break;
 				}
@@ -124,12 +124,6 @@ LRESULT CALLBACK ListProcesses(HWND hwnd, UINT message,
     {
     case WM_LBUTTONDBLCLK:
         {
-//             CMyListView list_view;
-//             list_view.set_hwnd(hwnd);
-//             int index = list_view.GetCurSel();
-//             char str[20];
-//             sprintf(str, "You choiced %d", index);
-//             MessageBox(hwnd, str, TEXT("list"), MB_ICONINFORMATION | MB_OK);
             break;
         }
     }
@@ -217,9 +211,15 @@ bool CreateGroupBox(const HWND hwnd)
  */
 bool CreateComboBox(const HWND hwnd)
 {
+	CStatic floor;
+	RECT floor_rect = {40, 50, 60, 25};
+	if (!floor.Create("楼  层", ES_CENTER, floor_rect, hwnd))
+	{
+		return false;
+	}
 	CComboBox combo;
 	RECT combo_rect;
-	combo_rect.left = 40;
+	combo_rect.left = 120;
 	combo_rect.top = 50;
 	combo_rect.right = 120;
 	combo_rect.bottom = 100;
@@ -311,6 +311,9 @@ bool CreateButton(const HWND hwnd)
 	return true;
 }
 
+/*
+ * 说明: 下单对话框处理过程函数
+ **/
 BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -362,6 +365,9 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+/*
+ * 说明: 结账对话框处理过程函数
+ **/
 BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -404,7 +410,9 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-
+/*
+ * 说明: 退菜对话框处理过程
+ **/
 BOOL CALLBACK RetreatProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -453,6 +461,9 @@ BOOL CALLBACK RetreatProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+/*
+ * 说明: 换台窗口处理过程函数 
+ **/
 BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -504,4 +515,9 @@ BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	return FALSE;
+}
+
+void SetTableInfo()
+{
+
 }

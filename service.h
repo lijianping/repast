@@ -2,6 +2,7 @@
 
 #include "StaffForm.h"
 #include "childwindowid.h"
+#include "Static.h"
 #include "Button.h"
 #include "ComboBox.h"
 #include "ListView.h"
@@ -28,6 +29,8 @@ BOOL CALLBACK RetreatProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+void SetTableInfo();
 
 /* Create list view */
 /*bool CreateList(HINSTANCE hinstance, HWND hwnd, CMyListView &list_view);*/
