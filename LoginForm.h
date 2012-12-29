@@ -21,6 +21,10 @@ public:
 					std::string error_info);
 	bool DeleteInfo(std::string user_name,
 		            std::string error_info);
+	bool UpdateInfo(std::string user_name,
+					std::string user_password,
+					short user_permission, 
+					std::string error_info);
 
 private:
     char m_name_[20];              /* staff's name in login form */

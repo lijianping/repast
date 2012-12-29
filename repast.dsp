@@ -146,6 +146,10 @@ SOURCE=.\Static.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TableInfo.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Wind.cpp
 # End Source File
 # End Group
@@ -203,6 +207,10 @@ SOURCE=.\StaffForm.h
 # Begin Source File
 
 SOURCE=.\Static.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\TableInfo.h
 # End Source File
 # Begin Source File
 

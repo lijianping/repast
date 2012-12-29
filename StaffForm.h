@@ -23,6 +23,10 @@ public:
                     double user_salary, char *user_dept_num,
 					std::string &error_info);
 	bool DeleteInfo(char *user_id, std::string &error_info);
+	bool UpdatetInfo(char *user_id, char *user_name,
+					 char *user_sex, short user_age,
+                     double user_salary, char *user_dept_num, 
+					 std::string &error_info);
 
 private:
     char m_id_[9];                /* staff's id */

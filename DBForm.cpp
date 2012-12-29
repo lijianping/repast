@@ -222,9 +222,11 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 			break;
 		}
 	}
+    /*just for test*/
 	char tmp[200]="\0";
 	sprintf(tmp, "%s, %ld", sql_state, native_error);
 	MessageBox(NULL, tmp, "sql_state, native_error", MB_OK);
+	/////
     delete [] sql_state;
     sql_state = NULL;
     return true;

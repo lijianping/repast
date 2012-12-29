@@ -46,6 +46,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
     sql_statement += "' and Lpassword = '";
     sql_statement += user_password;
     sql_statement += "'";
+	MessageBox(NULL, sql_statement.c_str(), "fd",0);/*just for a test*/
     this->ExecuteSQL((char *)sql_statement.c_str(), information);
     short permission = 0;
     SQLINTEGER sql_permission;
@@ -62,6 +63,15 @@ short CLoginForm::GetUserPermission(std::string user_name,
     return permission;
 }
 
+/*
+ *  说明: 新增系统登录用户信息
+ *  参数:
+ *        user_name       [in] 用户姓名
+ *        user_password   [in] 用户密码
+ *        user_permission [in] 用户权限
+ *        error_info      [out] 错误信息
+ *  返回值: 若成功返回true，否则返回false
+ **/
 bool CLoginForm::InsertInfo(std::string user_name,
 							std::string user_password,
 							short user_permission, 
@@ -78,6 +88,13 @@ bool CLoginForm::InsertInfo(std::string user_name,
 	return true;
 }
 
+/*
+ *  说明: 删除系统登录用户信息
+ *  参数:
+ *        user_name       [in] 用户姓名
+ *        error_info      [out] 错误信息
+ *  返回值: 若成功返回true，否则返回false
+ **/
 bool CLoginForm::DeleteInfo(std::string user_name, std::string error_info)
 {
 
@@ -102,5 +119,31 @@ bool CLoginForm::DeleteInfo(std::string user_name, std::string error_info)
     {
         return false;
     }
+	return true;
+}
+
+/*
+ *  说明: 更新系统登录用户信息
+ *  参数:
+ *        user_name       [in] 用户姓名
+ *        user_password   [in] 用户密码
+ *        user_permission [in] 用户权限
+ *        error_info      [out] 错误信息
+ *  返回值: 若成功返回true，否则返回false
+ **/
+bool CLoginForm::UpdateInfo(std::string user_name,
+							std::string user_password,
+							short user_permission, 
+							std::string error_info)
+{
+	char update_sql[200];
+	sprintf(update_sql, "update Login set Lpassword='%s', Lpermission='%d' where Lname='%s'",
+		user_password, user_permission, user_name);
+	/* 执行语句 */
+    if (false == ExecuteSQL(update_sql, error_info))
+    {
+        return false;
+    }
+
 	return true;
 }

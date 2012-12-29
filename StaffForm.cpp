@@ -44,9 +44,23 @@ bool CStaffForm::BindingParameter()
     return true;
 }
 
+/*
+ * 说明： 新增员工信息
+ * 参数：
+ *        user_id		     [in] 员工编号
+ *        user_name			 [in] 员工姓名
+ *        user_sex			 [in] 员工性别
+ *        user_age           [in] 员工年龄
+ *        user_salary        [in] 员工工资
+ *        user_user_dept_num [in] 员工所属部门编号
+ *        error_info		 [out] 错误信息
+ * 返回值：
+ *        执行成功返回true,否则返回false
+ **/
 bool CStaffForm::InsertInfo(char *user_id, char *user_name,
                            char *user_sex, short user_age,
-                           double user_salary, char *user_dept_num, std::string &error_info)
+                           double user_salary, char *user_dept_num, 
+						   std::string &error_info)
 {
     char insert_sql[200];
     /* 格式化插入语句 */
@@ -61,6 +75,14 @@ bool CStaffForm::InsertInfo(char *user_id, char *user_name,
     return true;
 }
 
+/*
+ * 说明： 删除员工信息
+ * 参数：
+ *        user_id [in] 员工编号
+ *        error_info [out] 错误信息
+ * 返回值：
+ *        执行成功返回true,否则返回false
+ **/
 bool CStaffForm::DeleteInfo(char *user_id, std::string &error_info)
 {
 	char delete_sql[500];
@@ -84,5 +106,38 @@ bool CStaffForm::DeleteInfo(char *user_id, std::string &error_info)
     {
         return false;
     }
+	return true;
+}
+
+
+/*
+ * 说明： 更新员工信息
+ * 参数：
+ *        user_id		     [in] 员工编号
+ *        user_name			 [in] 员工姓名
+ *        user_sex			 [in] 员工性别
+ *        user_age           [in] 员工年龄
+ *        user_salary        [in] 员工工资
+ *        user_user_dept_num [in] 员工所属部门编号
+ *        error_info		 [out] 错误信息
+ *返回值：
+ *        执行成功返回true,否则返回false
+ **/
+bool CStaffForm::UpdatetInfo(char *user_id, char *user_name,
+                           char *user_sex, short user_age,
+                           double user_salary, char *user_dept_num, 
+						   std::string &error_info)
+{
+	char update_sql[500];
+	sprintf(update_sql, 
+		"update Staff set Sname='%s', Ssex='%s', Sage='%s', Ssalary='%0.2lf', Sdeptno='%s' where Sid='%s'",
+		user_name, user_sex, user_age, user_salary, user_dept_num, user_id);
+	/* 执行语句 */
+    if (false == ExecuteSQL(update_sql, error_info))
+    {
+        return false;
+    }
+
+
 	return true;
 }
