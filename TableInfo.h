@@ -7,15 +7,16 @@ class CTableInfo : public CDBForm
 public:
 	CTableInfo();
 	virtual ~CTableInfo();
-	enum TableStatu {
-		kFounding = 0,       /* 已开台 */
-		kNotFounding = 1,    /* 未开台 */
+	enum TableStatus {
+		kFounding = 0,       /* 未开台 */
+		kNotFounding = 1,    /* 已开台 */
 		kBooked = 2          /* 已预定 */
 	};
-	 inline char* table_no();
-	 inline short payable_num();
-	 inline short real_num();
-	 inline short table_status();
+	inline char* table_no();
+	inline short payable_num();
+	inline short real_num();
+	inline short table_status();
+	bool UpdateForm(std::string sql, std::string &error);
 	virtual bool BindingParameter();
 private:
 	char m_table_no_[7];     /* 编号 */
@@ -32,7 +33,7 @@ private:
  * 说明: 获取台号
  * 返回值: 台号字符串
  **/
-char* CTableInfo:: table_no()
+char* CTableInfo::table_no()
 {
 	return m_table_no_;
 }
@@ -50,7 +51,7 @@ short CTableInfo::payable_num()
  * 说明: 获取实容人数
  * 返回值: 实容人数
  **/
-short CTableInfo:: real_num()
+short CTableInfo::real_num()
 {
 	return m_real_num_;
 }
@@ -61,7 +62,7 @@ short CTableInfo:: real_num()
  *          1, 未开台 
  *          2, 已预定 
  **/
-short CTableInfo:: table_status()
+short CTableInfo::table_status()
 {
 	return m_table_status_;
 }

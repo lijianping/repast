@@ -25,6 +25,7 @@ public:
 	std::string GetItem(int item, int subitem);
     int GetItemCount();
     int GetColumnCount();
+	int GetSelectedCount();
     int GetSelectionMark();
     int SetSelectionMark(int index);
     bool SetItemState(int item, UINT state, UINT mask);
