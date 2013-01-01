@@ -39,6 +39,7 @@ protected:
     SQLRETURN m_return_code_;  /* 执行SQL语句返回码 */ 
 	bool m_is_connect_;        /* 是否连接数据库，true表示已连上 */
     std::string m_query_sql_;  /* SQL查询语句 */
+
 };
 
 /*

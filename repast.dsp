@@ -98,6 +98,10 @@ SOURCE=.\ComboBox.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Commodity.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DBForm.cpp
 # End Source File
 # Begin Source File
@@ -167,6 +171,10 @@ SOURCE=.\childwindowid.h
 # Begin Source File
 
 SOURCE=.\ComboBox.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Commodity.h
 # End Source File
 # Begin Source File
 

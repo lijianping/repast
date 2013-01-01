@@ -46,7 +46,6 @@ short CLoginForm::GetUserPermission(std::string user_name,
     sql_statement += "' and Lpassword = '";
     sql_statement += user_password;
     sql_statement += "'";
-	MessageBox(NULL, sql_statement.c_str(), "fd",0);/*just for a test*/
     this->ExecuteSQL((char *)sql_statement.c_str(), information);
     short permission = 0;
     SQLINTEGER sql_permission;

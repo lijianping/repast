@@ -16,16 +16,19 @@ public:
 	 inline short payable_num();
 	 inline short real_num();
 	 inline short table_status();
+	 inline char* datetime();
 	virtual bool BindingParameter();
 private:
-	char m_table_no_[7];     /* 编号 */
-	short m_payable_num_;    /* 应纳人数 */
-	short m_real_num_;       /* 实纳人数 */
-	short m_table_status_;   /* 状态 */
-    SQLINTEGER m_sql_table_no_;
+	char m_table_no_[7];			 /* 编号 */
+	short m_payable_num_;			 /* 应纳人数 */
+	short m_real_num_;				 /* 实纳人数 */
+	short m_table_status_;			 /* 状态 */
+	char m_datetime_[20];
+    SQLINTEGER m_sql_table_no_;    
 	SQLINTEGER m_sql_payable_num_;
 	SQLINTEGER m_sql_real_num_;
 	SQLINTEGER m_sql_table_status_;
+	SQLINTEGER m_sql_datetime;
 };
 
 /*
@@ -66,4 +69,8 @@ short CTableInfo:: table_status()
 	return m_table_status_;
 }
 
+char* CTableInfo:: datetime()
+{
+	return m_datetime_;
+}
 #endif 

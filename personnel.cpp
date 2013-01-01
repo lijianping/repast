@@ -1,6 +1,6 @@
 
 #include "personnel.h"
-
+#include "Commodity.h"
 
 WNDPROC g_OldListProc;   /* The list view processes */
 
@@ -73,6 +73,24 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				{
 					if (OnStartQuery(hwnd))
 					{
+						/*just for test:start*/
+						CCommodity cc;
+						std::string error_info;
+						if (false ==cc.Connect("repast", "repast", "repast", error_info))
+						{
+							MessageBox(hwnd, error_info.c_str(), "test_error",0);
+						}
+						cc.GetRecordSet();
+						cc.MoveFirst();
+						char test[800];
+						while (!cc.IsEOF())
+						{
+							sprintf(test, "%s, %s, %f, %s, %d",
+								  cc.no(), cc.name(), cc.price(),cc.register_date(), cc.sum());
+							MessageBox(hwnd, test, "result", 0);
+							cc.MoveNext();
+						}
+						/*test end*/
 						CListView list;
 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
 						int count = list.GetItemCount();
