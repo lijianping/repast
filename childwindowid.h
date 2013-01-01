@@ -28,3 +28,4 @@
 #define ID_SERVICE_CHECKOUT             60020      /* customer checkout button id */
 #define ID_SERVICE_COMBO				60021      /* the tables where is locate */
 #define ID_SERVICE_CHANGE_PASSWD		60022	   /* change the user password button id */
+#define ID_SERVICE_REFRESH              60023      /* the refresh button that on the service window */

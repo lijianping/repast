@@ -18,6 +18,7 @@
 #define IDD_RETREAT                     107
 #define IDD_CHANGE_TABLE                108
 #define IDD_CUSTOM_CHECKOUT             109
+#define IDD_START_TABLE                 111
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -68,6 +69,11 @@
 #define IDC_GIVECHANGE_CHECKOUT         1052
 #define IDC_SAVE_CHECKOUT               1053
 #define IDC_CANCEL_CHECKOUT             1054
+#define ID_START_OK                     1054
+#define ID_START_CANCEL                 1055
+#define IDC_TABLE_NO_START              1056
+#define IDC_CUSTOMER_NO_START           1057
+#define IDC_REAL_NUM_START              1058
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -76,9 +82,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        110
+#define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1054
+#define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

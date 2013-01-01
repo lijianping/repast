@@ -236,6 +236,13 @@ int CListView::GetColumnCount()
 }
 
 /*
+ **/
+int CListView::GetSelectedCount()
+{
+	return ListView_GetSelectedCount(m_hwnd_);
+}
+
+/*
  * @ Description: Retrieves the selection mark of a list view control.
  * @ Return Value:
  *      The zero-based selection mark, or -1 if there is no selection.

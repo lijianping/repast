@@ -18,6 +18,18 @@ CTableInfo::~CTableInfo()
 
 }
 
+/*
+ *  说明: 更新台号信息表
+ *  参数:
+ *        sql [in] 更新的sql语句
+ *        error [out] 出错时的错误信息
+ *  返回值: 若成功返回true，否则返回false
+ */
+bool CTableInfo::UpdateForm(std::string sql, std::string &error)
+{
+	return this->ExecuteSQL(sql.c_str(), error);
+}
+
 bool CTableInfo::BindingParameter()
 {
 	/* 绑定列 */
