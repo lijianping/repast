@@ -47,12 +47,10 @@
 #define IDC_CUSTOM_MENU_RETREAT         1029
 #define ID_DELETE_RETREAT               1030
 #define ID_SAVE_RETREAT                 1031
-#define IDC_FLOOR_NUM_OLD               1033
 #define IDC_TABLE_NUM_OLD               1034
 #define IDC_PAYABLE_NUM_OLD             1035
 #define IDC_REAL_NUM_OLD                1036
 #define IDC_TABLE_TIME_OLD              1037
-#define IDC_FLOOR_NUM_NEW               1038
 #define IDC_TABLE_NUM_NEW               1039
 #define IDC_PAYABLE_NUM_NEW             1040
 #define IDC_REAL_NUM_NEW                1041
@@ -71,9 +69,13 @@
 #define IDC_CANCEL_CHECKOUT             1054
 #define ID_START_OK                     1054
 #define ID_START_CANCEL                 1055
-#define IDC_TABLE_NO_START              1056
-#define IDC_CUSTOMER_NO_START           1057
 #define IDC_REAL_NUM_START              1058
+#define IDC_CUSTOMER_NO_START2          1059
+#define IDC_LIST1                       1061
+#define IDC_LIST2                       1062
+#define IDC_BUTTON1                     1063
+#define IDC_BUTTON2                     1064
+#define IDC_COMBO1                      1065
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -84,7 +86,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_CONTROL_VALUE         1068
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

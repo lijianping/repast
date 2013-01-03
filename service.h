@@ -34,7 +34,7 @@ BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-bool SetTableInfo(const HWND hwnd, const UINT id, std::string &error);
+bool SetListInfo(const HWND hwnd, const UINT id, std::string &error);
 
 bool CreateRefeshButton(const HWND hwnd, const UINT id);
 

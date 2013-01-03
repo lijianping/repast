@@ -4,16 +4,27 @@
 
 #include "DBForm.h"
 #include <STDIO.H>   /* use sprintf function */
+#include <ASSERT.H>
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 CDBForm::CDBForm()
-    : m_hdbc_(SQL_NULL_HDBC),
-      m_hstmt_(SQL_NULL_HSTMT),
-      m_return_code_(NULL)
+	: m_hdbc_(SQL_NULL_HDBC),
+	  m_hstmt_(SQL_NULL_HSTMT),
+	  m_return_code_(NULL)
 {
+	std::string error;
+	assert(true == this->Connect("repast", "repast", "repast", error));
+}
 
+CDBForm::CDBForm(std::string dns, std::string name, std::string password)
+	: m_hdbc_(SQL_NULL_HDBC),
+      m_hstmt_(SQL_NULL_HSTMT),
+	  m_return_code_(NULL)
+{
+	std::string error;
+	assert(true == this->Connect(dns.c_str(), name.c_str(), password.c_str(), error));
 }
 
 CDBForm::~CDBForm()
@@ -21,51 +32,6 @@ CDBForm::~CDBForm()
 
 }
 
-/*
- * 说明: 初始化基类
- * 参数:
- *       hdbc    [in] 数据库连接句柄
- *       information [out] 连接错误信息
- * 返回值: 执行成功返回true，否则返回false
- */
-bool CDBForm::Initialize(SQLHDBC hdbc, std::string &information)
-{
-    if (NULL == hdbc)
-    {
-        information = "连接断开，请先连接数据库！";
-        return false;
-    }
-    m_hdbc_ = hdbc;
-    /* 分配语句句柄 */
-    m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "分配数据库语句句柄失败！";
-        return false;
-    }
-    /* 设置滚动游标 */
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
-                                    (SQLPOINTER)SQL_CURSOR_DYNAMIC, 
-                                    SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "设置数据库滚动游标失败！";
-        return false;
-	}
-    /*设置并发性*/
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
-                                    (SQLPOINTER)SQL_CONCUR_ROWVER, 
-                                    SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "设置数据库并发性失败！";
-        return false;
-    }
-	return true;
-}
 /*
  * 说明: 判断是否到了记录集的结尾
  * 返回值: 到了结尾返回true，否则返回false
@@ -235,7 +201,18 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
     return true;
 }
 
-bool CDBForm::Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &information)
+/*
+ * 说明: 设置sql语句
+ * 参数:
+ *       statement [in] 待执行的sql语句
+ **/
+void CDBForm::SetSQLStatement(const std::string statement)
+{
+	m_query_sql_ = statement;
+}
+
+bool CDBForm::Connect(const char *dsn, const char *id, 
+					  const char *password, std::string &information)
 {
 	/* 分配环境句柄 */
     m_return_code_ = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &m_henv_);
@@ -345,4 +322,16 @@ void CDBForm::Disconnect()
         SQLFreeHandle(SQL_HANDLE_ENV, m_henv_);
 		m_henv_ = NULL;
     }
+}
+
+/*
+ *  @说明: 获取服务器日期时间
+ *  @返回值: 若成功返回true，否则返回false
+ **/
+char* CDBForm::GetDateTime()
+{
+	std::string error;
+	this->ExecuteSQL("select gatedate()", error);
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_datetime_, sizeof(m_datetime_), NULL);
+	return m_datetime_;
 }

@@ -6,6 +6,7 @@
 
 #include "service.h"
 #include "TableInfo.h"
+#include "Customer.h"
 
 WNDPROC g_old_list_processes;
 char* status[3] = {"未开台", "已开台", "已预订"};
@@ -27,7 +28,7 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 			CreateButton(hwnd);
 			CreateRefeshButton(hwnd, ID_SERVICE_REFRESH);
 			std::string error_info;
-			SetTableInfo(hwnd, ID_SERVICE_LIST, error_info);
+			SetListInfo(hwnd, ID_SERVICE_LIST, error_info);
             return 0;
         }
     case WM_SETFOCUS:
@@ -46,7 +47,11 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 			case ID_SERVICE_REFRESH:
 				{
 					std::string error;
-					SetTableInfo(hwnd, ID_SERVICE_LIST, error);
+					if (!SetListInfo(hwnd, ID_SERVICE_LIST, error))
+					{
+						MessageBox(hwnd, error.c_str(), TEXT("服务管理"), MB_ICONINFORMATION);
+						break;
+					}
 					break;
 				}
 			case ID_SERVICE_COMBO:
@@ -80,27 +85,27 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 				{
 					std::string error_information;  /* 错误信息返回 */
 					CListView table_list;
-					table_list.Initialization(hwnd, ID_SERVICE_LIST);
-					int select_row = table_list.GetSelectionMark();
-					if (-1 == select_row)
-					{
-						MessageBox(hwnd, TEXT("请先选择台号"), TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}
-					std::string table_status = table_list.GetItem(select_row, 1);
-					if (table_status == std::string(status[1]) ||
-						table_status == std::string(status[2]))
-					{
-						MessageBox(hwnd, TEXT("该台号现在不可用"), TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}	
+// 					table_list.Initialization(hwnd, ID_SERVICE_LIST);
+// 					int select_row = table_list.GetSelectionMark();
+// 					if (-1 == select_row)
+// 					{
+// 						MessageBox(hwnd, TEXT("请先选择台号"), TEXT("服务管理"), MB_ICONINFORMATION);
+// 						break;
+// 					}
+// 					std::string table_status = table_list.GetItem(select_row, 1);
+// 					if (table_status == std::string(status[1]) ||
+// 						table_status == std::string(status[2]))
+// 					{
+// 						MessageBox(hwnd, TEXT("该台号现在不可用"), TEXT("服务管理"), MB_ICONINFORMATION);
+// 						break;
+// 					}	
 					Table table_info;
-					table_info.no = table_list.GetItem(select_row, 0);   /* 获取台号 */
-					std::string num = table_list.GetItem(select_row, 2);     /* 获取可容纳人数 */
-					table_info.payable_num = atoi(num.c_str());   /* 备注: 不是很安全 */
+// 					table_info.no = table_list.GetItem(select_row, 0);   /* 获取台号 */
+// 					std::string num = table_list.GetItem(select_row, 2);     /* 获取可容纳人数 */
+// 					table_info.payable_num = atoi(num.c_str());   /* 备注: 不是很安全 */
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_START_TABLE),
 						           hwnd, (DLGPROC)StartTableProc, (long)&table_info);
-					SetTableInfo(hwnd, ID_SERVICE_LIST, error_information);
+					SetListInfo(hwnd, ID_SERVICE_LIST, error_information);
 					break;
 				}
 			case ID_SERVICE_ORDER:
@@ -277,8 +282,8 @@ bool InitListView(const HWND hwnd, UINT id)
 	table_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	if (-1 != table_list.InsertColumn(0, 100, "台号") &&
 		-1 != table_list.InsertColumn(1, 100, "状态") &&
-		-1 != table_list.InsertColumn(2, 100, "可容纳人数") &&
-		-1 != table_list.InsertColumn(3, 150, "开台/预定时间"))
+		-1 != table_list.InsertColumn(2, 100, "顾客编号") &&
+		-1 != table_list.InsertColumn(3, 150, "开台时间"))
 	{
 		return true;
 	}
@@ -656,14 +661,14 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			Table *table_info = (Table *)lParam;
 			table_no = table_info->no;
 			payable_num = table_info->payable_num;
-			SetDlgItemText(hwnd, IDC_TABLE_NO_START, table_info->no.c_str());
+//			SetDlgItemText(hwnd, IDC_TABLE_NO_START, table_info->no.c_str());
 			SYSTEMTIME current_time;
 			char customer_no[128] = "\0";
 			GetLocalTime(&current_time);
 			sprintf(customer_no, "%d%d%d%d%d%s", current_time.wYear, current_time.wMonth,
 				    current_time.wDay, current_time.wHour, current_time.wMinute, table_info->no.c_str());
 			
-			SetDlgItemText(hwnd, IDC_CUSTOMER_NO_START, customer_no);
+//			SetDlgItemText(hwnd, IDC_CUSTOMER_NO_START, customer_no);
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -689,7 +694,7 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					 **/
 					CTableInfo table_info;
 					std::string error_info;
-					if (table_info.Connect("repast", "repast", "repast", error_info))
+//					if (table_info.Connect("repast", "repast", "repast", error_info))
 					{
 						SYSTEMTIME current_time;
 						char time_str[128] = "\0";
@@ -706,12 +711,12 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							break;
 						}
 					}
-					else
-					{
-						MessageBox(hwnd, error_info.c_str(),
-							       TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}
+//					else
+// 					{
+// 						MessageBox(hwnd, error_info.c_str(),
+// 							TEXT("服务管理"), MB_ICONINFORMATION);
+// 						break;
+// 					}
 				}
 			case ID_START_CANCEL:
 				{
@@ -729,6 +734,7 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
+
 /*
  * 说明: 设置台号信息
  * 参数:
@@ -737,19 +743,17 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
  *       error [out] 错误信息
  * 返回值: 成功返回true，否则返回false
  **/
-bool SetTableInfo(const HWND hwnd, const UINT id, std::string &error)
+bool SetListInfo(const HWND hwnd, const UINT id, std::string &error)
 {
 	CTableInfo table_info;
-	if (!table_info.Connect("repast", "repast", "repast", error))
-	{
-		return false;
-	}
-	if (!table_info.GetRecordSet())
+	CCustomer customer;
+	customer.SetSQLStatement("execute SelectCustomer");
+	if (!customer.GetRecordSet())
 	{
 		error = "获取记录集失败！";
 		return false;
 	}
-	if (!table_info.MoveFirst())
+	if (!customer.MoveFirst())
 	{
 		error = "移动到第一条记录集失败！";
 		return false;
@@ -766,14 +770,15 @@ bool SetTableInfo(const HWND hwnd, const UINT id, std::string &error)
 		return false;
 	}
 	int i(0);
-	while (!table_info.IsEOF()) 
+	while (!customer.IsEOF()) 
 	{
-		list.InsertItem(i, table_info.table_no());
-		list.SetItem(i, 1, status[table_info.table_status()]);
-		list.SetItem(i, 2, table_info.payable_num()); 
+		list.InsertItem(i, customer.table_no());
+		list.SetItem(i, 1, status[customer.table_state()]);
+		list.SetItem(i, 2, customer.customer_no());
+		list.SetItem(i, 3, customer.founding_time()); 
 		/* TODO: Add data time at here. */
 		i++;
-		if (!table_info.MoveNext())
+		if (!customer.MoveNext())
 		{
 			error = "移动到下一条记录集失败！";
 			return false;
@@ -782,7 +787,14 @@ bool SetTableInfo(const HWND hwnd, const UINT id, std::string &error)
 	return true;
 }
 
-bool CreateRefeshButton(const HWND hwnd, const UINT)
+/*
+ *  @说明: 创建刷新按钮
+ *  @参数: 
+ *         hwnd [in] 父窗口句柄
+ *         id [in] 窗口标识id
+ *  @返回值: 若成功返回true，否则返回false
+ **/
+bool CreateRefeshButton(const HWND hwnd, const UINT id)
 {
 	CButton refresh;
 	RECT refresh_rect;
@@ -791,5 +803,5 @@ bool CreateRefeshButton(const HWND hwnd, const UINT)
 	refresh_rect.right = 100;
 	refresh_rect.bottom = 30;
 	return refresh.Create("刷  新", ES_CENTER | BS_PUSHBUTTON | WS_TABSTOP,
-		                  refresh_rect, hwnd, ID_SERVICE_REFRESH);
+		                  refresh_rect, hwnd, id);
 }

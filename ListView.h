@@ -32,6 +32,7 @@ public:
     bool DeleteItem(int item);
     bool DeleteAllItems();
     void SetSelectAndGrid(DWORD style);
+	void SetEditLabel(const int item);
 
 private:
     UINT m_id_;
