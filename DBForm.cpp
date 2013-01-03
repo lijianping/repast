@@ -140,6 +140,8 @@ bool CDBForm::MoveLast()
  */
 bool CDBForm::GetRecordSet()
 {
+	
+
     /* 执行查询语句 */
     m_return_code_ = SQLExecDirect(m_hstmt_,
                                    (unsigned char*)m_query_sql_.c_str(),
@@ -151,6 +153,7 @@ bool CDBForm::GetRecordSet()
                    TEXT("DBForm"), MB_OK| MB_ICONERROR);
         return false;
     }
+
     /* 绑定参数 */
     BindingParameter(); 
     return true;
