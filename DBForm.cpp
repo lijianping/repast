@@ -343,3 +343,15 @@ void CDBForm::Disconnect()
 		m_henv_ = NULL;
     }
 }
+
+/*
+ *  @说明: 获取服务器日期时间
+ *  @返回值: 若成功返回true，否则返回false
+ **/
+char* CDBForm::GetDateTime()
+{
+	std::string error;
+	this->ExecuteSQL("select gatedate()", error);
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_datetime_, sizeof(m_datetime_), NULL);
+	return m_datetime_;
+}

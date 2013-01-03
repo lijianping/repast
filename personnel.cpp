@@ -73,24 +73,6 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				{
 					if (OnStartQuery(hwnd))
 					{
-						/*just for test:start*/
-						CCommodity cc;
-						std::string error_info;
-						if (false ==cc.Connect("repast", "repast", "repast", error_info))
-						{
-							MessageBox(hwnd, error_info.c_str(), "test_error",0);
-						}
-						cc.GetRecordSet();
-						cc.MoveFirst();
-						char test[800];
-						while (!cc.IsEOF())
-						{
-							sprintf(test, "%s, %s, %f, %s, %d",
-								  cc.no(), cc.name(), cc.price(),cc.register_date(), cc.sum());
-							MessageBox(hwnd, test, "result", 0);
-							cc.MoveNext();
-						}
-						/*test end*/
 						CListView list;
 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
 						int count = list.GetItemCount();
@@ -248,7 +230,7 @@ bool CreateStaffListView(HWND parent_hwnd)
 	/* Set the staff list width and height */
 	list_rect.right = width - 40;
 	list_rect.bottom = height / 4 * 3 - 40;
-	DWORD style = LVS_REPORT; /* Set the list view's style */
+	DWORD style = LVS_REPORT | LVS_EDITLABELS; /* Set the list view's style */
 	/* Set the new list view process */
 	staff_list.set_new_process(StaffListProc);
 	bool is_ok = staff_list.Create(style, list_rect, parent_hwnd,
@@ -335,6 +317,7 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 	char number[10];
 	sprintf(number, "%d »À", count);
 	SetWindowText(GetDlgItem(parent_hwnd, ID_CURRENT_RECORD_SUM), number);
+	staff_list.SetEditLabel(1);
 }
 
 /* 

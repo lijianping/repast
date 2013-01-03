@@ -46,7 +46,11 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 			case ID_SERVICE_REFRESH:
 				{
 					std::string error;
-					SetTableInfo(hwnd, ID_SERVICE_LIST, error);
+					if (!SetTableInfo(hwnd, ID_SERVICE_LIST, error))
+					{
+						MessageBox(hwnd, error.c_str(), TEXT("服务管理"), MB_ICONINFORMATION);
+						break;
+					}
 					break;
 				}
 			case ID_SERVICE_COMBO:
@@ -277,8 +281,8 @@ bool InitListView(const HWND hwnd, UINT id)
 	table_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	if (-1 != table_list.InsertColumn(0, 100, "台号") &&
 		-1 != table_list.InsertColumn(1, 100, "状态") &&
-		-1 != table_list.InsertColumn(2, 100, "可容纳人数") &&
-		-1 != table_list.InsertColumn(3, 150, "开台/预定时间"))
+		-1 != table_list.InsertColumn(2, 100, "顾客编号") &&
+		-1 != table_list.InsertColumn(3, 100, "开台时间"))
 	{
 		return true;
 	}
@@ -729,6 +733,7 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
+
 /*
  * 说明: 设置台号信息
  * 参数:
@@ -782,7 +787,14 @@ bool SetTableInfo(const HWND hwnd, const UINT id, std::string &error)
 	return true;
 }
 
-bool CreateRefeshButton(const HWND hwnd, const UINT)
+/*
+ *  @说明: 创建刷新按钮
+ *  @参数: 
+ *         hwnd [in] 父窗口句柄
+ *         id [in] 窗口标识id
+ *  @返回值: 若成功返回true，否则返回false
+ **/
+bool CreateRefeshButton(const HWND hwnd, const UINT id)
 {
 	CButton refresh;
 	RECT refresh_rect;
@@ -791,5 +803,5 @@ bool CreateRefeshButton(const HWND hwnd, const UINT)
 	refresh_rect.right = 100;
 	refresh_rect.bottom = 30;
 	return refresh.Create("刷  新", ES_CENTER | BS_PUSHBUTTON | WS_TABSTOP,
-		                  refresh_rect, hwnd, ID_SERVICE_REFRESH);
+		                  refresh_rect, hwnd, id);
 }

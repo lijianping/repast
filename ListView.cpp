@@ -322,5 +322,10 @@ bool CListView::DeleteAllItems()
 
 void CListView::SetSelectAndGrid(DWORD style)
 {
-    ListView_SetExtendedListViewStyle(m_hwnd_, style); 
+    ListView_SetExtendedListViewStyle(m_hwnd_, style| LVS_EX_INFOTIP); 
+}
+
+void CListView::SetEditLabel(const int item)
+{
+	ListView_EditLabel(m_hwnd_, item);
 }
