@@ -73,7 +73,6 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				{
 					if (OnStartQuery(hwnd))
 					{
-
 						CListView list;
 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
 						int count = list.GetItemCount();
