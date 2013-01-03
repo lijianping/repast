@@ -87,20 +87,7 @@ bool CStaffForm::DeleteInfo(char *user_id, std::string &error_info)
 {
 	char delete_sql[500];
 	char query_sql[500];
-	sprintf (delete_sql, "delete from Staff where Sno='%s'", user_id);   /*格式化查询语句*/
 	sprintf (query_sql, "select Sno from Staff where Sno='%s'", user_id);/*格式化删除语句*/
-	/*先查询是否有此记录，若有，则删除*/
-	if (false == ExecuteSQL(query_sql, error_info))
-	{
-		return false;
-	}
-	BindingParameter();
-	MoveFirst();
-	if (0 == strcmp("", id()))
-	{
-		error_info = "删除失败：无此记录";
-		return false;
-	}
 	/* 执行语句 */
     if (false == ExecuteSQL(delete_sql, error_info))
     {

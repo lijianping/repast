@@ -39,7 +39,7 @@ bool CListView::Create(DWORD style, const RECT &rect,
 {
     m_hwnd_ = CreateWindowEx(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
                              WC_LISTVIEW, NULL,
-                             WS_CHILD | WS_VISIBLE | WS_BORDER | style,
+                             WS_CHILD | WS_VISIBLE | style,
                              rect.left, rect.top, rect.right, rect.bottom,
                              parent_hwnd, (HMENU)id,
                              (HINSTANCE)GetWindowLong(parent_hwnd, GWL_HINSTANCE),

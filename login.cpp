@@ -63,12 +63,6 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                         /* get permission from database */
                         CLoginForm login; 
 						std::string error_information;
-						if (!login.Connect("repast", "repast", "repast",error_information))
-						{
-							MessageBox(hwnd, error_information.c_str(),
-                                TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
-                            return FALSE;
-						}
                         std::string name(user_name);
                         std::string password(user_password);
                         return_value = login.GetUserPermission(name, password,
@@ -79,7 +73,6 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                                        TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
                             return FALSE;
                         }
-						login.Disconnect();
                     }
                     EndDialog(hwnd, return_value);
                     break;

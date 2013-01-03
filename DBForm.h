@@ -15,14 +15,9 @@
 class CDBForm  
 {
 public:
-	bool Connect(CHAR *dsn, CHAR *id, CHAR *password, std::string &information);
-	inline bool is_connect();
-    inline SQLHENV henv() const;
-    inline SQLHDBC hdbc() const;
-    void Disconnect();
 	CDBForm();
+	CDBForm(std::string dns, std::string name, std::string password);
 	virtual ~CDBForm();
-    bool Initialize(SQLHDBC hdbc, std::string &information);
     bool IsEOF();
     bool MoveFirst();
     bool MoveNext();
@@ -32,7 +27,16 @@ public:
     bool ExecuteSQL(const char *sql_statement, std::string &error_info);
     virtual bool BindingParameter();
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &error_info);
+	void SetSQLStatement(const std::string statement);
 	char* GetDateTime();
+
+protected:
+	inline bool is_connect();
+    inline SQLHENV henv() const;
+    inline SQLHDBC hdbc() const;
+	bool Connect(const char *dsn, const char *id, 
+		         const char *password, std::string &information);
+    void Disconnect();
 
 protected:
 	SQLHENV m_henv_;           /* »·¾³¾ä±ú */

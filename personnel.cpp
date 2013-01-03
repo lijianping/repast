@@ -288,7 +288,7 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 	CStaffForm staff_info;
 	std::string error_information;
 	/* Connect the database */
-	staff_info.Connect("repast", "repast", "repast", error_information);
+//	staff_info.Connect("repast", "repast", "repast", error_information);
 	/* Get the record set */
 	staff_info.GetRecordSet();
 	/* Move to the first record */
@@ -310,7 +310,7 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 		i++;
 	}
 	/* Disconnect the link */
-	staff_info.Disconnect();
+//	staff_info.Disconnect();
 	/* The default selected line */
 	staff_list.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
 	int count = staff_list.GetItemCount();
@@ -709,7 +709,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 {
 	CStaffForm staff;
 	/* Connect to the database */
-	if (!staff.Connect("repast", "repast", "repast", error))
+//	if (!staff.Connect("repast", "repast", "repast", error))
 	{
 		return false;
 	}
@@ -723,7 +723,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	if (0 == strcmp("",staff.id()))
 	{
 		error = "ÎÞÆ¥Åä½á¹û£¡";
-		staff.Disconnect();
+//		staff.Disconnect();
 		return false;
 	}
 	else
@@ -749,7 +749,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 		}
 	}
 	/* Disconnect from database */
-	staff.Disconnect();
+//	staff.Disconnect();
 	return true;
 }
 
