@@ -73,6 +73,14 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				{
 					if (OnStartQuery(hwnd))
 					{
+						/*just for a test:start*/
+						char systime[21], tmp[100];
+						CDBForm cd;
+						int datepart;
+						datepart=cd.GetYear();
+						sprintf(tmp,"time: %d",datepart);
+						MessageBox(NULL, tmp, "result",0);
+						/*test end*/
 						CListView list;
 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
 						int count = list.GetItemCount();
@@ -708,13 +716,9 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &error)
 {
 	CStaffForm staff;
-	/* Connect to the database */
-//	if (!staff.Connect("repast", "repast", "repast", error))
-	{
-		return false;
-	}
 	if (!staff.ExecuteSQL(sql_query, error))
 	{
+		MessageBox(hwnd,error.c_str(),"error",MB_ICONINFORMATION|MB_OK);
 		return false;
 	}
 	staff.BindingParameter();  /* In this function, there no error judge. */
@@ -723,7 +727,6 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	if (0 == strcmp("",staff.id()))
 	{
 		error = "无匹配结果！";
-//		staff.Disconnect();
 		return false;
 	}
 	else
@@ -767,6 +770,7 @@ bool OnStartQuery(const HWND hwnd)
 	std::string error;
 	if (!ExecQuery(hwnd, ID_PERSONNEL_INFO, sql_statement.c_str(), error))
 	{
+		MessageBox(hwnd, sql_statement.c_str(), "sql",0 );//test
 		MessageBox(hwnd, error.c_str(), TEXT("查询错误"),
 			       MB_ICONINFORMATION | MB_OK);
 		return false;
