@@ -190,8 +190,6 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					}
 					Table table_info;
 					table_info.no = table_list.GetItem(select_row, 0);              /* 获取台号 */
-					std::string num = table_list.GetItem(select_row, 2);     /* 获取可容纳人数 */
-					table_info.payable_num = atoi(num.c_str());   /* 备注: 不是很安全 */
 					table_info.founding_time = table_list.GetItem(select_row, 3);   /* 获取开台时间 */
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CHANGE_TABLE),
 						           hwnd, (DLGPROC)ChangeProc, (long)&table_info);
@@ -280,9 +278,9 @@ bool InitListView(const HWND hwnd, UINT id)
 	table_list.Initialization(hwnd, id);
 	/* Set the full row selected and grid lines */
 	table_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	if (-1 != table_list.InsertColumn(0, 100, "台号") &&
-		-1 != table_list.InsertColumn(1, 100, "状态") &&
-		-1 != table_list.InsertColumn(2, 100, "顾客编号") &&
+	if (-1 != table_list.InsertColumn(0, 80, "台号") &&
+		-1 != table_list.InsertColumn(1, 80, "状态") &&
+		-1 != table_list.InsertColumn(2, 150, "顾客编号") &&
 		-1 != table_list.InsertColumn(3, 150, "开台时间"))
 	{
 		return true;
@@ -593,15 +591,16 @@ BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				(screen_height - height) / 2,
 				width, height, TRUE);
-			/*HWND table_list = GetDlgItem(hwnd, IDC_TABLE_AVAILABLE);*/
+	
 			Table *table_info = (Table *)lParam;
 			SetDlgItemText(hwnd, IDC_TABLE_NUM_OLD, table_info->no.c_str());
-			SetDlgItemInt(hwnd, IDC_PAYABLE_NUM_OLD, table_info->payable_num, TRUE);
+			
 			SetDlgItemText(hwnd, IDC_TABLE_TIME_OLD, table_info->founding_time.c_str());
 			CListView table;
 			table.Initialization(hwnd, IDC_TABLE_AVAILABLE);
-			table.InsertColumn(0, 100, "可用台号");
+			table.InsertColumn(0, 100, "台号");
 			table.SetSelectAndGrid(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+			InitAvailableTable(hwnd);
 			CComboBox postion;
 			postion.Initialization(hwnd, IDC_FLOOR_NUM_AVAILABLE);
 			postion.AddString("大厅一楼");
@@ -804,4 +803,23 @@ bool CreateRefeshButton(const HWND hwnd, const UINT id)
 	refresh_rect.bottom = 30;
 	return refresh.Create("刷  新", ES_CENTER | BS_PUSHBUTTON | WS_TABSTOP,
 		                  refresh_rect, hwnd, id);
+}
+
+bool InitAvailableTable(const HWND hwnd)
+{
+	CTableInfo table_form;
+	CListView table_list;
+	table_list.Initialization(hwnd, IDC_TABLE_AVAILABLE);
+	table_form.SetSQLStatement("select * from TableInfo");
+	table_form.GetRecordSet();
+	table_form.MoveFirst();
+	int i(0);
+	while (!table_form.IsEOF())
+	{
+		std::string temp = table_form.table_no();
+		table_list.InsertItem(i, temp);
+		table_form.MoveNext();
+		i++;
+	}
+	return true;
 }

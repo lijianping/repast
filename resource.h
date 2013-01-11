@@ -55,7 +55,6 @@
 #define IDC_PAYABLE_NUM_NEW             1040
 #define IDC_REAL_NUM_NEW                1041
 #define IDC_TABLE_TIME_NEW              1042
-#define IDC_TABLE_AVAILABLE             1043
 #define IDC_FLOOR_NUM_AVAILABLE         1045
 #define IDC_SAVE_CHANGE                 1046
 #define IDC_CANCLE_CHANGE               1047
@@ -71,11 +70,13 @@
 #define ID_START_CANCEL                 1055
 #define IDC_REAL_NUM_START              1058
 #define IDC_CUSTOMER_NO_START2          1059
-#define IDC_LIST1                       1061
 #define IDC_LIST2                       1062
 #define IDC_BUTTON1                     1063
 #define IDC_BUTTON2                     1064
 #define IDC_COMBO1                      1065
+#define IDC_TABLE_AVAILABLE             1070
+#define IDC_LIST3                       1071
+#define IDC_LIST5                       1073
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -86,7 +87,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1068
+#define _APS_NEXT_CONTROL_VALUE         1074
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

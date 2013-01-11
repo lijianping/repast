@@ -38,6 +38,13 @@ bool SetListInfo(const HWND hwnd, const UINT id, std::string &error);
 
 bool CreateRefeshButton(const HWND hwnd, const UINT id);
 
+/*
+ *  @说明: 初始化换台对话框中的可用台号
+ *  @返回值:
+ *           若成功返回true，否则返回false
+ **/
+bool InitAvailableTable(const HWND hwnd);
+
 /* Create list view */
 /*bool CreateList(HINSTANCE hinstance, HWND hwnd, CMyListView &list_view);*/
 

@@ -19,12 +19,15 @@ public:
 	inline short table_state() const;
 
 private:
-	char m_customer_no_[15];        /* 顾客编号 */
+	char m_customer_no_[16];        /* 顾客编号 */
 	short m_customer_num_;          /* 顾客人数 */
 	char m_founding_time_[20];      /* 开台/预定时间 */
 	short m_table_state_;           /* 台号状态 */
-	char m_table_no_[6];            /* 台号 */
-	SQLINTEGER m_length_;
+	char m_table_no_[7];            /* 台号 */
+	SQLINTEGER m_table_no_len_;
+	SQLINTEGER m_table_state_len_;
+	SQLINTEGER m_customer_no_len_;
+	SQLINTEGER m_time_len_;
 };
 
 char* CCustomer::customer_no() 
@@ -53,3 +56,24 @@ short CCustomer::table_state() const
 }
 
 #endif 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
