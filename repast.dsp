@@ -102,6 +102,10 @@ SOURCE=.\Commodity.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Customer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DBForm.cpp
 # End Source File
 # Begin Source File
@@ -175,6 +179,10 @@ SOURCE=.\ComboBox.h
 # Begin Source File
 
 SOURCE=.\Commodity.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Customer.h
 # End Source File
 # Begin Source File
 

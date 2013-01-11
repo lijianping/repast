@@ -29,7 +29,7 @@ CDBForm::CDBForm(std::string dns, std::string name, std::string password)
 
 CDBForm::~CDBForm()
 {
-
+	
 }
 
 /*
@@ -326,12 +326,92 @@ void CDBForm::Disconnect()
 
 /*
  *  @说明: 获取服务器日期时间
- *  @返回值: 若成功返回true，否则返回false
+ *  @返回值: 若成功返回true，否则返回null
  **/
 char* CDBForm::GetDateTime()
 {
 	std::string error;
-	this->ExecuteSQL("select gatedate()", error);
-	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_datetime_, sizeof(m_datetime_), NULL);
+	if (false==this->ExecuteSQL("select getdate()", error))
+	{
+		MessageBox(NULL,error.c_str(),"error", MB_OK|MB_ICONINFORMATION);
+		return NULL;
+	}
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_datetime_, sizeof(m_datetime_), &m_sql_datetime_);
+	this->MoveFirst();
 	return m_datetime_;
 }
+
+
+/*
+ *  @说明: 获取服务器日期中的部分
+ *  @参数：datepart [in] 指明返回日期中的哪一部分
+ *          year,month,day,hour,minute,second
+ *  @返回值: 若成功日期的部分，否则返回-1
+**/
+int CDBForm::GetDatePart(char* datepart)
+{
+	std::string error;
+	char sql_selectdate[64];
+//	sprintf(sql_selectdate,"select datepart(year,getdate())");
+	sprintf(sql_selectdate,"execute Getdatepart 'year'");
+//	sprintf(sql_selectdate,"execute Getdatepart'%s'",datepart);
+	MessageBox(NULL, sql_selectdate, "sqldate", 0);
+	if (false==this->ExecuteSQL(sql_selectdate, error))
+	{
+		MessageBox(NULL,error.c_str(),"error", MB_OK|MB_ICONINFORMATION);
+		return -1;
+	}
+	SQLBindCol(m_hstmt_, 1, SQL_C_LONG, &m_datepart_, sizeof(m_datepart_), &m_sql_datetime_);
+	this->MoveFirst();
+	return m_datepart_;
+}
+
+/*
+ *  @说明: 获取服务器日期中的年份
+ *  @返回值: 年份
+**/
+int CDBForm::GetYear()
+{
+	return GetDatePart("year");
+}
+
+/*
+ *  @说明: 获取服务器日期中的月份
+ *  @返回值: 月份
+**/
+int CDBForm::GetMonth()
+{
+	return GetDatePart("month");
+}
+// /*
+//  *  @说明: 获取服务器日期中的天日期
+//  *  @返回值: 天日期
+// **/
+// int CDBForm::GetDay()
+// {
+// 	return GetDatePart("day");
+// }
+// /*
+//  *  @说明: 获取服务器日期中的小时
+//  *  @返回值: 小时
+// **/
+// int CDBForm::GetHour()
+// {
+// 	return GetDatePart("hour");
+// }
+// /*
+//  *  @说明: 获取服务器日期中的分钟
+//  *  @返回值: 分钟
+// **/
+// int CDBForm::GetMinute()
+// {
+// 	return GetDatePart("minute");
+// }
+// /*
+//  *  @说明: 获取服务器日期中的秒
+//  *  @返回值: 秒
+// **/
+// int CDBForm::GetSecond()
+// {
+// 	return GetDatePart("second");
+// }
