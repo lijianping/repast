@@ -130,6 +130,10 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\MenuForm.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\personnel.cpp
 # End Source File
 # Begin Source File
@@ -199,6 +203,10 @@ SOURCE=.\ListView.h
 # Begin Source File
 
 SOURCE=.\LoginForm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MenuForm.h
 # End Source File
 # Begin Source File
 

@@ -34,7 +34,6 @@
 #define IDC_SEX_MAN                     1011
 #define IDC_SEX_WOMAN                   1012
 #define IDC_STAFF_DEPT2                 1013
-#define IDC_REPAST_MENU                 1017
 #define IDC_ADD_DISH                    1018
 #define IDC_DELETE_DISH                 1019
 #define IDC_SAVE_MENU                   1020
@@ -70,13 +69,14 @@
 #define ID_START_CANCEL                 1055
 #define IDC_REAL_NUM_START              1058
 #define IDC_CUSTOMER_NO_START2          1059
-#define IDC_LIST2                       1062
 #define IDC_BUTTON1                     1063
 #define IDC_BUTTON2                     1064
 #define IDC_COMBO1                      1065
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_LIST5                       1073
+#define IDC_DISH_NUMBER                 1074
+#define IDC_REPAST_MENU                 1075
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -87,7 +87,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1074
+#define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -7,8 +7,10 @@
 #include "service.h"
 #include "TableInfo.h"
 #include "Customer.h"
+#include "MenuForm.h"
 
-WNDPROC g_old_list_processes;
+WNDPROC g_old_list_processes; /* 主对话框中的列表处理过程 */
+WNDPROC g_dialog_menu_proc;  /* 对话框中的菜单列表的窗口处理过程 */
 char* status[3] = {"未开台", "已开台", "已预订"};
 
 LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
@@ -99,7 +101,7 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 // 						MessageBox(hwnd, TEXT("该台号现在不可用"), TEXT("服务管理"), MB_ICONINFORMATION);
 // 						break;
 // 					}	
-					Table table_info;
+					CustomerTable table_info;
 // 					table_info.no = table_list.GetItem(select_row, 0);   /* 获取台号 */
 // 					std::string num = table_list.GetItem(select_row, 2);     /* 获取可容纳人数 */
 // 					table_info.payable_num = atoi(num.c_str());   /* 备注: 不是很安全 */
@@ -124,8 +126,9 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 						MessageBox(hwnd, TEXT("该台尚未开台！"), TEXT("服务管理"), MB_ICONINFORMATION);
 						break;
 					}
-					Table table_info;  /* 台号信息 */
-					table_info.no = table_list.GetItem(select_row, 0);
+					CustomerTable table_info;  /* 台号信息 */
+					table_info.table_no = table_list.GetItem(select_row, 0);
+					table_info.customer_no = table_list.GetItem(select_row, 2);
 				//	table_info.founding_time = table_list.GetItem(select_row, 2);
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_ORDER),
 						           hwnd, (DLGPROC)OrderProc, (long)&table_info);
@@ -188,8 +191,9 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 							       TEXT("服务管理"), MB_ICONINFORMATION);
 						break;
 					}
-					Table table_info;
-					table_info.no = table_list.GetItem(select_row, 0);              /* 获取台号 */
+					CustomerTable table_info;
+					table_info.table_no = table_list.GetItem(select_row, 0);              /* 获取台号 */
+					table_info.customer_no = table_list.GetItem(select_row, 2);     /* 获取顾客编号 */
 					table_info.founding_time = table_list.GetItem(select_row, 3);   /* 获取开台时间 */
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CHANGE_TABLE),
 						           hwnd, (DLGPROC)ChangeProc, (long)&table_info);
@@ -439,16 +443,32 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				       (screen_height - height) / 2,
 					   width, height, TRUE);
-			Table *table = (Table *)lParam;
-			SetDlgItemText(hwnd, IDC_TABLE_NUM, table->no.c_str());
+			CustomerTable *table = (CustomerTable *)lParam;
+			SetDlgItemText(hwnd, IDC_TABLE_NUM, table->table_no.c_str());
+			SetDlgItemText(hwnd, IDC_CUSTOM_NUM, table->customer_no.c_str());
 			CListView menu_list, custom_list;
 			menu_list.Initialization(hwnd, IDC_REPAST_MENU);
-			menu_list.InsertColumn(0, 100, "菜名");
-			menu_list.InsertColumn(1, 100, "价格");
-			menu_list.SetSelectAndGrid(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+			g_dialog_menu_proc = menu_list.SetListProc(OrderMenuListProc); /* 更改其默认的窗口处理过程 */
+			menu_list.InsertColumn(0, 120, "菜名");
+			menu_list.InsertColumn(1, 80, "单价");
+			menu_list.SetSelectAndGrid( LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+//			menu_list.SetExtendStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+			CMenuForm menu_form;
+			menu_form.SetSQLStatement("select * from Menu");
+			menu_form.GetRecordSet();
+			menu_form.MoveFirst();
+			int i(0);
+			while (!menu_form.IsEOF())
+			{
+				menu_list.InsertItem(i, menu_form.dish_name());
+				menu_list.SetItem(i, 1, menu_form.dish_price());
+				i++;
+				menu_form.MoveNext();
+			}
 			custom_list.Initialization(hwnd, IDC_CUSTOM_MENU);
-			custom_list.InsertColumn(0, 100, "菜名");
-			custom_list.InsertColumn(1, 100, "价格");
+			custom_list.InsertColumn(0, 120, "菜名");
+			custom_list.InsertColumn(1, 80, "单价");
+			custom_list.InsertColumn(2, 50, "数量");
 			custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			return TRUE;
 		}
@@ -456,6 +476,31 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
+			case IDC_ADD_DISH:
+				{
+					/* 初始化列表控件 */
+					CListView menu_list, customer_list;
+					menu_list.Initialization(hwnd, IDC_REPAST_MENU);
+					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
+					/* 获取菜单列表中的项 */
+					int select_row = menu_list.GetSelectionMark();
+					select_row = 0;
+					if (-1 == select_row) {
+						MessageBox(hwnd, TEXT("请先选择一个项！"), TEXT("点菜"), MB_ICONINFORMATION);
+						break;
+					}
+					BOOL is_ok;
+					int num = GetDlgItemInt(hwnd, IDC_DISH_NUMBER, &is_ok, FALSE);
+					if (!is_ok) {
+						MessageBox(hwnd, TEXT("数量输入有误！"), TEXT("点菜"), MB_ICONINFORMATION);
+						break;
+					}
+					/* 获取顾客点菜信息并放入顾客点菜列表 */
+					customer_list.InsertItem(0, menu_list.GetItem(select_row, 0)); 
+					customer_list.SetItem(0, 1, menu_list.GetItem(select_row, 1));
+					customer_list.SetItem(0, 2, num);
+					break;
+				}
 			case IDC_CANCEL_MENU:
 				{
 					EndDialog(hwnd, LOWORD(wParam));
@@ -570,8 +615,8 @@ BOOL CALLBACK RetreatProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 /*
- * 说明: 换台窗口处理过程函数 
- **/
+* 说明: 换台窗口处理过程函数 
+**/
 BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -592,8 +637,8 @@ BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				(screen_height - height) / 2,
 				width, height, TRUE);
 	
-			Table *table_info = (Table *)lParam;
-			SetDlgItemText(hwnd, IDC_TABLE_NUM_OLD, table_info->no.c_str());
+			CustomerTable *table_info = (CustomerTable *)lParam;
+			SetDlgItemText(hwnd, IDC_TABLE_NUM_OLD, table_info->table_no.c_str());
 			
 			SetDlgItemText(hwnd, IDC_TABLE_TIME_OLD, table_info->founding_time.c_str());
 			CListView table;
@@ -657,15 +702,15 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 					   (screen_height - height) / 2,
 				       width, height, TRUE);
-			Table *table_info = (Table *)lParam;
-			table_no = table_info->no;
-			payable_num = table_info->payable_num;
+			CustomerTable *table_info = (CustomerTable *)lParam;
+			table_no = table_info->table_no;
+			
 //			SetDlgItemText(hwnd, IDC_TABLE_NO_START, table_info->no.c_str());
 			SYSTEMTIME current_time;
 			char customer_no[128] = "\0";
 			GetLocalTime(&current_time);
 			sprintf(customer_no, "%d%d%d%d%d%s", current_time.wYear, current_time.wMonth,
-				    current_time.wDay, current_time.wHour, current_time.wMinute, table_info->no.c_str());
+				    current_time.wDay, current_time.wHour, current_time.wMinute, table_info->table_no.c_str());
 			
 //			SetDlgItemText(hwnd, IDC_CUSTOMER_NO_START, customer_no);
 			return TRUE;
@@ -822,4 +867,18 @@ bool InitAvailableTable(const HWND hwnd)
 		i++;
 	}
 	return true;
+}
+
+LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_LBUTTONDOWN:
+		{
+			HWND dialog_hwnd = GetParent(hwnd);
+			HWND number_edit_hwnd = GetDlgItem(dialog_hwnd, IDC_DISH_NUMBER);  /* 获取数量编辑框句柄 */
+			SetDlgItemInt(dialog_hwnd, IDC_DISH_NUMBER, 1, FALSE);   /* 初始为1 */
+			return 0;
+		}
+	}
+	return CallWindowProc(g_dialog_menu_proc, hwnd, message, wParam, lParam);
 }

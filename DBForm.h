@@ -27,7 +27,7 @@ public:
     bool ExecuteSQL(const char *sql_statement, std::string &error_info);
     virtual bool BindingParameter();
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &error_info);
-	void SetSQLStatement(const std::string statement);
+	virtual void SetSQLStatement(const std::string statement);
 	char* GetDateTime();
 	int GetDatePart(char* datepart);
 	int GetYear();

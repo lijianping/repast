@@ -33,6 +33,8 @@ public:
     bool DeleteAllItems();
     void SetSelectAndGrid(DWORD style);
 	void SetEditLabel(const int item);
+	WNDPROC SetListProc(const WNDPROC proc);
+	void SetExtendStyle(DWORD style);
 
 private:
     UINT m_id_;

@@ -45,18 +45,20 @@ bool CreateRefeshButton(const HWND hwnd, const UINT id);
  **/
 bool InitAvailableTable(const HWND hwnd);
 
-/* Create list view */
-/*bool CreateList(HINSTANCE hinstance, HWND hwnd, CMyListView &list_view);*/
-
 bool CreateStartButton(HINSTANCE hinstance, HWND hwnd, std::string error_info);
+
+/*
+ * @ 说明: 下单对话框中的菜单list view窗口处理过程函数
+ **/
+LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 /* struct define */
 
 /* 台号信息 */
-struct Table {
-	std::string no;              /* 台号 */
-	int payable_num;             /* 应纳人数 */
-	int real_num;                /* 实纳人数 */
-	std::string founding_time;   /* 开台时间 */
+struct CustomerTable {
+	std::string table_no;
+	int table_state;
+	std::string customer_no;
+	std::string founding_time;
 };
 #endif  
