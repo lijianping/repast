@@ -872,7 +872,7 @@ bool InitAvailableTable(const HWND hwnd)
 LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
-	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
 		{
 			HWND dialog_hwnd = GetParent(hwnd);
 			HWND number_edit_hwnd = GetDlgItem(dialog_hwnd, IDC_DISH_NUMBER);  /* 获取数量编辑框句柄 */

@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// Chinese (中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -125,7 +125,8 @@ BEGIN
     EDITTEXT        IDC_DISH_NUMBER,166,70,28,12,ES_AUTOHSCROLL
     LTEXT           "数量",IDC_STATIC,145,72,21,12
     CONTROL         "List1",IDC_REPAST_MENU,"SysListView32",LVS_REPORT | 
-                    WS_BORDER | WS_TABSTOP,34,76,90,109
+                    LVS_SINGLESEL | LVS_EDITLABELS | WS_BORDER | WS_TABSTOP,
+                    34,76,90,109
 END
 
 IDD_RETREAT DIALOG DISCARDABLE  0, 0, 337, 185
@@ -360,7 +361,7 @@ BEGIN
     0
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // Chinese (中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
