@@ -19,9 +19,14 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			CreateStaffListView(hwnd);
 			InitListView(hwnd, ID_PERSONNEL_INFO);
 			SetListViewData(hwnd, ID_PERSONNEL_INFO);
-			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */ 
+			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
 			return 0;
 		}
+	case WM_PRINT:
+		{
+			MessageBox(hwnd, "test WM_PAIT", "test", 0);
+		}
+		return 0;
 	case WM_COMMAND:
 		{
 			bool is_check = false;
@@ -74,28 +79,6 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 					if (OnStartQuery(hwnd))
 					{
 						/*just for a test:start*/
-						char systime[21], tmp[100];
-						CDBForm cd;
-						std::string error;
-						int datepart;
-						datepart=cd.GetYear();
-						sprintf(tmp,"time: %d",datepart);
-						MessageBox(NULL, tmp, "result",0);
-						datepart=cd.GetMonth();
-						sprintf(tmp,"time: %d",datepart);
-						MessageBox(NULL, tmp, "result",0);
-						datepart=cd.GetDay();
-						sprintf(tmp,"time: %d",datepart);
-						MessageBox(NULL, tmp, "result",0);
-						datepart=cd.GetHour();
-						sprintf(tmp,"time: %d",datepart);
-						MessageBox(NULL, tmp, "result",0);
-						datepart=cd.GetMinute();
-						sprintf(tmp,"time: %d",datepart);
-						MessageBox(NULL, tmp, "result",0);
-						datepart=cd.GetSecond();
-						sprintf(tmp,"time: %d",datepart);
-						MessageBox(NULL, tmp, "result",0);
 
 						/*test end*/
 						CListView list;
@@ -292,7 +275,10 @@ bool InitListView(HWND parent_hwnd, UINT id)
 		-1 != staff_list.InsertColumn(2, 100, "员工性别") &&
 		-1 != staff_list.InsertColumn(3, 100, "员工年龄") &&
 		-1 != staff_list.InsertColumn(4, 100, "员工工资") &&
-		-1 != staff_list.InsertColumn(5, 100, "员工部门"))
+		-1 != staff_list.InsertColumn(5, 100, "员工部门") &&
+		-1 != staff_list.InsertColumn(6, 100, "员工邮箱") &&
+		-1 != staff_list.InsertColumn(7, 100, "员工电话") &&
+		-1 != staff_list.InsertColumn(8, 100, "员工地址"))
 	{
 		return true;
 	}
@@ -330,6 +316,9 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 		staff_list.SetItem(i, 3, staff_info.age());
 		staff_list.SetItem(i, 4, staff_info.salary());
 		staff_list.SetItem(i, 5, staff_info.dept_num());
+		staff_list.SetItem(i, 6, staff_info.mailbox());
+		staff_list.SetItem(i, 7, staff_info.phone_num());
+		staff_list.SetItem(i, 8, staff_info.address());
 		/* Move to the next record */	
 		staff_info.MoveNext();
 		i++;
@@ -692,7 +681,7 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 {
 	char sql_query[256] = "\0";
 	std::string id = GetID(parent_hwnd);   /* Get the staff's id from id's edit box */
-	sprintf(sql_query, "select * from Staff where Sno like '%c%s%c'",
+	sprintf(sql_query, "select Sno,Sname,Ssex,Sage,Ssalary,Dname,Smailbox,Sphoneno,Saddress from Staff,Dept where Sno like '%c%s%c'",
 		    '%', id.c_str(), '%');
 	std::string sql_statement(sql_query);
 	if (IsCheckName(parent_hwnd))
@@ -717,6 +706,7 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 		std::string temp(sql_query);
 		sql_statement += temp;
 	}
+	sql_statement += " and Sno=Dno";
 	return sql_statement;
 }
 
@@ -764,6 +754,9 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 			staff_list.SetItem(item, 3, staff.age());
 			staff_list.SetItem(item, 4, staff.salary());
 			staff_list.SetItem(item, 5, staff.dept_num());
+			staff_list.SetItem(item, 6, staff.mailbox());
+			staff_list.SetItem(item, 7, staff.phone_num());
+			staff_list.SetItem(item, 8, staff.address());
 			staff.MoveNext();
 			item++;
 		}

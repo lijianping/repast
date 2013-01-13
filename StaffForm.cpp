@@ -17,7 +17,7 @@ CStaffForm::CStaffForm()
     memset(m_sex_, '\0', sizeof(m_sex_));
     memset(m_dept_num_, '\0', sizeof(m_dept_num_));
     memset(m_dept_name_, '\0', sizeof(m_dept_name_));
-    m_query_sql_ = "select * from Staff";
+    m_query_sql_ = "select Sno,Sname,Ssex,Sage,Ssalary,Dname,Smailbox,Sphoneno,Saddress from Staff,Dept where Sno=Dno";
 }
 
 CStaffForm::~CStaffForm()
