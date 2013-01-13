@@ -322,10 +322,26 @@ bool CListView::DeleteAllItems()
 
 void CListView::SetSelectAndGrid(DWORD style)
 {
-    ListView_SetExtendedListViewStyle(m_hwnd_, style| LVS_EX_INFOTIP); 
+    ListView_SetExtendedListViewStyle(m_hwnd_, style | LVS_EX_INFOTIP); 
 }
 
 void CListView::SetEditLabel(const int item)
 {
 	ListView_EditLabel(m_hwnd_, item);
+}
+
+/*
+ * @ 说明: 设置list的窗口处理过程函数
+ * @ 参数:
+ *         proc [in] 待设置的窗口处理过程
+ * @ 返回值:
+ *           返回之前的窗口处理过程函数
+ **/
+WNDPROC CListView::SetListProc(const WNDPROC proc)
+{
+	return (WNDPROC)SetWindowLong(m_hwnd_, GWL_WNDPROC, (LONG)proc);
+}
+
+void CListView::SetExtendStyle(DWORD style) {
+	ListView_SetExtendedListViewStyle(m_hwnd_, style);
 }
