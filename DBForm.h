@@ -15,6 +15,7 @@
 class CDBForm  
 {
 public:
+	bool SQLAllocHandleStmt();
 	CDBForm();
 	CDBForm(std::string dns, std::string name, std::string password);
 	virtual ~CDBForm();
@@ -28,14 +29,13 @@ public:
     virtual bool BindingParameter();
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &error_info);
 	void SetSQLStatement(const std::string statement);
-	char* GetDateTime();
-	int GetDatePart(char* datepart);
+	int GetDatePart(char* sql_selectdate);
 	int GetYear();
 	int GetMonth();
-// 	int GetDay();
-// 	int GetHour();
-// 	int GetMinute();
-// 	int GetSecond();
+	int GetDay();
+	int GetHour();
+	int GetMinute();
+	int GetSecond();
 
 protected:
 	inline bool is_connect();

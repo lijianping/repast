@@ -76,10 +76,27 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 						/*just for a test:start*/
 						char systime[21], tmp[100];
 						CDBForm cd;
+						std::string error;
 						int datepart;
 						datepart=cd.GetYear();
 						sprintf(tmp,"time: %d",datepart);
 						MessageBox(NULL, tmp, "result",0);
+						datepart=cd.GetMonth();
+						sprintf(tmp,"time: %d",datepart);
+						MessageBox(NULL, tmp, "result",0);
+						datepart=cd.GetDay();
+						sprintf(tmp,"time: %d",datepart);
+						MessageBox(NULL, tmp, "result",0);
+						datepart=cd.GetHour();
+						sprintf(tmp,"time: %d",datepart);
+						MessageBox(NULL, tmp, "result",0);
+						datepart=cd.GetMinute();
+						sprintf(tmp,"time: %d",datepart);
+						MessageBox(NULL, tmp, "result",0);
+						datepart=cd.GetSecond();
+						sprintf(tmp,"time: %d",datepart);
+						MessageBox(NULL, tmp, "result",0);
+
 						/*test end*/
 						CListView list;
 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
@@ -313,7 +330,7 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 		staff_list.SetItem(i, 3, staff_info.age());
 		staff_list.SetItem(i, 4, staff_info.salary());
 		staff_list.SetItem(i, 5, staff_info.dept_num());
-		/* Move to the next record */
+		/* Move to the next record */	
 		staff_info.MoveNext();
 		i++;
 	}

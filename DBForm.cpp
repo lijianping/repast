@@ -29,7 +29,56 @@ CDBForm::CDBForm(std::string dns, std::string name, std::string password)
 
 CDBForm::~CDBForm()
 {
-	
+}
+
+/*
+ * 说明：分配语句句柄
+ * 返回值：分配成功返回true,否则返回false
+ **/
+bool CDBForm::SQLAllocHandleStmt()
+{
+	std::string error;
+	if (NULL != m_hstmt_)
+	{
+		SQLFreeStmt(m_hstmt_, SQL_UNBIND);/*释放绑定*/
+		SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
+		m_hstmt_ = NULL;
+	}
+	/* 分配语句句柄 */
+    m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error = "分配数据库语句句柄失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(),	TEXT("错误"), MB_ICONERROR | MB_OK);
+        return false;
+    }
+
+	/* 设置游标属性：用行版本控制乐观并发设置动态游标类型 */
+    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
+		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
+		SQL_IS_INTEGER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error = "设置数据库滚动游标失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+        return false;
+	}
+    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
+		(SQLPOINTER)SQL_CONCUR_ROWVER, 
+		SQL_IS_INTEGER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error = "设置数据库滚动游标失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+        return false;
+    }
+	return true;
 }
 
 /*
@@ -51,13 +100,17 @@ bool CDBForm::IsEOF()
  */
 bool CDBForm::MoveFirst()
 {
+	std::string error;
 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
-    if (m_return_code_ != SQL_ERROR &&
-        m_return_code_ != SQL_INVALID_HANDLE)
+	if ((m_return_code_ == SQL_ERROR) ||
+        (m_return_code_ == SQL_INVALID_HANDLE))
     {
-        return true;
-    }
-    return false;
+		error = "获取第一条记录出错：";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+		return false;
+	}
+	return true;
 }
 
 /*
@@ -66,13 +119,17 @@ bool CDBForm::MoveFirst()
  */
 bool CDBForm::MoveNext()
 {
+	std::string error;
 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_NEXT,0);
-    if (m_return_code_ != SQL_ERROR &&
-        m_return_code_ != SQL_INVALID_HANDLE)
+	if ((m_return_code_ == SQL_ERROR) ||
+        (m_return_code_ == SQL_INVALID_HANDLE))
     {
-        return true;
-    }
-    return false;
+		error = "获取下一条记录出错：";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+		return false;
+	}
+	return true;
 }
 
 /*
@@ -81,13 +138,17 @@ bool CDBForm::MoveNext()
  */
 bool CDBForm::MovePrior()
 {
+	std::string error;
     m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_PRIOR, 0);
-    if (m_return_code_ != SQL_ERROR &&
-        m_return_code_ != SQL_INVALID_HANDLE)
+	if ((m_return_code_ == SQL_ERROR) ||
+        (m_return_code_ == SQL_INVALID_HANDLE))
     {
-        return true;
-    }
-    return false;
+		error = "获取上一条记录出错：";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+		return false;
+	}
+	return true;
 }
 
 /*
@@ -96,7 +157,16 @@ bool CDBForm::MovePrior()
  */
 bool CDBForm::MoveLast()
 {
+	std::string error;
 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_LAST,0);
+	if ((m_return_code_ == SQL_ERROR) ||
+        (m_return_code_ == SQL_INVALID_HANDLE))
+    {
+		error = "获取最后一条记录出错：";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+    	MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+		return false;
+	}
 	return true;
 }
 
@@ -191,11 +261,11 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 			break;
 		}
 	}
-    /*just for test*/
+//     /*just for test*/
 	char tmp[200]="\0";
 	sprintf(tmp, "%s, %ld", sql_state, native_error);
 	MessageBox(NULL, tmp, "sql_state, native_error", MB_OK);
-	/////
+// 	/////
     delete [] sql_state;
     sql_state = NULL;
     return true;
@@ -239,8 +309,8 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 		information = "分配连接句柄失败!";
         return false;
     }
-	/*设置连接属性（登录超时：10s)*/
-    m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_LOGIN_TIMEOUT, (void *)10, 0);
+	/*设置连接属性（登录超时：5s)*/
+    m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_LOGIN_TIMEOUT, (void *)5, 0);
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
@@ -258,40 +328,14 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 		ReportError(m_hdbc_, SQL_HANDLE_DBC, information);
         return false;
     }
-	/* 分配语句句柄 */
-    m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "分配数据库语句句柄失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return false;
-    }
-    /* 设置滚动游标 */
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
-		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
-		SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return false;
+	if (false ==SQLAllocHandleStmt())
+	{
+		return false;
 	}
-    /*设置并发性*/
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
-		(SQLPOINTER)SQL_CONCUR_ROWVER, 
-		SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "设置数据库并发性失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return false;
-    }
 	m_is_connect_ = true;
     return m_is_connect_;
 }
+
 
 
 /*
@@ -324,22 +368,6 @@ void CDBForm::Disconnect()
     }
 }
 
-/*
- *  @说明: 获取服务器日期时间
- *  @返回值: 若成功返回true，否则返回null
- **/
-char* CDBForm::GetDateTime()
-{
-	std::string error;
-	if (false==this->ExecuteSQL("select getdate()", error))
-	{
-		MessageBox(NULL,error.c_str(),"error", MB_OK|MB_ICONINFORMATION);
-		return NULL;
-	}
-	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_datetime_, sizeof(m_datetime_), &m_sql_datetime_);
-	this->MoveFirst();
-	return m_datetime_;
-}
 
 
 /*
@@ -348,20 +376,25 @@ char* CDBForm::GetDateTime()
  *          year,month,day,hour,minute,second
  *  @返回值: 若成功日期的部分，否则返回-1
 **/
-int CDBForm::GetDatePart(char* datepart)
+int CDBForm::GetDatePart(char *sql_selectdate)
 {
 	std::string error;
-	char sql_selectdate[64];
-//	sprintf(sql_selectdate,"select datepart(year,getdate())");
-	sprintf(sql_selectdate,"execute Getdatepart 'year'");
-//	sprintf(sql_selectdate,"execute Getdatepart'%s'",datepart);
-	MessageBox(NULL, sql_selectdate, "sqldate", 0);
+	/* 分配语句句柄 */
+	this->SQLAllocHandleStmt();
 	if (false==this->ExecuteSQL(sql_selectdate, error))
 	{
-		MessageBox(NULL,error.c_str(),"error", MB_OK|MB_ICONINFORMATION);
+		MessageBox(NULL,error.c_str(), TEXT("错误"), MB_OK|MB_ICONINFORMATION);
 		return -1;
 	}
-	SQLBindCol(m_hstmt_, 1, SQL_C_LONG, &m_datepart_, sizeof(m_datepart_), &m_sql_datetime_);
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_LONG, &m_datepart_, sizeof(m_datepart_), &m_sql_datetime_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		error = "绑定参数出错：";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
+		return -1;
+	}
 	this->MoveFirst();
 	return m_datepart_;
 }
@@ -372,7 +405,7 @@ int CDBForm::GetDatePart(char* datepart)
 **/
 int CDBForm::GetYear()
 {
-	return GetDatePart("year");
+   return GetDatePart("select DATEPART(year,getdate())");
 }
 
 /*
@@ -381,37 +414,40 @@ int CDBForm::GetYear()
 **/
 int CDBForm::GetMonth()
 {
-	return GetDatePart("month");
+	return GetDatePart("select DATEPART(month,getdate())");
 }
-// /*
-//  *  @说明: 获取服务器日期中的天日期
-//  *  @返回值: 天日期
-// **/
-// int CDBForm::GetDay()
-// {
-// 	return GetDatePart("day");
-// }
-// /*
-//  *  @说明: 获取服务器日期中的小时
-//  *  @返回值: 小时
-// **/
-// int CDBForm::GetHour()
-// {
-// 	return GetDatePart("hour");
-// }
-// /*
-//  *  @说明: 获取服务器日期中的分钟
-//  *  @返回值: 分钟
-// **/
-// int CDBForm::GetMinute()
-// {
-// 	return GetDatePart("minute");
-// }
-// /*
-//  *  @说明: 获取服务器日期中的秒
-//  *  @返回值: 秒
-// **/
-// int CDBForm::GetSecond()
-// {
-// 	return GetDatePart("second");
-// }
+
+/*
+ *  @说明: 获取服务器日期中的天日期
+ *  @返回值: 天日期
+**/
+int CDBForm::GetDay()
+{
+	return GetDatePart("select DATEPART(day,getdate())");
+}
+
+/*
+ *  @说明: 获取服务器日期中的小时
+ *  @返回值: 小时
+**/
+int CDBForm::GetHour()
+{
+	return GetDatePart("select DATEPART(hour,getdate())");
+}
+
+/*
+ *  @说明: 获取服务器日期中的分钟
+ *  @返回值: 分钟
+**/
+int CDBForm::GetMinute()
+{
+	return GetDatePart("select DATEPART(minute,getdate())");
+}
+/*
+ *  @说明: 获取服务器日期中的秒
+ *  @返回值: 秒
+**/
+int CDBForm::GetSecond()
+{
+	return GetDatePart("select DATEPART(second,getdate())");
+}
