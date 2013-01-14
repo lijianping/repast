@@ -110,6 +110,10 @@ SOURCE=.\DBForm.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Department.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Edit.cpp
 # End Source File
 # Begin Source File
@@ -191,6 +195,10 @@ SOURCE=.\Customer.h
 # Begin Source File
 
 SOURCE=.\DBForm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Department.h
 # End Source File
 # Begin Source File
 

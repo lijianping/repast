@@ -1,7 +1,6 @@
 
 #include "personnel.h"
 #include "Commodity.h"
-#include "Customer.h"
 
 WNDPROC g_OldListProc;   /* The list view processes */
 
@@ -13,13 +12,15 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	case WM_CREATE:
 		{
 			hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+			SetTimer(hwnd, ID_TIMER, 6000,NULL);/*设置计时器消息时间为1分钟*/
 			/* Create name check box */
 			std::string error;
 			CreateGroupBox(hwnd);
 			CreateChildWindow(hwnd, error);
 			CreateStaffListView(hwnd);
 			InitListView(hwnd, ID_PERSONNEL_INFO);
-			SetListViewData(hwnd, ID_PERSONNEL_INFO);
+			OnStartQuery(hwnd);
+		//	SetListViewData(hwnd, ID_PERSONNEL_INFO);
 			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
 			return 0;
 		}
@@ -75,24 +76,29 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 					if (OnStartQuery(hwnd))
 					{
 						/*just for a test:start*/
-						 CCustomer cc;
-						 cc.InsertCustomerMenu("201301011212128","麻婆豆腐",2);
+						 
 						
 						/*test end*/
-						CListView list;
-						list.Initialization(hwnd, ID_PERSONNEL_INFO);
-						int count = list.GetItemCount();
-						char number[10];
-						sprintf(number, "%d 人", count);
-						SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);
+// 						CListView list;
+// 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
+// 						int count = list.GetItemCount();
+// 						char number[10];
+// 						sprintf(number, "%d 人", count);
+// 						SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);
 					}
 					break;
 				}
 			}
 			return 0;
 		}
+	case WM_TIMER:
+	{
+		MessageBeep(-1);
+		return 0;
+	}
 	case WM_DESTROY:
 		{
+			KillTimer(hwnd, ID_TIMER);/*结束计时器消息*/
 			PostQuitMessage(0);
 			return 0;
 		}
@@ -731,6 +737,12 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	staff.MoveFirst();  
 	if (0 == strcmp("",staff.id()))
 	{
+		CListView staff_list;
+		/* Initialization the list view object */
+		HWND list_hwnd = GetDlgItem(hwnd, id);
+		staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
+		/* Clean the list view */
+		staff_list.DeleteAllItems();
 		error = "无匹配结果！";
 		return false;
 	}
@@ -778,10 +790,22 @@ bool OnStartQuery(const HWND hwnd)
 	std::string error;
 	if (!ExecQuery(hwnd, ID_PERSONNEL_INFO, sql_statement.c_str(), error))
 	{
-		MessageBox(hwnd, sql_statement.c_str(), "sql",0 );//test
-		MessageBox(hwnd, error.c_str(), TEXT("查询错误"),
+		MessageBox(hwnd, error.c_str(), TEXT("查询结果"),
 			       MB_ICONINFORMATION | MB_OK);
-		return false;
 	}
+	CStaffForm cstaff;
+	char staff_sum[15]={0};
+	sprintf(staff_sum, "%d 人", cstaff.GetStaffSum());
+	SetWindowText(GetDlgItem(hwnd, ID_PERSONNEL_STAFF_SUM), staff_sum);/*显示员工总数*/
+	CDepartment cdept;
+	char dept_sum[15]={0};
+	sprintf(dept_sum,"%d 个",cdept.GetDeptSum());
+	SetWindowText(GetDlgItem(hwnd, ID_PERSONNEL_DEPT_SUM), dept_sum);/*显示部门总数*/
+	CListView list;
+	list.Initialization(hwnd, ID_PERSONNEL_INFO);
+	int count = list.GetItemCount();
+	char number[10];
+	sprintf(number, "%d 人", count);
+	SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);/*显示当前列表中员工数量*/
 	return true;
 }

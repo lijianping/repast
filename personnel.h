@@ -9,6 +9,7 @@
 #include "StaffForm.h"
 #include "childwindowid.h"
 #include "resource.h"
+#include "Department.h"
 
 LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -48,6 +49,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 
 bool OnStartQuery(const HWND hwnd);
 
+#define ID_TIMER 4000 /*¼ÆÊ±Æ÷±àºÅ*/
 
 /* struct define */
 typedef struct StaffInfo
