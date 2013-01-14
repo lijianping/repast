@@ -251,6 +251,8 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 		error_info = TEXT("报告错误发生的原因是，分配sqlstate内存失败");
 		return false;
     }
+	sql_state = 0;
+	
 	/*获取错误*/
     SQLGetDiagRec(handle_type, hdbc, record_number, sql_state, &native_error,
                   (unsigned char *)message, 500, &message_length);

@@ -540,12 +540,21 @@ bool CreateChildWindow(HWND parent_hwnd, std::string &error)
  */
 bool InitComboBox(HWND hwnd, int id)
 {
-    if (CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"人事部") ||
-        CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"财务部") ||
-        CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"后勤部"))
-    {
-        return false;
-    }
+	HWND hwnd_combo;
+    CDepartment cdept;
+	hwnd_combo = GetDlgItem(hwnd, id);
+	cdept.SetSQLStatement("select * from Dept");
+	cdept.GetRecordSet();
+	cdept.MoveFirst();
+//	SendMessage(dept_hwnd, CB_ETLBTEXT, index, (LPARAM)cdept.name());
+	while (!cdept.IsEOF())
+	{
+		if (CB_ERR == SendMessage(hwnd_combo, CB_ADDSTRING, 0, (LPARAM)cdept.name()))
+		{
+			return false;
+		}
+		cdept.MoveNext();
+	}
     return true;
 }
 
@@ -666,7 +675,7 @@ std::string GetSex(const HWND parent_hwnd)
  */
 std::string GetDept(const HWND parent_hwnd)
 {
-	char dept[40] = "\0";
+	char dept[41] = {0};
 	HWND dept_hwnd;
 	dept_hwnd = GetDlgItem(parent_hwnd, ID_PERSONNEL_DEPT_COMBO);
 	int index = SendMessage(dept_hwnd, CB_GETCURSEL, 0, 0);
@@ -706,11 +715,12 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 	if (IsCheckDept(parent_hwnd))
 	{
 		std::string dept = GetDept(parent_hwnd);
-		sprintf(sql_query, " and Dname='%s'", dept.c_str());
+		sprintf(sql_query, " and Dname like '%c%s'", '%', dept.c_str());
 		std::string temp(sql_query);
 		sql_statement += temp;
 	}
 	sql_statement += " and Sdeptno=Dno";
+	MessageBox (parent_hwnd, sql_statement.c_str(), "sql",0); //test
 	return sql_statement;
 }
 

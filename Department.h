@@ -2,23 +2,19 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_DEPARTMENT_H__74043D5B_10BE_4ADA_8D66_AE3051938DDC__INCLUDED_)
-#define AFX_DEPARTMENT_H__74043D5B_10BE_4ADA_8D66_AE3051938DDC__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef REPAST_DEPARTMENT_H_
+#define REPAST_DEPARTMENT_H_
 
 #include "DBForm.h"
 
-class CDepartment: public CDBForm
+class CDepartment : public CDBForm
 {
 public:
 	CDepartment();
 	virtual ~CDepartment();
 	virtual bool BindingParameter();
-	char *id();
-	char *name();
+	inline char *id();
+	inline char *name();
 	int GetDeptSum();
 private:
 	char m_id_[5];

@@ -539,15 +539,22 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					CListView customer_list;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					int count = customer_list.GetItemCount();
+					if(0==count)
+					{
+						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
+						break;
+					}
 					char customer_no[16] = {0};
 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+					CCustomerMenuForm customer_menu_info;
+					customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
 					for (int i = 0; i < count; ++i) {
 						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
 						
+
 						customer.InsertCustomerMenu(customer_no,
 							                        customer_list.GetItem(i, 0).c_str(), 
 													quantity);
-					
 					}
 					is_change = false;
 					break;
@@ -566,11 +573,16 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				int ret = MessageBox(hwnd, TEXT("Save the change!"), TEXT("ORDER"), MB_YESNOCANCEL);
 				if (IDYES == ret) {
 					CCustomerMenuForm customer_menu_info;
-					customer_menu_info.DeleteAll(table->customer_no.c_str());
+					customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
 					CCustomer customer;
 					CListView customer_list;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					int count = customer_list.GetItemCount();
+					if(0==count)
+					{
+						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
+						break;
+					}
 					char customer_no[16] = {0};
 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
 					for (int i = 0; i < count; ++i) {

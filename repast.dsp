@@ -106,6 +106,10 @@ SOURCE=.\Customer.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\CustomerMenuForm.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DBForm.cpp
 # End Source File
 # Begin Source File
@@ -191,6 +195,10 @@ SOURCE=.\Commodity.h
 # Begin Source File
 
 SOURCE=.\Customer.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\CustomerMenuForm.h
 # End Source File
 # Begin Source File
 
