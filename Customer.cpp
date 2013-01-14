@@ -27,7 +27,7 @@ bool CCustomer::BindingParameter()
 	return true;
 }
 
-bool CCustomer::InsertCustomerMenu(const char *customer_no, const char * menu_name, int quantity)
+bool CCustomer::InsertCustomerMenu(const char *customer_no, const char *menu_name, int quantity)
 {
 	std::string error;
 	char sql_insert[256]={0};

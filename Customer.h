@@ -12,12 +12,14 @@ public:
 	bool InsertCustomerMenu(const char *coustmer_no, const char* menu_name, int quantity);
 	CCustomer();
 	virtual ~CCustomer();
-	virtual bool BindingParameter();
 	inline char* customer_no();
 	inline short customer_num() const;
 	inline char* founding_time();
 	inline char* table_no();
 	inline short table_state() const;
+
+protected:
+	virtual bool BindingParameter();
 
 private:
 	char m_customer_no_[16];        /* ¹Ë¿Í±àºÅ */
