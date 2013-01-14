@@ -9,6 +9,7 @@
 class CCustomer : public CDBForm  
 {
 public:
+	bool InsertCustomerMenu(const char *coustmer_no, const char* menu_name, int quantity);
 	CCustomer();
 	virtual ~CCustomer();
 	virtual bool BindingParameter();

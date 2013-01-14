@@ -38,3 +38,14 @@ bool CMenuForm::BindingParameter()
 	SQLBindCol(m_hstmt_, 3, SQL_C_FLOAT, &m_dish_price_, 0, &m_price_len_);
 	return true;
 }
+
+bool CMenuForm::InsertMenu(char *no, char *name, float price,std::string error)
+{
+	char sql_insert[256]={0};
+	sprintf(sql_insert, "execute InsertMenu '%s', '%s','%f'", no, name, price);
+	if (false == ExecuteSQL(sql_insert,error))
+	{
+		return false;
+	}
+	return true;
+}

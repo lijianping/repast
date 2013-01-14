@@ -17,7 +17,7 @@ CStaffForm::CStaffForm()
     memset(m_sex_, '\0', sizeof(m_sex_));
     memset(m_dept_num_, '\0', sizeof(m_dept_num_));
     memset(m_dept_name_, '\0', sizeof(m_dept_name_));
-    m_query_sql_ = "select Sno,Sname,Ssex,Sage,Ssalary,Dname,Smailbox,Sphoneno,Saddress from Staff,Dept where Sno=Dno";
+    m_query_sql_ = "select Sno,Sname,Ssex,Sage,Ssalary,Dname,Smailbox,Sphoneno,Saddress from Staff,Dept where Sdeptno=Dno";
 }
 
 CStaffForm::~CStaffForm()
@@ -37,7 +37,8 @@ bool CStaffForm::BindingParameter()
     SQLBindCol(m_hstmt_, 3, SQL_C_CHAR, m_sex_, sizeof(m_sex_), &m_sql_sex_);
     SQLBindCol(m_hstmt_, 4, SQL_C_SSHORT, &m_age_, 0, &m_sql_age_);
     SQLBindCol(m_hstmt_, 5, SQL_C_DOUBLE, &m_salary_, 0, &m_sql_salary_);
-    SQLBindCol(m_hstmt_, 6, SQL_C_CHAR, m_dept_num_, sizeof(m_dept_num_), &m_sql_dept_num_);
+    SQLBindCol(m_hstmt_, 6, SQL_C_CHAR, m_dept_name_, sizeof(m_dept_name_), &m_sql_dept_name_);
+   // SQLBindCol(m_hstmt_, 6, SQL_C_CHAR, m_dept_num_, sizeof(m_dept_num_), &m_sql_dept_num_);
 	SQLBindCol(m_hstmt_, 7, SQL_C_CHAR, m_mailbox_, sizeof(m_mailbox_), &m_sql_mailbox_);
 	SQLBindCol(m_hstmt_, 8, SQL_C_CHAR, m_phone_num_, sizeof(m_phone_num_), &m_sql_phone_num_);
 	SQLBindCol(m_hstmt_, 9, SQL_C_CHAR, m_address_, sizeof(m_address_), &m_sql_address_);
@@ -68,6 +69,11 @@ bool CStaffForm::InsertInfo(char *user_id, char *user_name,
             "insert into Staff values('%s', '%s', '%s', %d, %f, '%s')",
             user_id, user_name, user_sex, user_age,
             user_salary, user_dept_num);
+	/*∑÷≈‰”Ôæ‰æ‰±˙*/
+    if (false == SQLAllocHandleStmt(error_info))
+	{
+		return false;
+	}
 	if (false == ExecuteSQL(insert_sql, error_info))
 	{
 		return false;
@@ -127,4 +133,11 @@ bool CStaffForm::UpdatetInfo(char *user_id, char *user_name,
 
 
 	return true;
+}
+
+int CStaffForm::GetStaffSum()
+{
+	int staff_sum=-1;
+	
+	return staff_sum;
 }

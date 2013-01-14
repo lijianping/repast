@@ -35,7 +35,7 @@ CDBForm::~CDBForm()
  * 说明：分配语句句柄
  * 返回值：分配成功返回true,否则返回false
  **/
-bool CDBForm::SQLAllocHandleStmt()
+bool CDBForm::SQLAllocHandleStmt(std::string &error_info)
 {
 	std::string error;
 	if (NULL != m_hstmt_)
@@ -49,9 +49,8 @@ bool CDBForm::SQLAllocHandleStmt()
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        error = "分配数据库语句句柄失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		MessageBox(NULL, error.c_str(),	TEXT("错误"), MB_ICONERROR | MB_OK);
+        error_info = "分配数据库语句句柄失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
 
@@ -62,9 +61,8 @@ bool CDBForm::SQLAllocHandleStmt()
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        error = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+        error_info = "设置数据库滚动游标失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
 	}
     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
@@ -73,9 +71,8 @@ bool CDBForm::SQLAllocHandleStmt()
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        error = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+        error_info = "设置数据库滚动游标失败！";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
 	return true;
@@ -176,8 +173,12 @@ bool CDBForm::MoveLast()
  */
 bool CDBForm::GetRecordSet()
 {
-	
-
+	std::string error_info;
+	/*分配语句句柄*/
+    if (false == SQLAllocHandleStmt(error_info))
+	{
+		return false;
+	}
     /* 执行查询语句 */
     m_return_code_ = SQLExecDirect(m_hstmt_,
                                    (unsigned char*)m_query_sql_.c_str(),
@@ -185,7 +186,8 @@ bool CDBForm::GetRecordSet()
     if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        MessageBox(NULL, TEXT("执行数据库查询语句失败！"),
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+        MessageBox(NULL, error_info.c_str(),
                    TEXT("DBForm"), MB_OK| MB_ICONERROR);
         return false;
     }
@@ -215,6 +217,11 @@ bool CDBForm::BindingParameter()
  */
 bool CDBForm::ExecuteSQL(const char *sql_statement, std::string &error_info )
 {
+	/*分配语句句柄*/
+    if (false == SQLAllocHandleStmt(error_info))
+	{
+		return false;
+	}
     /* 执行语句 */
     m_return_code_ = SQLExecDirect(m_hstmt_, 
                                    (unsigned char *)sql_statement,
@@ -328,7 +335,8 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 		ReportError(m_hdbc_, SQL_HANDLE_DBC, information);
         return false;
     }
-	if (false ==SQLAllocHandleStmt())
+	/*分配语句句柄*/
+    if (false == SQLAllocHandleStmt(information))
 	{
 		return false;
 	}
@@ -379,8 +387,11 @@ void CDBForm::Disconnect()
 int CDBForm::GetDatePart(char *sql_selectdate)
 {
 	std::string error;
-	/* 分配语句句柄 */
-	this->SQLAllocHandleStmt();
+	/*分配语句句柄*/
+    if (false == SQLAllocHandleStmt(error))
+	{
+		return -1;
+	}
 	if (false==this->ExecuteSQL(sql_selectdate, error))
 	{
 		MessageBox(NULL,error.c_str(), TEXT("错误"), MB_OK|MB_ICONINFORMATION);

@@ -15,7 +15,7 @@
 class CDBForm  
 {
 public:
-	bool SQLAllocHandleStmt();
+	bool SQLAllocHandleStmt(std::string &error_info);
 	CDBForm();
 	CDBForm(std::string dns, std::string name, std::string password);
 	virtual ~CDBForm();

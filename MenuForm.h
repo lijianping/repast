@@ -6,6 +6,7 @@
 class CMenuForm : public CDBForm  
 {
 public:
+	bool InsertMenu(char *no, char *name, float price,std::string error);
 	CMenuForm();
 	virtual ~CMenuForm();
 	virtual void SetSQLStatement(const std::string statement);

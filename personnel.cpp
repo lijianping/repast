@@ -1,6 +1,7 @@
 
 #include "personnel.h"
 #include "Commodity.h"
+#include "Customer.h"
 
 WNDPROC g_OldListProc;   /* The list view processes */
 
@@ -22,11 +23,6 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
 			return 0;
 		}
-	case WM_PRINT:
-		{
-			MessageBox(hwnd, "test WM_PAIT", "test", 0);
-		}
-		return 0;
 	case WM_COMMAND:
 		{
 			bool is_check = false;
@@ -79,7 +75,9 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 					if (OnStartQuery(hwnd))
 					{
 						/*just for a test:start*/
-
+						 CCustomer cc;
+						 cc.InsertCustomerMenu("201301011212128","ÂéÆÅ¶¹¸¯",2);
+						
 						/*test end*/
 						CListView list;
 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
@@ -315,7 +313,7 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 		staff_list.SetItem(i, 2, staff_info.sex());
 		staff_list.SetItem(i, 3, staff_info.age());
 		staff_list.SetItem(i, 4, staff_info.salary());
-		staff_list.SetItem(i, 5, staff_info.dept_num());
+		staff_list.SetItem(i, 5, staff_info.dept_name());
 		staff_list.SetItem(i, 6, staff_info.mailbox());
 		staff_list.SetItem(i, 7, staff_info.phone_num());
 		staff_list.SetItem(i, 8, staff_info.address());
@@ -702,11 +700,11 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 	if (IsCheckDept(parent_hwnd))
 	{
 		std::string dept = GetDept(parent_hwnd);
-		sprintf(sql_query, " and Sdept='%s'", dept.c_str());
+		sprintf(sql_query, " and Dname='%s'", dept.c_str());
 		std::string temp(sql_query);
 		sql_statement += temp;
 	}
-	sql_statement += " and Sno=Dno";
+	sql_statement += " and Sdeptno=Dno";
 	return sql_statement;
 }
 
@@ -753,7 +751,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 			staff_list.SetItem(item, 2, staff.sex());
 			staff_list.SetItem(item, 3, staff.age());
 			staff_list.SetItem(item, 4, staff.salary());
-			staff_list.SetItem(item, 5, staff.dept_num());
+			staff_list.SetItem(item, 5, staff.dept_name());
 			staff_list.SetItem(item, 6, staff.mailbox());
 			staff_list.SetItem(item, 7, staff.phone_num());
 			staff_list.SetItem(item, 8, staff.address());

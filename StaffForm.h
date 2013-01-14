@@ -27,6 +27,7 @@ public:
 					 char *user_sex, short user_age,
                      double user_salary, char *user_dept_num, 
 					 std::string &error_info);
+	int GetStaffSum();
 
 private:
     char m_id_[9];                /* staff's id */
@@ -45,7 +46,7 @@ private:
     SQLINTEGER m_sql_age_;        /* the staff's age in database Staff form */
     SQLINTEGER m_sql_salary_;     /* the staff's salary in database Staff form */
     SQLINTEGER m_sql_dept_num_;   /* the staff's department number in database Staff form */
-//	SQLINTEGER m_sql_dept_name_;  /* the staff's department name in database Dept form */
+	SQLINTEGER m_sql_dept_name_;  /* the staff's department name in database Dept form */
 	SQLINTEGER m_sql_mailbox_;    /* the staff's mailbox in database Dept form */
 	SQLINTEGER m_sql_phone_num_;  /* the staff's phone number in database Dept form */
 	SQLINTEGER m_sql_address_;    /* the staff's address in database Dept form */
