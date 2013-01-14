@@ -35,6 +35,7 @@ public:
 	void SetEditLabel(const int item);
 	WNDPROC SetListProc(const WNDPROC proc);
 	void SetExtendStyle(DWORD style);
+	int FindItem(std::string item);
 
 private:
     UINT m_id_;

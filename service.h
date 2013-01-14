@@ -57,7 +57,7 @@ LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARA
 /* Ã®∫≈–≈œ¢ */
 struct CustomerTable {
 	std::string table_no;
-	int table_state;
+	std::string table_state;
 	std::string customer_no;
 	std::string founding_time;
 };

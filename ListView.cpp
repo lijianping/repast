@@ -345,3 +345,19 @@ WNDPROC CListView::SetListProc(const WNDPROC proc)
 void CListView::SetExtendStyle(DWORD style) {
 	ListView_SetExtendedListViewStyle(m_hwnd_, style);
 }
+
+/*
+ * @ 说明: find the item
+ * @ 参数:
+ *         item [in] The item you will find.
+ * @ 返回值:
+ *           The index of the item indicates success.
+ *           -1 indicates failure. 
+ **/
+int CListView::FindItem(std::string item) {
+	LVFINDINFO find_info;
+	find_info.flags = LVFI_PARTIAL | LVFI_STRING;
+	find_info.psz = item.c_str();
+	// ListView_FindItem(m_hwnd_, -1, &find_info);
+	return SendMessage(m_hwnd_, LVM_FINDITEM, -1, (LPARAM)&find_info);
+}

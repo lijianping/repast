@@ -128,6 +128,7 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					}
 					CustomerTable table_info;  /* 台号信息 */
 					table_info.table_no = table_list.GetItem(select_row, 0);
+					table_info.table_state = table_list.GetItem(select_row, 1);
 					table_info.customer_no = table_list.GetItem(select_row, 2);
 				//	table_info.founding_time = table_list.GetItem(select_row, 2);
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_ORDER),
@@ -445,14 +446,15 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					   width, height, TRUE);
 			CustomerTable *table = (CustomerTable *)lParam;
 			SetDlgItemText(hwnd, IDC_TABLE_NUM, table->table_no.c_str());
+			SetDlgItemText(hwnd, IDC_STATE_ORDER, table->table_state.c_str());
 			SetDlgItemText(hwnd, IDC_CUSTOM_NUM, table->customer_no.c_str());
+			
 			CListView menu_list, custom_list;
 			menu_list.Initialization(hwnd, IDC_REPAST_MENU);
 			g_dialog_menu_proc = menu_list.SetListProc(OrderMenuListProc); /* 更改其默认的窗口处理过程 */
 			menu_list.InsertColumn(0, 120, "菜名");
 			menu_list.InsertColumn(1, 80, "单价");
-			menu_list.SetSelectAndGrid( LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-//			menu_list.SetExtendStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+			menu_list.SetExtendStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 			CMenuForm menu_form;
 			menu_form.SetSQLStatement("select * from Menu");
 			menu_form.GetRecordSet();
@@ -484,7 +486,6 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					/* 获取菜单列表中的项 */
 					int select_row = menu_list.GetSelectionMark();
-					select_row = 0;
 					if (-1 == select_row) {
 						MessageBox(hwnd, TEXT("请先选择一个项！"), TEXT("点菜"), MB_ICONINFORMATION);
 						break;
@@ -496,9 +497,28 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 					/* 获取顾客点菜信息并放入顾客点菜列表 */
-					customer_list.InsertItem(0, menu_list.GetItem(select_row, 0)); 
-					customer_list.SetItem(0, 1, menu_list.GetItem(select_row, 1));
-					customer_list.SetItem(0, 2, num);
+					std::string dish_name = menu_list.GetItem(select_row, 0);
+					int ret = customer_list.FindItem(dish_name);
+					if (-1 == customer_list.FindItem(dish_name)) {
+						customer_list.InsertItem(0, dish_name); 
+						customer_list.SetItem(0, 1, menu_list.GetItem(select_row, 1));
+						customer_list.SetItem(0, 2, num);
+					} else {
+						MessageBox(hwnd, TEXT("You have order this dish!"),
+							       TEXT("ORDER"), MB_ICONINFORMATION);
+					}
+					break;
+				}
+			case IDC_DELETE_DISH:
+				{
+					CListView customer_list;
+					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
+					int select_row = customer_list.GetSelectionMark();
+					if (-1 != select_row) {
+						if (IDYES == MessageBox(hwnd, TEXT("移除该项？"), TEXT("点菜"), MB_YESNO)) {
+							customer_list.DeleteItem(select_row);
+						}
+					}
 					break;
 				}
 			case IDC_CANCEL_MENU:
