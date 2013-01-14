@@ -8,6 +8,7 @@
 #include "TableInfo.h"
 #include "Customer.h"
 #include "MenuForm.h"
+#include "CustomerMenuForm.h"
 
 WNDPROC g_old_list_processes; /* 主对话框中的列表处理过程 */
 WNDPROC g_dialog_menu_proc;  /* 对话框中的菜单列表的窗口处理过程 */
@@ -381,7 +382,7 @@ bool CreateButton(const HWND hwnd)
 		return false;
 	}
 	rect.left += 30;
-	rect.top = 50;
+	rect.top = 60;
 	rect.right = 80;
 	rect.bottom = 30;
  	if (!button.Create("开  台", ES_CENTER | BS_PUSHBUTTON | WS_TABSTOP,
@@ -389,25 +390,19 @@ bool CreateButton(const HWND hwnd)
 	{
 		return false;
 	}
-	rect.top += 50;
+	rect.top += 60;
 	if (!button.Create("换  台", ES_CENTER | BS_PUSHBUTTON,
 		               rect, hwnd, ID_SERVICE_CHANGE))
 	{
 		return false;
 	}
-	rect.top += 50;
-	if (!button.Create("下  单", ES_CENTER | BS_PUSHBUTTON,
+	rect.top += 60;
+	if (!button.Create("点  菜", ES_CENTER | BS_PUSHBUTTON,
 		               rect, hwnd, ID_SERVICE_ORDER))
 	{
 		return false;
 	}
-	rect.top += 50;
-	if (!button.Create("退  单", ES_CENTER | BS_PUSHBUTTON,
-		               rect, hwnd, ID_SERVICE_RETREAT))
-	{
-		return false;
-	}
-	rect.top += 50;
+	rect.top += 60;
 	if (!button.Create("结  账", ES_CENTER | BS_PUSHBUTTON,
 		               rect, hwnd, ID_SERVICE_CHECKOUT))
 	{
@@ -427,6 +422,8 @@ bool CreateButton(const HWND hwnd)
  **/
 BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static CustomerTable *table;
+	static bool is_change = false;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -444,7 +441,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				       (screen_height - height) / 2,
 					   width, height, TRUE);
-			CustomerTable *table = (CustomerTable *)lParam;
+			table = (CustomerTable *)lParam;
 			SetDlgItemText(hwnd, IDC_TABLE_NUM, table->table_no.c_str());
 			SetDlgItemText(hwnd, IDC_STATE_ORDER, table->table_state.c_str());
 			SetDlgItemText(hwnd, IDC_CUSTOM_NUM, table->customer_no.c_str());
@@ -472,6 +469,17 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			custom_list.InsertColumn(1, 80, "单价");
 			custom_list.InsertColumn(2, 50, "数量");
 			custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			CCustomerMenuForm order_info;
+			order_info.GetCustomerMenuSet(table->customer_no.c_str());
+			order_info.MoveFirst();
+			i = 0;
+			while (!order_info.IsEOF()) {
+				custom_list.InsertItem(i, order_info.dish_name());
+				custom_list.SetItem(i, 1, order_info.dish_price());
+				custom_list.SetItem(i, 2, order_info.dish_quantity());
+				i++;
+				order_info.MoveNext();
+			}
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -480,6 +488,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_ADD_DISH:
 				{
+					is_change = true;
 					/* 初始化列表控件 */
 					CListView menu_list, customer_list;
 					menu_list.Initialization(hwnd, IDC_REPAST_MENU);
@@ -511,14 +520,36 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 			case IDC_DELETE_DISH:
 				{
+					is_change = true;
 					CListView customer_list;
+					CCustomerMenuForm customer_menu;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					int select_row = customer_list.GetSelectionMark();
 					if (-1 != select_row) {
 						if (IDYES == MessageBox(hwnd, TEXT("移除该项？"), TEXT("点菜"), MB_YESNO)) {
+				//			customer_menu.DeleteDish(table->customer_no.c_str(), customer_list.GetItem(select_row, 0).c_str());
 							customer_list.DeleteItem(select_row);
 						}
 					}
+					break;
+				}
+			case IDC_SAVE_MENU:
+				{
+					CCustomer customer;
+					CListView customer_list;
+					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
+					int count = customer_list.GetItemCount();
+					char customer_no[16] = {0};
+					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+					for (int i = 0; i < count; ++i) {
+						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
+						
+						customer.InsertCustomerMenu(customer_no,
+							                        customer_list.GetItem(i, 0).c_str(), 
+													quantity);
+					
+					}
+					is_change = false;
 					break;
 				}
 			case IDC_CANCEL_MENU:
@@ -531,6 +562,28 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_CLOSE:
 		{
+			if (true == is_change) {
+				int ret = MessageBox(hwnd, TEXT("Save the change!"), TEXT("ORDER"), MB_YESNOCANCEL);
+				if (IDYES == ret) {
+					CCustomerMenuForm customer_menu_info;
+					customer_menu_info.DeleteAll(table->customer_no.c_str());
+					CCustomer customer;
+					CListView customer_list;
+					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
+					int count = customer_list.GetItemCount();
+					char customer_no[16] = {0};
+					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+					for (int i = 0; i < count; ++i) {
+						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
+						customer.InsertCustomerMenu(customer_no,
+													customer_list.GetItem(i, 0).c_str(), 
+													quantity);
+					}
+
+				} else if (IDCANCEL == ret) {
+					break;
+				}
+			}
 			EndDialog(hwnd, HIWORD(wParam));
 			return TRUE;
 		}
