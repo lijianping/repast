@@ -10,7 +10,7 @@
 
 CDepartment::CDepartment()
 {
-
+	memset(m_name_, '\0', sizeof(m_name_));
 }
 
 CDepartment::~CDepartment()

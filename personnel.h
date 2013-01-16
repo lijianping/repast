@@ -11,6 +11,10 @@
 #include "resource.h"
 #include "Department.h"
 
+#define ADD_STAFF 0
+#define DELETE_STAFF 1
+#define MODIFY_STAFF 2
+
 LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -43,13 +47,15 @@ std::string GetSex(const HWND parent_hwnd);
 
 std::string GetDept(const HWND parent_hwnd);
 
-std::string GetQueryStatement(const HWND parent_hwnd);
+std::string GetEmailAddress(const HWND parent_hwnd);
 
 bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &error);
 
 bool OnStartQuery(const HWND hwnd);
 
-#define ID_TIMER 4000 /*¼ÆÊ±Æ÷±àºÅ*/
+bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const unsigned int edit_status);
+
+
 
 /* struct define */
 typedef struct StaffInfo
@@ -59,7 +65,13 @@ typedef struct StaffInfo
     std::string sex;
     std::string age;
     std::string salary;
+	std::string department;
+	std::string email_address;
+	std::string phone;
+	std::string address;
+
 }STAFFINFO;
+
 
 #endif
 
