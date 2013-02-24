@@ -423,7 +423,7 @@ bool CreateButton(const HWND hwnd)
 BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static CustomerTable *table;
-	static bool is_change = false;
+    static bool is_change = false;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -488,7 +488,6 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_ADD_DISH:
 				{
-					is_change = true;
 					/* 初始化列表控件 */
 					CListView menu_list, customer_list;
 					menu_list.Initialization(hwnd, IDC_REPAST_MENU);
@@ -512,6 +511,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						customer_list.InsertItem(0, dish_name); 
 						customer_list.SetItem(0, 1, menu_list.GetItem(select_row, 1));
 						customer_list.SetItem(0, 2, num);
+						is_change = true;   /* modify the customer menu */
 					} else {
 						MessageBox(hwnd, TEXT("You have order this dish!"),
 							       TEXT("ORDER"), MB_ICONINFORMATION);
@@ -520,7 +520,6 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 			case IDC_DELETE_DISH:
 				{
-					is_change = true;
 					CListView customer_list;
 					CCustomerMenuForm customer_menu;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
@@ -529,6 +528,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						if (IDYES == MessageBox(hwnd, TEXT("移除该项？"), TEXT("点菜"), MB_YESNO)) {
 				//			customer_menu.DeleteDish(table->customer_no.c_str(), customer_list.GetItem(select_row, 0).c_str());
 							customer_list.DeleteItem(select_row);
+							is_change = true; /* modify the customer menu */
 						}
 					}
 					break;
@@ -539,17 +539,16 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					CListView customer_list;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					int count = customer_list.GetItemCount();
-					char customer_no[16] = {0};
-					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+// 					char customer_no[16] = {0};
+// 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
 					for (int i = 0; i < count; ++i) {
 						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
 						
-						customer.InsertCustomerMenu(customer_no,
+						customer.InsertCustomerMenu(table->customer_no.c_str(),
 							                        customer_list.GetItem(i, 0).c_str(), 
 													quantity);
-					
 					}
-					is_change = false;
+					is_change = false; /* save the change and set the is_change false */
 					break;
 				}
 			case IDC_CANCEL_MENU:
@@ -563,7 +562,8 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		{
 			if (true == is_change) {
-				int ret = MessageBox(hwnd, TEXT("Save the change!"), TEXT("ORDER"), MB_YESNOCANCEL);
+				int ret = MessageBox(hwnd, TEXT("Save the change!"), 
+					                 TEXT("ORDER"), MB_YESNOCANCEL);
 				if (IDYES == ret) {
 					CCustomerMenuForm customer_menu_info;
 					customer_menu_info.DeleteAll(table->customer_no.c_str());
@@ -579,6 +579,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 													customer_list.GetItem(i, 0).c_str(), 
 													quantity);
 					}
+					is_change = false;
 
 				} else if (IDCANCEL == ret) {
 					break;
