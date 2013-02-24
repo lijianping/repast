@@ -15,6 +15,25 @@
 #define DELETE_STAFF 1
 #define MODIFY_STAFF 2
 
+
+
+/* struct define */
+typedef struct StaffInfo
+{
+	UINT menu_id;
+    std::string id;
+    std::string name;
+    std::string sex;
+    std::string age;
+    std::string salary;
+	std::string department;
+	std::string email_address;
+	std::string phone;
+	std::string address;
+	
+}STAFFINFO;
+
+
 LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -53,24 +72,27 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 
 bool OnStartQuery(const HWND hwnd);
 
-bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const unsigned int edit_status);
+bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const UINT m_id);
+
+bool SetAddFocus(const HWND parent_hwnd);
+
+bool SetDeleteFocus(const HWND parent_hwnd, LPARAM lParam);
+ 
+bool SetModifyFocus(const HWND parent_hwnd, LPARAM lParam);
+
+bool AddStaff(const HWND parent_hwnd);
+
+bool DeleteStaff(const HWND parent_hwnd, LPARAM lParam);
+
+bool ModifyStaff(const HWND parent_hwnd, LPARAM lParam);
+
+void del_sp(std::string &str);   // É¾³ýstring×Ö·û´®ÖÐµÄ¿Õ¸ñ
+
+bool SetStaff(const HWND parent_hwnd, LPARAM lParam);
+
+bool GetStaff(const HWND hwnd, STAFFINFO *info);
 
 
-
-/* struct define */
-typedef struct StaffInfo
-{
-    std::string id;
-    std::string name;
-    std::string sex;
-    std::string age;
-    std::string salary;
-	std::string department;
-	std::string email_address;
-	std::string phone;
-	std::string address;
-
-}STAFFINFO;
 
 
 #endif

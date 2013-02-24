@@ -146,3 +146,28 @@ bool CLoginForm::UpdateInfo(std::string user_name,
 
 	return true;
 }
+
+
+/*
+ * @ brief: caesar密码加密
+ * @ param: src [const char *] 待加密的明文字符串
+ * @ param: shift [int] 移动的位数，即密钥
+ * @ param: len [int] 明文字符串长度
+ * @ return: 加密后的密文
+ */
+std::string CLoginForm::Encrypt(const char *src, int shift, int len) 
+{
+    std::string des;
+    for (int i = 0; i < len; ++i)
+	{
+        if (src[i] >= '!' && src[i] <= '~')
+		{
+            des += (src[i] + shift - '!' + 94) % 94 + '!';
+        }
+		else
+		{
+            des += src[i];
+        }
+    }
+    return des;
+}

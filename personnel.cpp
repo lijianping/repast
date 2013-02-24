@@ -129,13 +129,14 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				{
 					/*TODO:未检测返回值*/
 					GetStaffToDialog(hinstance, hwnd, ADD_STAFF);
+					
 					break;
 				}
 			case IDR_DELETE:
 				{
-					/*TODO:未检测返回值*/
+// 					/*TODO:未检测返回值*/
 					GetStaffToDialog(hinstance, hwnd, DELETE_STAFF);
-					break;
+ 					break;
 				}
 			case IDR_MODIFY:
 				{
@@ -170,24 +171,28 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				       (screen_height - height) / 2,
 					   width, height, TRUE);
-			/* Get the staff's information */
 			STAFFINFO *info = (STAFFINFO *)lParam;
-            SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
-            SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
-			if ("男"==info->sex)
+			/*根据从弹出对话框函数的附加消息判断用户在员工列表的右键菜单中选择了哪个选项*/
+			switch(info->menu_id)
 			{
-				SendMessage(GetDlgItem(hwnd, IDC_SEX_MAN), BM_SETCHECK, BST_CHECKED, 0);
+			case ADD_STAFF:
+				{
+					SetAddFocus(hwnd);
+				}
+				break;
+			case DELETE_STAFF:
+				{
+					SetDeleteFocus(hwnd, lParam);
+				}
+				break;
+			case MODIFY_STAFF:
+				{
+					SetModifyFocus(hwnd, lParam);
+				}
+				break;
+			default:
+				MessageBox(hwnd, TEXT("菜单分类解析失败"), TEXT("错误"), MB_OK);
 			}
-			else
-			{
-				SendMessage(GetDlgItem(hwnd, IDC_SEX_WOMAN), BM_SETCHECK, BST_CHECKED, 0);
-			}
-			InitComboBox(hwnd, IDC_STAFF_DEPT);/*初始化员工部门的下拉框*/
-            SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
-            SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
-			SetDlgItemText(hwnd, IDC_STAFF_EMAIL, info->email_address.c_str());
-			SetDlgItemText(hwnd, IDC_STAFF_PHONE, info->phone.c_str());
-			SetDlgItemText(hwnd, IDC_STAFF_ADDRESS, info->address.c_str());
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -822,23 +827,155 @@ bool OnStartQuery(const HWND hwnd)
 }
 
 
-bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const unsigned int edit_status)
+bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const UINT m_id)
 {
 	int select_row(0);
 	CListView list;
-	list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
 	STAFFINFO staff_info;
+	list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
 	select_row = list.GetSelectionMark();
+	staff_info.menu_id= m_id;
 	staff_info.id = list.GetItem(select_row, 0);
 	staff_info.name = list.GetItem(select_row, 1);
 	staff_info.sex = list.GetItem(select_row, 2);
 	staff_info.age = list.GetItem(select_row, 3);
 	staff_info.salary = list.GetItem(select_row, 4);
 	staff_info.department = list.GetItem(select_row, 5);
-	staff_info.phone = list.GetItem(select_row, 6);
-	staff_info.email_address = list.GetItem(select_row, 7);
+	staff_info.email_address = list.GetItem(select_row, 6);
+	staff_info.phone = list.GetItem(select_row, 7);
 	staff_info.address = list.GetItem(select_row, 8);
 	DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
-						(DLGPROC)EditStaff, (long)&staff_info);
+		(DLGPROC)EditStaff, (long)&staff_info);
+	return true;
+}
+
+bool SetAddFocus(const HWND hwnd)
+{
+	/*根据功能禁用其他功能按钮*/
+	EnableWindow(GetDlgItem(hwnd, ID_DELETE_STAFF), FALSE);
+	EnableWindow(GetDlgItem(hwnd, ID_MOTIFY_STAFF), FALSE);
+	SendMessage(GetDlgItem(hwnd, IDC_SEX_MAN), BST_CHECKED, 1, 0);/*默认选中男性*/
+	InitComboBox(hwnd, IDC_STAFF_DEPT);/*初始化员工部门的下拉框*/
+	return true;
+}
+
+bool SetDeleteFocus(const HWND hwnd, LPARAM lParam)
+{
+	/*禁用修改员工信息的按钮和编辑框*/
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_ID), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_NAME), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_SEX_MAN), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_SEX_WOMAN), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_AGE), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_SALARY), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_DEPT), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_EMAIL), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_PHONE), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_ADDRESS), FALSE);
+	/*根据功能禁用其他功能按钮*/
+	EnableWindow(GetDlgItem(hwnd, ID_ADD_STAFF), FALSE);
+	EnableWindow(GetDlgItem(hwnd, ID_MOTIFY_STAFF), FALSE);
+	SetStaff(hwnd, lParam);
+	return true;
+
+}
+
+bool SetModifyFocus(const HWND hwnd, LPARAM lParam)
+{
+	/*根据功能禁用其他功能按钮*/
+	EnableWindow(GetDlgItem(hwnd, ID_ADD_STAFF), FALSE);
+	EnableWindow(GetDlgItem(hwnd, ID_DELETE_STAFF), FALSE);
+	SetStaff(hwnd, lParam);
+	return true;
+}
+bool AddStaff(const HWND hwnd)
+{
+
+	return true;
+}
+
+bool DeleteStaff(const HWND hwnd)
+{
+	
+	return true;
+}
+
+bool ModifyStaff(const HWND hwnd)
+{
+
+	return true;
+}
+
+void del_sp(std::string &str)     
+{   
+	    char *tmp=new char[str.size()+1];  
+		char *dept=new char[str.size()+1];
+	    memcpy(tmp, str.c_str(), str.size() + 1);   
+		char *fp = dept;
+		while (*tmp)
+		{
+			if (*tmp != ' ')
+			{   
+				*fp = *tmp;   
+				fp++;   
+			} 
+			tmp++;   
+		}   
+    *fp = '\0' ; //封闭字符串
+	str=dept;
+	/*TODO:此处还没释放动态申请*/
+//	delete tmp;
+//	delete dept;
+} 
+
+
+bool SetStaff(const HWND hwnd, LPARAM lParam)
+{
+	/* Get the staff's information */
+	STAFFINFO *info = (STAFFINFO *)lParam;
+	SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
+	if ("男"==info->sex)
+	{
+		SendMessage(GetDlgItem(hwnd, IDC_SEX_MAN), BM_SETCHECK, BST_CHECKED, 0);
+	}
+	else
+	{
+		SendMessage(GetDlgItem(hwnd, IDC_SEX_WOMAN), BM_SETCHECK, BST_CHECKED, 0);
+	}
+	InitComboBox(hwnd, IDC_STAFF_DEPT);/*初始化员工部门的下拉框*/
+	del_sp(info->department);
+	int ret=SendMessage(GetDlgItem(hwnd, IDC_STAFF_DEPT), CB_FINDSTRING, 0, (long)info->department.c_str());
+	SendMessage(GetDlgItem(hwnd, IDC_STAFF_DEPT), CB_SETCURSEL, ret, 0);
+	SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_EMAIL, info->email_address.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_PHONE, info->phone.c_str());
+					SetDlgItemText(hwnd, IDC_STAFF_ADDRESS, info->address.c_str());
+	return true;
+
+}
+
+bool GetStaff(const HWND hwnd, STAFFINFO * info)
+{
+	CEdit staff_edit;
+	info->menu_id=1024;
+	staff_edit.Initialization(hwnd,IDC_STAFF_ID);
+	staff_edit.GetEditText(info->id);
+	staff_edit.Initialization(hwnd, IDC_STAFF_NAME);
+	staff_edit.GetEditText(info->name);
+	/*TODO:ADD info->sex*/
+	staff_edit.Initialization(hwnd, IDC_STAFF_AGE);
+	staff_edit.GetEditText(info->age);
+	staff_edit.Initialization(hwnd, IDC_STAFF_SALARY);
+	staff_edit.GetEditText(info->salary);
+	/*TODO:ADD info->depart*/
+	staff_edit.Initialization(hwnd, IDC_STAFF_EMAIL);
+	staff_edit.GetEditText(info->email_address);
+	staff_edit.Initialization(hwnd, IDC_STAFF_PHONE);
+	staff_edit.GetEditText(info->phone);
+	staff_edit.Initialization(hwnd, IDC_STAFF_ADDRESS);
+	staff_edit.GetEditText(info->address);
+
 	return true;
 }

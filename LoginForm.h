@@ -25,6 +25,7 @@ public:
 					std::string user_password,
 					short user_permission, 
 					std::string error_info);
+	std::string Encrypt(const char *src, int shift, int len);
 
 private:
     char m_name_[20];              /* staff's name in login form */
