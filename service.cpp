@@ -9,9 +9,14 @@
 #include "Customer.h"
 #include "MenuForm.h"
 #include "CustomerMenuForm.h"
+#include "LoginForm.h"
+#include <MATH.H>
 
 WNDPROC g_old_list_processes; /* 主对话框中的列表处理过程 */
 WNDPROC g_dialog_menu_proc;  /* 对话框中的菜单列表的窗口处理过程 */
+WNDPROC g_checkout_edit_proc;
+extern std::string g_login_name;
+
 char* status[3] = {"未开台", "已开台", "已预订"};
 
 LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
@@ -69,22 +74,22 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 						combo.Initialization(hwnd, ID_SERVICE_COMBO);
 						std::string text;
 						combo.GetComboBoxText(text);
-						if ("大厅一楼" == text)
+						if ("一楼" == text)
 						{
-							MessageBox(hwnd, TEXT("大厅一楼"), TEXT("combo"), MB_ICONINFORMATION);
+							MessageBox(hwnd, TEXT("一楼"), TEXT("combo"), MB_ICONINFORMATION);
 						}
-						if ("大厅二楼" == text)
+						if ("二楼" == text)
 						{
-							MessageBox(hwnd, TEXT("大厅二楼"), TEXT("combo"), MB_ICONINFORMATION);
+							MessageBox(hwnd, TEXT("二楼"), TEXT("combo"), MB_ICONINFORMATION);
 						}
-						if ("大厅三楼" == text)
+						if ("三楼" == text)
 						{
-							MessageBox(hwnd, TEXT("大厅三楼"), TEXT("combo"), MB_ICONINFORMATION);
+							MessageBox(hwnd, TEXT("三楼"), TEXT("combo"), MB_ICONINFORMATION);
 						}	
 					}
 					break;
 				}
-			case ID_SERVICE_START:
+			case ID_SERVICE_START:   // 开台管理
 				{
 					std::string error_information;  /* 错误信息返回 */
 					CListView table_list;
@@ -111,7 +116,32 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					SetListInfo(hwnd, ID_SERVICE_LIST, error_information);
 					break;
 				}
-			case ID_SERVICE_ORDER:
+			case ID_SERVICE_CHANGE:  // 换台管理
+			{
+				CListView table_list;
+				table_list.Initialization(hwnd, ID_SERVICE_LIST);
+				int select_row = table_list.GetSelectionMark();
+				if (-1 == select_row)
+				{
+					MessageBox(hwnd, TEXT("请先选择台号！"), TEXT("服务管理"), MB_ICONINFORMATION);
+					break;
+				}
+				std::string current_status = table_list.GetItem(select_row, 1);
+				if (std::string(status[0]) == current_status)
+				{
+					MessageBox(hwnd, TEXT("该台尚未开台或预订， 不可进行换台！"), 
+							   TEXT("服务管理"), MB_ICONINFORMATION);
+					break;
+				}
+				CustomerTable table_info;
+				table_info.table_no = table_list.GetItem(select_row, 0);              /* 获取台号 */
+				table_info.customer_no = table_list.GetItem(select_row, 2);     /* 获取顾客编号 */
+				table_info.founding_time = table_list.GetItem(select_row, 3);   /* 获取开台时间 */
+				DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CHANGE_TABLE),
+							   hwnd, (DLGPROC)ChangeProc, (long)&table_info);
+				break;
+			}
+			case ID_SERVICE_ORDER: // 点菜管理  
 				{
 					CListView table_list;    /* 台号信息列表 */
 					table_list.Initialization(hwnd, ID_SERVICE_LIST);
@@ -136,7 +166,7 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 						           hwnd, (DLGPROC)OrderProc, (long)&table_info);
 					break;
 				}
-			case ID_SERVICE_RETREAT:
+			case ID_SERVICE_CHECKOUT:   // 结账功能
 				{
 					CListView table_list;
 					table_list.Initialization(hwnd, ID_SERVICE_LIST);
@@ -150,55 +180,21 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					if (std::string(status[0]) == current_status)
 					{
 						MessageBox(hwnd, TEXT("该台尚未开台！"), TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}
-					DialogBox(hinstance, MAKEINTRESOURCE(IDD_RETREAT),
-						      hwnd, (DLGPROC)RetreatProc);
-					break;
-				}
-			case ID_SERVICE_CHECKOUT:
-				{
-					CListView table_list;
-					table_list.Initialization(hwnd, ID_SERVICE_LIST);
-					int select_row = table_list.GetSelectionMark();
-					if (-1 == select_row)
-					{
-						MessageBox(hwnd, TEXT("请先选择台号！"), TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}
-					std::string current_status = table_list.GetItem(select_row, 1);
-					if (std::string(status[0]) == current_status)
-					{
-						MessageBox(hwnd, TEXT("该台尚未开台！"), TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}
-					DialogBox(hinstance, MAKEINTRESOURCE(IDD_CUSTOM_CHECKOUT),
-						      hwnd, (DLGPROC)CheckOutProc);
-					break;
-				}
-			case ID_SERVICE_CHANGE:
-				{
-					CListView table_list;
-					table_list.Initialization(hwnd, ID_SERVICE_LIST);
-					int select_row = table_list.GetSelectionMark();
-					if (-1 == select_row)
-					{
-						MessageBox(hwnd, TEXT("请先选择台号！"), TEXT("服务管理"), MB_ICONINFORMATION);
-						break;
-					}
-					std::string current_status = table_list.GetItem(select_row, 1);
-					if (std::string(status[0]) == current_status)
-					{
-						MessageBox(hwnd, TEXT("该台尚未开台或预订， 不可进行换台！"), 
-							       TEXT("服务管理"), MB_ICONINFORMATION);
 						break;
 					}
 					CustomerTable table_info;
 					table_info.table_no = table_list.GetItem(select_row, 0);              /* 获取台号 */
 					table_info.customer_no = table_list.GetItem(select_row, 2);     /* 获取顾客编号 */
-					table_info.founding_time = table_list.GetItem(select_row, 3);   /* 获取开台时间 */
-					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CHANGE_TABLE),
-						           hwnd, (DLGPROC)ChangeProc, (long)&table_info);
+					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CUSTOM_CHECKOUT),
+						      hwnd, (DLGPROC)CheckOutProc, (long)&table_info);
+					break;
+				}
+			
+			case ID_SERVICE_CHANGE_PASSWD:  // 密码管理
+				{
+ 					DialogBox(hinstance, MAKEINTRESOURCE(IDD_CHANGE_PASSWD),
+						      hwnd, (DLGPROC)ChangePasswdProc);
+				
 					break;
 				}
 			}
@@ -352,9 +348,9 @@ bool InitComboBox(const HWND hwnd, int id)
 {
 	HWND combo;
 	combo = GetDlgItem(hwnd, id);
-	if (CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"大厅一楼") ||
-		CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"大厅二楼") ||
-		CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"大厅三楼"))
+	if (CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"一楼") ||
+		CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"二楼") ||
+		CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"三楼"))
 	{
 		return false;
 	}
@@ -539,12 +535,18 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					CListView customer_list;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					int count = customer_list.GetItemCount();
-// 					char customer_no[16] = {0};
-// 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+					if(0==count)
+					{
+						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
+						break;
+					}
+					char customer_no[16] = {0};
+					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+					CCustomerMenuForm customer_menu_info;
+					customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
 					for (int i = 0; i < count; ++i) {
 						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
-						
-						customer.InsertCustomerMenu(table->customer_no.c_str(),
+						customer.InsertCustomerMenu(customer_no,
 							                        customer_list.GetItem(i, 0).c_str(), 
 													quantity);
 					}
@@ -566,11 +568,16 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					                 TEXT("ORDER"), MB_YESNOCANCEL);
 				if (IDYES == ret) {
 					CCustomerMenuForm customer_menu_info;
-					customer_menu_info.DeleteAll(table->customer_no.c_str());
+					customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
 					CCustomer customer;
 					CListView customer_list;
 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
 					int count = customer_list.GetItemCount();
+					if(0==count)
+					{
+						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
+						break;
+					}
 					char customer_no[16] = {0};
 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
 					for (int i = 0; i < count; ++i) {
@@ -592,11 +599,39 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+
+LRESULT CALLBACK EditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
+{
+	switch(msg) {
+	case WM_KEYDOWN:
+		{
+			if (wParam == VK_RETURN) {
+				HWND parent = GetParent(hwnd);
+				char totle[64] = "\0", paidin[64] = "\0";
+				GetDlgItemText(parent, IDC_RECEIVALBE_CHECKOUT, totle, 64);
+				GetDlgItemText(parent, IDC_PAIDIN_CHECKOUT,paidin, 64);
+				float totle_cash = atof(totle);
+				float pay = atof(paidin);
+				if (0.0 == pay) {
+					MessageBox(parent, TEXT("输入有误！"), TEXT("结账管理"), MB_OK | MB_ICONINFORMATION);
+					break;
+				}
+				float check = pay - totle_cash;
+				char temp[32];
+				sprintf(temp, "%0.2f", check);
+				SetDlgItemText(parent, IDC_GIVECHANGE_CHECKOUT, temp);
+				SetFocus(GetDlgItem(parent, IDC_SAVE_CHECKOUT));
+			}
+		}
+	}
+	return CallWindowProc(g_checkout_edit_proc, hwnd, msg, wParam, lParam);
+}
 /*
  * 说明: 结账对话框处理过程函数
  **/
 BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static CustomerTable *table_info;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -614,12 +649,59 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				       (screen_height - height) / 2,
 					   width, height, TRUE);
+			table_info = (CustomerTable *)lParam;
+			SetDlgItemText(hwnd, IDC_TABLE_NUM_CHECKOUT, table_info->table_no.c_str());
+			SetDlgItemText(hwnd, IDC_CUSTOM_NUM_CHECKOUT, table_info->customer_no.c_str());
+			CListView custom_list;
+			custom_list.Initialization(hwnd, IDC_MENU_CHEKOUT);
+			custom_list.InsertColumn(0, 120, "菜名");
+			custom_list.InsertColumn(1, 80, "单价");
+			custom_list.InsertColumn(2, 50, "数量");
+			custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			CCustomerMenuForm order_info;
+			order_info.GetCustomerMenuSet(table_info->customer_no.c_str());
+			order_info.MoveFirst();
+			int i = 0;
+			float totle_cash = 0;
+			while (!order_info.IsEOF()) {
+				custom_list.InsertItem(i, order_info.dish_name());
+				custom_list.SetItem(i, 1, order_info.dish_price());
+				custom_list.SetItem(i, 2, order_info.dish_quantity());
+				totle_cash += order_info.dish_price() * order_info.dish_quantity();
+				i++;
+				order_info.MoveNext();
+			}
+			char temp[64] = "\0";
+			sprintf(temp, "%0.2f", totle_cash);
+			SetDlgItemText(hwnd, IDC_RECEIVALBE_CHECKOUT, temp);
+
+			HWND edit = GetDlgItem(hwnd, IDC_PAIDIN_CHECKOUT);
+			SetFocus(edit);
+			g_checkout_edit_proc = (WNDPROC)SetWindowLong(edit, GWL_WNDPROC, (LONG)EditProc);
 			return TRUE;
 		}
 	case WM_COMMAND:
 		{
 			switch (LOWORD(wParam))
 			{
+			case IDC_SAVE_CHECKOUT: 
+				{
+					TCHAR totle[64] = "\0", more[64] = "\0";
+					int ret1 = GetDlgItemText(hwnd, IDC_RECEIVALBE_CHECKOUT, totle, 64);
+					int ret2 = GetDlgItemText(hwnd, IDC_GIVECHANGE_CHECKOUT, more, 64);
+					float check_in = atof(totle);
+					float check_out = atof(more);
+					if (!ret1 || !ret2) {
+						MessageBox(hwnd, TEXT("输入有误！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					} 
+					if (check_out < 0) {
+						TCHAR info[128] = "\0";
+						sprintf(info, "还差 %0.2f 元", fabs(check_out));
+						MessageBox(hwnd, info, TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					}
+				}
 			case IDC_CANCEL_CHECKOUT:
 				{
 					EndDialog(hwnd, LOWORD(wParam));
@@ -639,58 +721,58 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 /*
  * 说明: 退菜对话框处理过程
- **/
-BOOL CALLBACK RetreatProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_INITDIALOG:
-		{
-			RECT rect;
-			if (!GetWindowRect(hwnd, &rect))
-			{
-				MessageBox(hwnd, TEXT("Get rect failed!"), TEXT("ERROR"), MB_ICONINFORMATION | MB_OK);
-				return FALSE;
-			}
-			int width = rect.right - rect.left;
-			int height = rect.bottom - rect.top;
-			int screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
-			int screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
-			MoveWindow(hwnd, (screen_width - width) / 2,
-				       (screen_height - height) / 2,
-					   width, height, TRUE);
-			return TRUE;
-		}
-	case WM_COMMAND:
-		{
-			switch (LOWORD(wParam))
-			{
-			case IDC_TABLE_RETREAT_NUM:
-				{
-					if (LOWORD(wParam) == VK_RETURN)
-					MessageBox(hwnd, TEXT("hello"), TEXT("Edit"), 0);
-					break;
-				}
-			case ID_CANCEL_RETREAT:
-				{
-					EndDialog(hwnd, LOWORD(wParam));
-					break;
-				}
-			}
-			return TRUE;
-		}
-	case WM_CLOSE:
-		{
-			EndDialog(hwnd, HIWORD(wParam));
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
+ 
+// BOOL CALLBACK RetreatProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+// {
+// 	switch (msg)
+// 	{
+// 	case WM_INITDIALOG:
+// 		{
+// 			RECT rect;
+// 			if (!GetWindowRect(hwnd, &rect))
+// 			{
+// 				MessageBox(hwnd, TEXT("Get rect failed!"), TEXT("ERROR"), MB_ICONINFORMATION | MB_OK);
+// 				return FALSE;
+// 			}
+// 			int width = rect.right - rect.left;
+// 			int height = rect.bottom - rect.top;
+// 			int screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
+// 			int screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
+// 			MoveWindow(hwnd, (screen_width - width) / 2,
+// 				       (screen_height - height) / 2,
+// 					   width, height, TRUE);
+// 			return TRUE;
+// 		}
+// 	case WM_COMMAND:
+// 		{
+// 			switch (LOWORD(wParam))
+// 			{
+// 			case IDC_TABLE_RETREAT_NUM:
+// 				{
+// 					if (LOWORD(wParam) == VK_RETURN)
+// 					MessageBox(hwnd, TEXT("hello"), TEXT("Edit"), 0);
+// 					break;
+// 				}
+// 			case ID_CANCEL_RETREAT:
+// 				{
+// 					EndDialog(hwnd, LOWORD(wParam));
+// 					break;
+// 				}
+// 			}
+// 			return TRUE;
+// 		}
+// 	case WM_CLOSE:
+// 		{
+// 			EndDialog(hwnd, HIWORD(wParam));
+// 			return TRUE;
+// 		}
+// 	}
+// 	return FALSE;
+// }
+*/
 /*
-* 说明: 换台窗口处理过程函数 
-**/
+ * 说明: 换台窗口处理过程函数 
+ **/
 BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -718,8 +800,9 @@ BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			CListView table;
 			table.Initialization(hwnd, IDC_TABLE_AVAILABLE);
 			table.InsertColumn(0, 100, "台号");
+			table.InsertColumn(1, 50, "人数");
 			table.SetSelectAndGrid(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
-			InitAvailableTable(hwnd);
+			InitAvailableTable(hwnd, IDC_TABLE_AVAILABLE);
 			CComboBox postion;
 			postion.Initialization(hwnd, IDC_FLOOR_NUM_AVAILABLE);
 			postion.AddString("大厅一楼");
@@ -782,11 +865,21 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //			SetDlgItemText(hwnd, IDC_TABLE_NO_START, table_info->no.c_str());
 			SYSTEMTIME current_time;
 			char customer_no[128] = "\0";
-			GetLocalTime(&current_time);
-			sprintf(customer_no, "%d%d%d%d%d%s", current_time.wYear, current_time.wMonth,
-				    current_time.wDay, current_time.wHour, current_time.wMinute, table_info->table_no.c_str());
+			CDBForm DB_time;
 			
-//			SetDlgItemText(hwnd, IDC_CUSTOMER_NO_START, customer_no);
+			GetLocalTime(&current_time);
+			sprintf(customer_no, "%d%d%d%d%d%s", DB_time.GetYear(), DB_time.GetMonth(),
+				    DB_time.GetDay(), DB_time.GetHour(), DB_time.GetMinute(), table_info->table_no.c_str());
+			
+			SetDlgItemText(hwnd, IDC_CUSTOMER_NO_START, customer_no);
+			
+			CListView table;
+			table.Initialization(hwnd, IDC_START_TABLE);
+			table.InsertColumn(0, 100, "台号");
+			table.InsertColumn(1, 50, "人数");
+			table.SetSelectAndGrid(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+			GetTableInfo(hwnd, IDC_START_TABLE);
+			InitComboBox(hwnd, IDC_COMBO1);
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -797,49 +890,61 @@ BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					BOOL error;
 					UINT real_num = GetDlgItemInt(hwnd, IDC_REAL_NUM_START, &error, FALSE);
-					if (!error)
-					{
+					if (!error)	{
 						MessageBox(hwnd, TEXT("人数输入有误！"), TEXT("开台"), MB_ICONINFORMATION);
 						break;
-					}
-					else if (real_num > payable_num)
-					{
+					} else if (real_num > payable_num) {
 						MessageBox(hwnd, TEXT("人数超过限制！"), TEXT("开台"), MB_ICONINFORMATION);
 						break;
 					}
 					/*
 					 * TODO: Update database
 					 **/
+					
 					CTableInfo table_info;
 					std::string error_info;
-//					if (table_info.Connect("repast", "repast", "repast", error_info))
-					{
-						SYSTEMTIME current_time;
-						char time_str[128] = "\0";
-						GetLocalTime(&current_time);
-						sprintf(time_str, "%d-%d-%d %d:%d:%d", current_time.wYear, current_time.wMonth, 
-							    current_time.wDay, current_time.wHour, current_time.wMinute, current_time.wSecond); 
-						char sql[128] = "\0";
-						sprintf(sql, "update TableInfo set Tstatus=1, Ttime='%s' where Ttableno='%s'",
-						    time_str, table_no.c_str());
-						if (!table_info.UpdateForm(sql, error_info))
-						{
-							MessageBox(hwnd, error_info.c_str(), TEXT("开台"),
-								MB_ICONINFORMATION);
-							break;
-						}
+					SYSTEMTIME current_time;
+					char time_str[128] = "\0";
+					GetLocalTime(&current_time);
+					sprintf(time_str, "%d-%d-%d %d:%d:%d", current_time.wYear, current_time.wMonth, 
+							current_time.wDay, current_time.wHour, current_time.wMinute, current_time.wSecond); 
+					char sql[128] = "\0";
+					sprintf(sql, "update TableInfo set Tstatus=1, Ttime='%s' where Ttableno='%s'",
+						time_str, table_no.c_str());
+					if (!table_info.UpdateForm(sql, error_info)) {
+						MessageBox(hwnd, error_info.c_str(), TEXT("开台"),
+							MB_ICONINFORMATION);
+						break;
 					}
-//					else
-// 					{
-// 						MessageBox(hwnd, error_info.c_str(),
-// 							TEXT("服务管理"), MB_ICONINFORMATION);
-// 						break;
-// 					}
 				}
 			case ID_START_CANCEL:
 				{
 					EndDialog(hwnd, LOWORD(wParam));
 					break;
+				}
+			case IDC_COMBO1:
+				{
+					if (HIWORD(wParam) == CBN_SELCHANGE)
+					{
+						/* 
+						 * HIT: When you change the combo box item, if you want 
+						 *      make some change, you can add it at here. 
+						 */
+						CComboBox combo;
+						combo.Initialization(hwnd, IDC_COMBO1);
+						std::string text;
+						combo.GetComboBoxText(text);
+						if ("一楼" == text) {
+							const char floor[] = "01";
+							GetTableInfo(hwnd, IDC_START_TABLE, floor);
+						} else if ("二楼" == text) {
+							const char floor[] = "02";
+							GetTableInfo(hwnd, IDC_START_TABLE, floor);
+						} else if ("三楼" == text) {
+							const char floor[] = "03";
+							GetTableInfo(hwnd, IDC_START_TABLE, floor);
+						}	
+					}
 				}
 			}
 			return TRUE;
@@ -924,11 +1029,11 @@ bool CreateRefeshButton(const HWND hwnd, const UINT id)
 		                  refresh_rect, hwnd, id);
 }
 
-bool InitAvailableTable(const HWND hwnd)
+bool InitAvailableTable(const HWND hwnd, int id)
 {
 	CTableInfo table_form;
 	CListView table_list;
-	table_list.Initialization(hwnd, IDC_TABLE_AVAILABLE);
+	table_list.Initialization(hwnd, id);
 	table_form.SetSQLStatement("select * from TableInfo");
 	table_form.GetRecordSet();
 	table_form.MoveFirst();
@@ -936,7 +1041,9 @@ bool InitAvailableTable(const HWND hwnd)
 	while (!table_form.IsEOF())
 	{
 		std::string temp = table_form.table_no();
+		short num = table_form.payable_num();
 		table_list.InsertItem(i, temp);
+		table_list.SetItem(i, 1, num);
 		table_form.MoveNext();
 		i++;
 	}
@@ -955,4 +1062,93 @@ LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARA
 		}
 	}
 	return CallWindowProc(g_dialog_menu_proc, hwnd, message, wParam, lParam);
+}
+
+BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		{
+			RECT rect;
+			if (!GetWindowRect(hwnd, &rect))
+			{
+				MessageBox(hwnd, TEXT("Get rect failed!"), TEXT("ERROR"), MB_ICONINFORMATION | MB_OK);
+				return FALSE;
+			}
+			int width = rect.right - rect.left;
+			int height = rect.bottom - rect.top;
+			int screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
+			int screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
+			MoveWindow(hwnd, (screen_width - width) / 2,
+					   (screen_height - height) / 2,
+				       width, height, TRUE);
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDOK:
+				{
+					TCHAR new_passwd[64] = "\0", confirm[64] = "\0";
+					int ret = GetDlgItemText(hwnd, IDC_NEW_PASSWD, new_passwd, 64);
+					int ret1 = GetDlgItemText(hwnd, IDC_CONFIRM, confirm, 64);
+					std::string password1(new_passwd), password2(confirm);
+					if (password1 != password2) {
+						MessageBox(hwnd, TEXT("两次密码输入不一致！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					} 
+					if (!ret || !ret1) {
+						MessageBox(hwnd, TEXT("密码不能为空！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					}
+					TCHAR old_passwd[64] = "\0";
+					GetDlgItemText(hwnd, IDC_OLD_PASSWD, old_passwd, 64);
+					std::string password(old_passwd), error;
+					CLoginForm modify_passwd;
+					// 判断用户密码是否正确
+					if (0 == modify_passwd.GetUserPermission(g_login_name, password, error)) {
+						MessageBox(hwnd, TEXT("用户密码错误！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					}
+					modify_passwd.ModifyPasswd(g_login_name, password1);
+				}
+			case IDCANCEL:
+				{
+					EndDialog(hwnd, LOWORD(wParam));
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_CLOSE:
+		{
+			EndDialog(hwnd, HIWORD(wParam));
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+void GetTableInfo(const HWND hwnd, const int id, const char *floor, int use) {
+	CTableInfo table_form;
+	CListView table_list;
+	table_list.Initialization(hwnd, id);
+	table_list.DeleteAllItems();
+	char sql[128] = "\0";
+	sprintf(sql, "select * from TableInfo where Tstatus = %d and Tno like '%s%c'", use, floor, '%');
+	table_form.SetSQLStatement(sql);
+	table_form.GetRecordSet();
+	table_form.MoveFirst();
+	int i(0);
+	while (!table_form.IsEOF())
+	{
+		std::string temp = table_form.table_no();
+		short num = table_form.payable_num();
+		table_list.InsertItem(i, temp);
+		table_list.SetItem(i, 1, num);
+		table_form.MoveNext();
+		i++;
+	}
 }

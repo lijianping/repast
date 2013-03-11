@@ -6,6 +6,7 @@
 #include "LoginForm.h"
 #include "childwindowid.h"
 
+std::string g_login_name;  // µÇÂ½ÓÃ»§Ãû
 
 BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
@@ -73,6 +74,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                                        TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
                             return FALSE;
                         }
+						g_login_name = name;
                     }
                     EndDialog(hwnd, return_value);
                     break;

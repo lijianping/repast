@@ -44,7 +44,6 @@ CWind::~CWind()
 }
 
 /*
- * @作者: 李建平
  * @功能: 设置创建窗口时的信息
  */
 void CWind::SetWindowInfo(HINSTANCE hinstance, TCHAR *sztitle /* = TEXT */,
@@ -67,7 +66,6 @@ void CWind::SetWindowInfo(HINSTANCE hinstance, TCHAR *sztitle /* = TEXT */,
 }
 
 /*
- * @作者: 李建平
  * @功能: 创建窗口
  * @说明: 需要在此函数之前调用set_show_state函数，否则
  *        窗口无法正常显示
@@ -99,9 +97,7 @@ bool CWind::UserCreateWindow()
 }
 
 /*
- * @作者: 李建平
  * @函数说明: 窗口消息循环
- * @返回值:
  */
 int CWind::MessageLoop()
 {
@@ -114,7 +110,6 @@ int CWind::MessageLoop()
 }
 
 /*
- * @作者: 李建平
  * @功能: 注册窗口类
  * @返回值:若注册成功返回true，否则返回false
  */
@@ -139,7 +134,6 @@ bool CWind::UserRegisterClass()
 }
 
 /*
- * @作者: 李建平
  * @功能: 默认的窗口处理函数
  */
 LRESULT CALLBACK WindProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

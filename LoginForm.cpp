@@ -41,10 +41,11 @@ short CLoginForm::GetUserPermission(std::string user_name,
                                     std::string user_password,
                                     std::string &information)
 {
+	std::string password = Encrypt(user_password.c_str(), user_password.length() / 2, user_password.length());
     std::string sql_statement = "select Lpermission from Login where Lname = '";
     sql_statement += user_name;
     sql_statement += "' and Lpassword = '";
-    sql_statement += user_password;
+    sql_statement += password;
     sql_statement += "'";
     this->ExecuteSQL((char *)sql_statement.c_str(), information);
     short permission = 0;
@@ -145,4 +146,37 @@ bool CLoginForm::UpdateInfo(std::string user_name,
     }
 
 	return true;
+}
+
+
+/*
+ * @ brief: caesar密码加密
+ * @ param: src [in] 待加密的明文字符串
+ * @ param: shift [in] 移动的位数，即密钥
+ * @ param: len [in] 明文字符串长度
+ * @ return: 加密后的密文
+ */
+std::string CLoginForm::Encrypt(const char *src, int shift, int len) {
+    std::string des;
+    for (int i = 0; i < len; ++i) {
+        if (src[i] >= '!' && src[i] <= '~') {
+            des += (src[i] + shift - '!' + 94) % 94 + '!';
+        } else {
+            des += src[i];
+        }
+    }
+    return des;
+}
+
+/*
+ * @ brief: 修改用户密码
+ * @ param: password [in] 用户密码
+ * @ return: 若成功返回true，否则返回false
+ **/
+bool CLoginForm::ModifyPasswd(std::string user_name, std::string password) {
+	std::string encrypted = Encrypt(password.c_str(), password.length() / 2, password.length());
+	char sql[64] = "\0";
+	sprintf(sql, "Exec UpdatePassword %s, %s", user_name.c_str(), encrypted.c_str());
+	std::string error_string;
+	return ExecuteSQL(sql, error_string);
 }

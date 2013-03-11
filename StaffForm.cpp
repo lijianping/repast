@@ -138,6 +138,15 @@ bool CStaffForm::UpdatetInfo(char *user_id, char *user_name,
 int CStaffForm::GetStaffSum()
 {
 	int staff_sum=-1;
-	
+	SQLINTEGER sql_sum;
+	std::string error;
+	char *sql_select_sum="select count(*) from Staff";
+	if (false == ExecuteSQL(sql_select_sum, error))
+	{
+		MessageBox(NULL, error.c_str(), TEXT("统计员工数量出错"), MB_OK);
+		return staff_sum;
+	}
+	SQLBindCol(m_hstmt_, 1, SQL_C_SLONG, &staff_sum, sizeof(staff_sum), &sql_sum);
+	MoveFirst();
 	return staff_sum;
 }

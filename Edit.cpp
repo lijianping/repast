@@ -76,8 +76,8 @@ bool CEdit::Initialization(HWND parent_hwnd, UINT id)
  **/
 bool CEdit::GetEditText(std::string &text)
 {
-    TCHAR temp[128] = "\0";
-    int ret = GetWindowText(m_hwnd_, temp, 128);
+    TCHAR temp[1024] = "\0";
+    int ret = GetWindowText(m_hwnd_, temp, 1024);
     if (0 != ret)
     {
         std::string text_temp(temp);

@@ -1,7 +1,6 @@
 
 #include "personnel.h"
 #include "Commodity.h"
-#include "Customer.h"
 
 WNDPROC g_OldListProc;   /* The list view processes */
 
@@ -19,7 +18,8 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			CreateChildWindow(hwnd, error);
 			CreateStaffListView(hwnd);
 			InitListView(hwnd, ID_PERSONNEL_INFO);
-			SetListViewData(hwnd, ID_PERSONNEL_INFO);
+			OnStartQuery(hwnd);/*执行查询，显示查询结果*/
+		//	SetListViewData(hwnd, ID_PERSONNEL_INFO);
 			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
 			return 0;
 		}
@@ -72,19 +72,20 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				}
 			case ID_PERSONNEL_QUERY:
 				{
-					if (OnStartQuery(hwnd))
+					if (false == OnStartQuery(hwnd))
 					{
+						MessageBox(hwnd, TEXT("没有匹配的记录"), TEXT("查询结果"),
+			           MB_ICONINFORMATION | MB_OK);
 						/*just for a test:start*/
-						 CCustomer cc;
-						 cc.InsertCustomerMenu("201301011212128","麻婆豆腐",2);
+						 
 						
 						/*test end*/
-						CListView list;
-						list.Initialization(hwnd, ID_PERSONNEL_INFO);
-						int count = list.GetItemCount();
-						char number[10];
-						sprintf(number, "%d 人", count);
-						SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);
+// 						CListView list;
+// 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
+// 						int count = list.GetItemCount();
+// 						char number[10];
+// 						sprintf(number, "%d 人", count);
+// 						SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);
 					}
 					break;
 				}
@@ -109,7 +110,7 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	switch (msg)
 	{
 	case WM_RBUTTONDOWN:
-		{
+		{   /*弹出右键菜单*/
 			menu = LoadMenu(hinstance, MAKEINTRESOURCE(IDR_PERSONNEL));
 			menu = GetSubMenu(menu, 0);
 			POINT point;
@@ -126,37 +127,21 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			{
 			case IDR_ADD:
 				{
-					/* TODO: add a staff in the staff table. */
+					/*TODO:未检测返回值*/
+					GetStaffToDialog(hinstance, hwnd, ADD_STAFF);
+					
 					break;
 				}
 			case IDR_DELETE:
 				{
-					CListView list;
-					list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
-					STAFFINFO staff_info;
-					select_row = list.GetSelectionMark();
-					staff_info.id = list.GetItem(select_row, 0);
-					staff_info.name = list.GetItem(select_row, 1);
-					staff_info.sex = list.GetItem(select_row, 2);
-					staff_info.age = list.GetItem(select_row, 3);
-					staff_info.salary = list.GetItem(select_row, 4);
-					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
-                                   (DLGPROC)EditStaff, (long)&staff_info);
-					break;
+// 					/*TODO:未检测返回值*/
+					GetStaffToDialog(hinstance, hwnd, DELETE_STAFF);
+ 					break;
 				}
 			case IDR_MODIFY:
 				{
-					CListView list;
-					list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
-					STAFFINFO staff_info;
-					select_row = list.GetSelectionMark();
-					staff_info.id = list.GetItem(select_row, 0);
-					staff_info.name = list.GetItem(select_row, 1);
-					staff_info.sex = list.GetItem(select_row, 2);
-					staff_info.age = list.GetItem(select_row, 3);
-					staff_info.salary = list.GetItem(select_row, 4);
-					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
-						(DLGPROC)EditStaff, (long)&staff_info);
+					/*TODO:未检测返回值*/
+					GetStaffToDialog(hinstance, hwnd, MODIFY_STAFF);
 					break;
 				}
 			}
@@ -168,6 +153,7 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -185,12 +171,28 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				       (screen_height - height) / 2,
 					   width, height, TRUE);
-			/* Get the staff's information */
 			STAFFINFO *info = (STAFFINFO *)lParam;
-            SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
-            SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());			
-            SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
-            SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
+			/*根据从弹出对话框函数的附加消息判断用户在员工列表的右键菜单中选择了哪个选项*/
+			switch(info->menu_id)
+			{
+			case ADD_STAFF:
+				{
+					SetAddFocus(hwnd);
+				}
+				break;
+			case DELETE_STAFF:
+				{
+					SetDeleteFocus(hwnd, lParam);
+				}
+				break;
+			case MODIFY_STAFF:
+				{
+					SetModifyFocus(hwnd, lParam);
+				}
+				break;
+			default:
+				MessageBox(hwnd, TEXT("菜单分类解析失败"), TEXT("错误"), MB_OK);
+			}
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -202,6 +204,8 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				 **/
 			case ID_CANCEL_STAFF:
 				{
+					/*重新查询，刷新数据*/
+					OnStartQuery(hwnd);
 					EndDialog(hwnd, LOWORD(wParam));
 					break;
 				}
@@ -210,6 +214,8 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_CLOSE:
 		{
+			/*重新查询，刷新数据*/
+			OnStartQuery(hwnd);
 			EndDialog(hwnd, HIWORD(wParam));
 			return TRUE;
 		}
@@ -534,12 +540,21 @@ bool CreateChildWindow(HWND parent_hwnd, std::string &error)
  */
 bool InitComboBox(HWND hwnd, int id)
 {
-    if (CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"人事部") ||
-        CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"财务部") ||
-        CB_ERR == SendMessage(GetDlgItem(hwnd, id), CB_ADDSTRING, 0, (LPARAM)"后勤部"))
-    {
-        return false;
-    }
+	HWND hwnd_combo;
+    CDepartment cdept;
+	hwnd_combo = GetDlgItem(hwnd, id);
+	cdept.SetSQLStatement("select * from Dept");
+	cdept.GetRecordSet();
+	cdept.MoveFirst();
+	while (!cdept.IsEOF())
+	{
+		if (CB_ERR == SendMessage(hwnd_combo, CB_ADDSTRING, 0, (LPARAM)cdept.name()))
+		{
+			return false;
+		}
+		cdept.MoveNext();
+	}
+	SendMessage(hwnd_combo, CB_SETCURSEL, 0, 0);
     return true;
 }
 
@@ -660,13 +675,17 @@ std::string GetSex(const HWND parent_hwnd)
  */
 std::string GetDept(const HWND parent_hwnd)
 {
-	char dept[40] = "\0";
+	char dept[41] = "\0";
 	HWND dept_hwnd;
 	dept_hwnd = GetDlgItem(parent_hwnd, ID_PERSONNEL_DEPT_COMBO);
 	int index = SendMessage(dept_hwnd, CB_GETCURSEL, 0, 0);
 	SendMessage(dept_hwnd, CB_GETLBTEXT, index, (LPARAM)&dept);
-	return std::string(dept);
+	std::string dept_name(dept);
+	int length = dept_name.length();
+	std::string sub_string = dept_name.substr(0, length);
+	return sub_string;
 }
+
 
 /* 
  * @ Description: Get the sql query statement .
@@ -700,7 +719,7 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 	if (IsCheckDept(parent_hwnd))
 	{
 		std::string dept = GetDept(parent_hwnd);
-		sprintf(sql_query, " and Dname='%s'", dept.c_str());
+		sprintf(sql_query, " and Dname like '%c%s'", '%', dept.c_str());
 		std::string temp(sql_query);
 		sql_statement += temp;
 	}
@@ -723,7 +742,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	CStaffForm staff;
 	if (!staff.ExecuteSQL(sql_query, error))
 	{
-		MessageBox(hwnd,error.c_str(),"error",MB_ICONINFORMATION|MB_OK);
+	//	MessageBox(hwnd,error.c_str(),"error",MB_ICONINFORMATION|MB_OK);
 		return false;
 	}
 	staff.BindingParameter();  /* In this function, there no error judge. */
@@ -731,6 +750,12 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	staff.MoveFirst();  
 	if (0 == strcmp("",staff.id()))
 	{
+		CListView staff_list;
+		/* Initialization the list view object */
+		HWND list_hwnd = GetDlgItem(hwnd, id);
+		staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
+		/* Clean the list view */
+		staff_list.DeleteAllItems();
 		error = "无匹配结果！";
 		return false;
 	}
@@ -767,21 +792,190 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 /* 
  * @ Description: Start execute.
  * @ Parameters:
- *		hwnd [in] Specifies the department check box's parent window.
+ *		hwnd [in] Specifies the check box's parent window.
  * @ Return Value:
  *		If succeed, the return value is true; otherwise, the return
  *		value is false.
  */
 bool OnStartQuery(const HWND hwnd)
 {
+	bool ret_statu = true;
 	std::string sql_statement = GetQueryStatement(hwnd);
 	std::string error;
 	if (!ExecQuery(hwnd, ID_PERSONNEL_INFO, sql_statement.c_str(), error))
 	{
-		MessageBox(hwnd, sql_statement.c_str(), "sql",0 );//test
-		MessageBox(hwnd, error.c_str(), TEXT("查询错误"),
-			       MB_ICONINFORMATION | MB_OK);
-		return false;
+		/*已把提示“查询结果：无匹配结果”放到回调函数“开始查询下”*/
+// 		MessageBox(hwnd, error.c_str(), TEXT("查询结果"),
+// 			       MB_ICONINFORMATION | MB_OK);
+		ret_statu = false;
 	}
+	CStaffForm cstaff;
+	char staff_sum[15]={0};
+	sprintf(staff_sum, "%d 人", cstaff.GetStaffSum());
+	SetWindowText(GetDlgItem(hwnd, ID_PERSONNEL_STAFF_SUM), staff_sum);/*显示员工总数*/
+	CDepartment cdept;
+	char dept_sum[15]={0};
+	sprintf(dept_sum,"%d 个",cdept.GetDeptSum());
+	SetWindowText(GetDlgItem(hwnd, ID_PERSONNEL_DEPT_SUM), dept_sum);/*显示部门总数*/
+	CListView list;
+	list.Initialization(hwnd, ID_PERSONNEL_INFO);
+	int count = list.GetItemCount();
+	char number[10];
+	sprintf(number, "%d 人", count);
+	SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);/*显示当前列表中员工数量*/
+	return ret_statu;
+}
+
+
+bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const UINT m_id)
+{
+	int select_row(0);
+	CListView list;
+	STAFFINFO staff_info;
+	list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
+	select_row = list.GetSelectionMark();
+	staff_info.menu_id= m_id;
+	staff_info.id = list.GetItem(select_row, 0);
+	staff_info.name = list.GetItem(select_row, 1);
+	staff_info.sex = list.GetItem(select_row, 2);
+	staff_info.age = list.GetItem(select_row, 3);
+	staff_info.salary = list.GetItem(select_row, 4);
+	staff_info.department = list.GetItem(select_row, 5);
+	staff_info.email_address = list.GetItem(select_row, 6);
+	staff_info.phone = list.GetItem(select_row, 7);
+	staff_info.address = list.GetItem(select_row, 8);
+	DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
+		(DLGPROC)EditStaff, (long)&staff_info);
+	return true;
+}
+
+bool SetAddFocus(const HWND hwnd)
+{
+	/*根据功能禁用其他功能按钮*/
+	EnableWindow(GetDlgItem(hwnd, ID_DELETE_STAFF), FALSE);
+	EnableWindow(GetDlgItem(hwnd, ID_MOTIFY_STAFF), FALSE);
+	SendMessage(GetDlgItem(hwnd, IDC_SEX_MAN), BST_CHECKED, 1, 0);/*默认选中男性*/
+	InitComboBox(hwnd, IDC_STAFF_DEPT);/*初始化员工部门的下拉框*/
+	return true;
+}
+
+bool SetDeleteFocus(const HWND hwnd, LPARAM lParam)
+{
+	/*禁用修改员工信息的按钮和编辑框*/
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_ID), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_NAME), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_SEX_MAN), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_SEX_WOMAN), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_AGE), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_SALARY), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_DEPT), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_EMAIL), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_PHONE), FALSE);
+	EnableWindow(GetDlgItem(hwnd, IDC_STAFF_ADDRESS), FALSE);
+	/*根据功能禁用其他功能按钮*/
+	EnableWindow(GetDlgItem(hwnd, ID_ADD_STAFF), FALSE);
+	EnableWindow(GetDlgItem(hwnd, ID_MOTIFY_STAFF), FALSE);
+	SetStaff(hwnd, lParam);
+	return true;
+
+}
+
+bool SetModifyFocus(const HWND hwnd, LPARAM lParam)
+{
+	/*根据功能禁用其他功能按钮*/
+	EnableWindow(GetDlgItem(hwnd, ID_ADD_STAFF), FALSE);
+	EnableWindow(GetDlgItem(hwnd, ID_DELETE_STAFF), FALSE);
+	SetStaff(hwnd, lParam);
+	return true;
+}
+bool AddStaff(const HWND hwnd)
+{
+
+	return true;
+}
+
+bool DeleteStaff(const HWND hwnd)
+{
+	
+	return true;
+}
+
+bool ModifyStaff(const HWND hwnd)
+{
+
+	return true;
+}
+
+void del_sp(std::string &str)     
+{   
+	    char *tmp=new char[str.size()+1];  
+		char *dept=new char[str.size()+1];
+	    memcpy(tmp, str.c_str(), str.size() + 1);   
+		char *fp = dept;
+		while (*tmp)
+		{
+			if (*tmp != ' ')
+			{   
+				*fp = *tmp;   
+				fp++;   
+			} 
+			tmp++;   
+		}   
+    *fp = '\0' ; //封闭字符串
+	str=dept;
+	/*TODO:此处还没释放动态申请*/
+//	delete tmp;
+//	delete dept;
+} 
+
+
+bool SetStaff(const HWND hwnd, LPARAM lParam)
+{
+	/* Get the staff's information */
+	STAFFINFO *info = (STAFFINFO *)lParam;
+	SetDlgItemText(hwnd, IDC_STAFF_ID, info->id.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_NAME, info->name.c_str());
+	if ("男"==info->sex)
+	{
+		SendMessage(GetDlgItem(hwnd, IDC_SEX_MAN), BM_SETCHECK, BST_CHECKED, 0);
+	}
+	else
+	{
+		SendMessage(GetDlgItem(hwnd, IDC_SEX_WOMAN), BM_SETCHECK, BST_CHECKED, 0);
+	}
+	InitComboBox(hwnd, IDC_STAFF_DEPT);/*初始化员工部门的下拉框*/
+	del_sp(info->department);
+	int ret=SendMessage(GetDlgItem(hwnd, IDC_STAFF_DEPT), CB_FINDSTRING, 0, (long)info->department.c_str());
+	SendMessage(GetDlgItem(hwnd, IDC_STAFF_DEPT), CB_SETCURSEL, ret, 0);
+	SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_SALARY, info->salary.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_EMAIL, info->email_address.c_str());
+	SetDlgItemText(hwnd, IDC_STAFF_PHONE, info->phone.c_str());
+					SetDlgItemText(hwnd, IDC_STAFF_ADDRESS, info->address.c_str());
+	return true;
+
+}
+
+bool GetStaff(const HWND hwnd, STAFFINFO * info)
+{
+	CEdit staff_edit;
+	info->menu_id=1024;
+	staff_edit.Initialization(hwnd,IDC_STAFF_ID);
+	staff_edit.GetEditText(info->id);
+	staff_edit.Initialization(hwnd, IDC_STAFF_NAME);
+	staff_edit.GetEditText(info->name);
+	/*TODO:ADD info->sex*/
+	staff_edit.Initialization(hwnd, IDC_STAFF_AGE);
+	staff_edit.GetEditText(info->age);
+	staff_edit.Initialization(hwnd, IDC_STAFF_SALARY);
+	staff_edit.GetEditText(info->salary);
+	/*TODO:ADD info->depart*/
+	staff_edit.Initialization(hwnd, IDC_STAFF_EMAIL);
+	staff_edit.GetEditText(info->email_address);
+	staff_edit.Initialization(hwnd, IDC_STAFF_PHONE);
+	staff_edit.GetEditText(info->phone);
+	staff_edit.Initialization(hwnd, IDC_STAFF_ADDRESS);
+	staff_edit.GetEditText(info->address);
+
 	return true;
 }

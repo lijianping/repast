@@ -210,7 +210,7 @@ std::string CListView::GetItem(int item, int subitem)
  *      The number of items in the list view control.
  **/
 int CListView::GetItemCount()
-{
+{	
     return SendMessage(m_hwnd_, LVM_GETITEMCOUNT, 0, 0);
 }
 
