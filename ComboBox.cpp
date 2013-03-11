@@ -158,7 +158,7 @@ bool CComboBox::EnableWindow(const BOOL enable /* = TRUE */)
 bool CComboBox::GetComboBoxText(std::string &text)
 {
     int index = SendMessage(m_hwnd_, CB_GETCURSEL, 0, 0);
-    TCHAR data[128] = "\0";
+    TCHAR data[256] = "\0";
     int ret = SendMessage(m_hwnd_, CB_GETLBTEXT, index, (LPARAM)data);
     if (CB_ERR != ret)
     {

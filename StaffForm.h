@@ -18,18 +18,23 @@ public:
 	inline char* phone_num();
 	inline char* address();
     virtual bool BindingParameter();
-    bool InsertInfo(char *user_id, char *user_name,
-                    char *user_sex, short user_age,
-                    double user_salary, char *user_dept_num,
-					std::string &error_info);
-	bool DeleteInfo(char *user_id, std::string &error_info);
-	bool UpdatetInfo(char *user_id, char *user_name,
-					 char *user_sex, short user_age,
-                     double user_salary, char *user_dept_num, 
-					 std::string &error_info);
+    virtual bool BindingParameter(bool is_out);
+	bool InsertInfo(const char *user_id, const char *user_name,
+		const char *user_sex, const char * user_age,
+		const char *user_salary, const char *user_dept_name, 
+		const char *user_email, const char *user_phone,
+   	    const char *user_address, std::string &error_info);
+	bool DeleteInfo(const char *user_id, std::string &error_info);
+	bool UpdatetInfo(const char * old_id, const char *user_id,
+		const char *user_name,	const char *user_sex,
+		const char * user_age,const char *user_salary, 
+		const char *user_dept_name, const char *user_email,
+		const char *user_phone,const char *user_address,
+		std::string &error_info);
 	int GetStaffSum();
 
 private:
+	char test[9];
     char m_id_[9];                /* staff's id */
     char m_name_[10];             /* staff's name */
     char m_sex_[3];               /* staff's sex */
@@ -40,6 +45,9 @@ private:
 	char m_mailbox_[51];          /* staff's mailbox*/
 	char m_phone_num_[21];        /* staff's phone number */
 	char m_address_[10001];       /* staff's mailbox*/
+
+
+	SQLINTEGER s_test;
     SQLINTEGER m_sql_id_;         /* the staff's id in database Staff form */
     SQLINTEGER m_sql_name_;       /* the staff's name in database Staff form */
     SQLINTEGER m_sql_sex_;        /* the staff's sex in database Staff form */

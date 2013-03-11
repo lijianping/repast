@@ -178,10 +178,6 @@ SOURCE=.\Wind.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\Button.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\childwindowid.h
 # End Source File
 # Begin Source File
