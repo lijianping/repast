@@ -29,19 +29,25 @@ public:
     virtual bool BindingParameter();
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &error_info);
 	virtual void SetSQLStatement(const std::string statement);
-	char* GetDateTime();
-	int GetDatePart(char* datepart);
 	int GetYear();
+	std::string GetYearString();
 	int GetMonth();
+	std::string GetMonthString();
 	int GetDay();
+	std::string GetDayString();
 	int GetHour();
+	std::string GetHourString();
 	int GetMinute();
+	std::string GetMinuteString();
 	int GetSecond();
+	std::string GetSecondString();
 
 protected:
 	inline bool is_connect();
     inline SQLHENV henv() const;
     inline SQLHDBC hdbc() const;
+	int GetDatePart(char* datepart);
+	char *GetDatePartString(const char *datepart);
 	bool Connect(const char *dsn, const char *id, 
 		         const char *password, std::string &information);
     void Disconnect();
@@ -57,6 +63,8 @@ private:
     char m_datetime_[20];         /* 日期时间 */
 	SQLINTEGER m_sql_datetime_;  /**/
 	int m_datepart_;
+	char m_server_datatime[32];
+	SQLINTEGER m_server_datetime_len_;
 };
 
 /*

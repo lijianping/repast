@@ -20,6 +20,7 @@
 #define IDD_CUSTOM_CHECKOUT             109
 #define IDD_START_TABLE                 111
 #define IDD_CHANGE_PASSWD               112
+#define IDD_DIALOG1                     113
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -56,6 +57,7 @@
 #define IDC_REAL_NUM_NEW                1041
 #define IDC_TABLE_TIME_NEW              1042
 #define IDC_FLOOR_NUM_AVAILABLE         1045
+#define IDC_FLOOR                       1045
 #define IDC_SAVE_CHANGE                 1046
 #define IDC_CANCLE_CHANGE               1047
 #define IDC_TABLE_NUM_CHECKOUT          1047
@@ -72,12 +74,15 @@
 #define IDC_CUSTOMER_NO_START2          1059
 #define IDC_CUSTOMER_NO_START           1059
 #define IDC_BUTTON1                     1063
+#define IDC_ADD_TABLE                   1063
 #define IDC_BUTTON2                     1064
+#define IDC_DELETE_TABLE                1064
 #define IDC_COMBO1                      1065
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_START_TABLE                 1071
 #define IDC_LIST5                       1073
+#define IDC_CUSTOMER_TABLE              1073
 #define IDC_DISH_NUMBER                 1074
 #define IDC_REPAST_MENU                 1075
 #define IDC_STATE_ORDER                 1076
@@ -92,7 +97,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        114
 #define _APS_NEXT_COMMAND_VALUE         40004
 #define _APS_NEXT_CONTROL_VALUE         1079
 #define _APS_NEXT_SYMED_VALUE           101

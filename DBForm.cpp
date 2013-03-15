@@ -274,6 +274,7 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 	char tmp[200]="\0";
 	sprintf(tmp, "%s, %ld", sql_state, native_error);
 	MessageBox(NULL, tmp, "sql_state, native_error", MB_OK);
+	MessageBox(NULL, error_info.c_str(), TEXT("error"), 0);
 // 	/////
     delete [] sql_state;
     sql_state = NULL;
@@ -412,6 +413,32 @@ int CDBForm::GetDatePart(char *sql_selectdate)
 	return m_datepart_;
 }
 
+char *CDBForm::GetDatePartString(const char *datepart) {
+	std::string error;
+	/*分配语句句柄*/
+    if (false == SQLAllocHandleStmt(error))
+	{
+		return NULL;
+	}
+	if (false==this->ExecuteSQL(datepart, error))
+	{
+		MessageBox(NULL,error.c_str(), TEXT("错误"), MB_OK|MB_ICONINFORMATION);
+		return NULL;
+	}
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, &m_server_datatime, 
+		                        sizeof(m_server_datatime), &m_server_datetime_len_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		error = "绑定参数出错：";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
+		return NULL;
+	}
+	this->MoveFirst();
+	return m_server_datatime;
+}
+
 /*
  *  @说明: 获取服务器日期中的年份
  *  @返回值: 年份
@@ -463,4 +490,73 @@ int CDBForm::GetMinute()
 int CDBForm::GetSecond()
 {
 	return GetDatePart("select DATEPART(second,getdate())");
+}
+
+/*
+ * @ brief: 获取服务器时间-年
+ * @ return: 年
+ * */
+std::string CDBForm::GetYearString() {
+	std::string server_year(GetDatePartString("select datename(year, getdate())"));
+	return server_year;
+}
+
+/*
+ * @ brief: 获取服务器时间-月
+ * @ return: 月
+ * */
+std::string CDBForm::GetMonthString() {
+	std::string server_month(GetDatePartString("select datename(month, getdate())"));
+	if (1 == server_month.length()) {
+		server_month = "0" + server_month;
+	}
+	return server_month;
+}
+
+/*
+ * @ brief: 获取服务器时间-日
+ * @ return: 日
+ * */
+std::string CDBForm::GetDayString() {
+	std::string server_day(GetDatePartString("select datename(day, getdate())"));
+	if (1 == server_day.length()) {
+		server_day = "0" + server_day;
+	}
+	return server_day;
+}
+
+/*
+ * @ brief: 获取服务器时间-时
+ * @ return: 时
+ * */
+std::string CDBForm::GetHourString() {
+	std::string server_hour(GetDatePartString("select datename(hour, getdate())"));
+	if (1 == server_hour.length()) {
+		server_hour = "0" + server_hour;
+	}
+	return server_hour;
+}
+
+/*
+ * @ brief: 获取服务器时间-分
+ * @ return: 分
+ * */
+std::string CDBForm::GetMinuteString() {
+	std::string server_minute(GetDatePartString("select datename(minute, getdate())"));
+	if (1 == server_minute.length()) {
+		server_minute = "0" + server_minute;
+	}
+	return server_minute;
+}
+
+/*
+ * @ brief: 获取服务器时间-秒
+ * @ return: 秒
+ * */
+std::string CDBForm::GetSecondString() {
+	std::string server_second(GetDatePartString("select datename(second, getdate())"));
+	if (1 == server_second.length()) {
+		server_second = "0" + server_second;
+	}
+	return server_second;
 }
