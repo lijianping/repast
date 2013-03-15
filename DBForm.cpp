@@ -10,11 +10,12 @@
 //////////////////////////////////////////////////////////////////////
 
 CDBForm::CDBForm()
-	: m_hdbc_(SQL_NULL_HDBC),
+	: m_henv_(SQL_NULL_HENV),
+      m_hdbc_(SQL_NULL_HDBC),
 	  m_hstmt_(SQL_NULL_HSTMT),
 	  m_sql_pro_ret(SQL_NTS),
 	  m_pro_ret(0),
-	  m_return_code_(NULL)
+	  m_return_code_(0)
 {
 	std::string error;
 	assert(true == this->Connect("repast", "repast", "repast", error));

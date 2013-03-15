@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "service.h"
 #include "childwindowid.h"
+#include "manager.h"
 
 /*#include <WINDOWS.H>*/
 
@@ -34,7 +35,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int user_permission = 0;  /* The user permission flag */
     user_permission = DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_LOGIN), NULL,
                                      (DLGPROC)LoginProcesses, (long)&hInstance);
-/*	user_permission = 1;*/
+//	user_permission = 5;
     switch (user_permission)
     {
     case PERMISSION_SERVICE:
@@ -54,7 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         {
             break;
         }
-    case PERMISSION_INVENTORY:
+    case PERMISSION_INVENTORY: //≤÷ø‚π‹¿Ì
         {
             break;
         }
@@ -74,6 +75,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         }
     case PERMISSION_MANAGER:
         {
+			DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, (DLGPROC)ManagerProcesses, (LONG)&hInstance);
             break;
         }
     default:

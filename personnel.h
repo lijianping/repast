@@ -87,7 +87,6 @@ bool DeleteStaff(const HWND parent_hwnd);
 
 bool ModifyStaff(const HWND parent_hwnd);
 
-void del_sp(std::string &str);   // É¾³ýstring×Ö·û´®ÖÐµÄ¿Õ¸ñ
 
 bool ShowStaffDlg(const HWND parent_hwnd, LPARAM lParam);
 bool GetStaffDlg(const HWND hwnd, STAFFINFO *info);

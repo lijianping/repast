@@ -20,6 +20,10 @@
 #define IDD_CUSTOM_CHECKOUT             109
 #define IDD_START_TABLE                 111
 #define IDD_CHANGE_PASSWD               112
+#define IDD_DIALOG1                     113
+#define IDD_TAB_CHILD2                  114
+#define IDD_TAB_CHILD1                  115
+#define IDD_EDIT_USER                   116
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -74,6 +78,8 @@
 #define IDC_BUTTON1                     1063
 #define IDC_BUTTON2                     1064
 #define IDC_COMBO1                      1065
+#define IDC_DELETE_USER                 1065
+#define IDC_CHOICE_DAY                  1066
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_START_TABLE                 1071
@@ -84,6 +90,31 @@
 #define IDC_OLD_PASSWD                  1077
 #define IDC_NEW_PASSWD                  1078
 #define IDC_CONFIRM                     1079
+#define IDC_TAB1                        1079
+#define IDC_USER_LIST                   1080
+#define IDC_ADD_USER                    1081
+#define IDC_MODIFY_USER                 1082
+#define IDC_                            1083
+#define IDC_CHOICE_YEAR                 1084
+#define IDC_CHOICE_DATE                 1085
+#define IDC_YEAR                        1086
+#define IDC_MONTH                       1087
+#define IDC_DAY                         1088
+#define IDC_CHOICE_MONTH                1090
+#define IDC_USER_NAME                   1094
+#define IDC_USER_PASSWD                 1095
+#define IDC_USER_PASSWD2                1096
+#define IDC_SYS_MANAGEMENT              1097
+#define IDC_PERSONNEL_MANAGEMENT        1098
+#define IDC_STOCK_MANAGEMENT            1099
+#define IDC_DESK_MANAGEMENT             1100
+#define IDC_E_ADD_USER                  1101
+#define IDC_E_MODIFY_USER               1102
+#define IDC_E_DELETE_USER               1103
+#define IDC_E_CANCEL                    1104
+#define IDC_E_USER_NAME                 1105
+#define IDC_E_USER_PASSWD               1106
+#define IDC_E_CONFROM_PASSWD            1107
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -92,9 +123,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        117
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1079
+#define _APS_NEXT_CONTROL_VALUE         1110
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

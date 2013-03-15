@@ -131,8 +131,7 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			case IDR_ADD:
 				{
 					/*TODO:未检测返回值*/
-					GetStaffToDialog(hinstance, hwnd, ADD_STAFF);
-					
+					GetStaffToDialog(hinstance, hwnd, ADD_STAFF);					
 					break;
 				}
 			case IDR_DELETE:
@@ -771,6 +770,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	staff.BindingParameter();  /* In this function, there no error judge. */
 	/* Move to the first of the record set */
 	staff.MoveFirst();  
+	/*TODO:此处判断无匹配的结果有问题*/
 	if (0 == strcmp("",staff.id()))
 	{
 		CListView staff_list;
@@ -852,7 +852,6 @@ bool OnStartQuery(const HWND hwnd)
 	char number[10];
 	sprintf(number, "%d 人", count);
 	SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);/*显示当前列表中员工数量*/
-
 	return ret_statu;
 }
 
@@ -888,6 +887,7 @@ bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const UINT m_i
 	staff_info.address = list.GetItem(select_row, 8);
 	DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_STAFF_EDIT), hwnd,
 		(DLGPROC)EditStaff, (long)&staff_info);
+	OnStartQuery(GetParent(hwnd));
 	return true;
 }
 
@@ -1003,7 +1003,6 @@ bool DeleteStaff(const HWND hwnd)
 	STAFFINFO staff_info;
     GetStaffDlg(hwnd, &staff_info);/*获取对话框中的员工信息*/
 	CStaffForm staff_form;
-
 	if (true == staff_form.DeleteInfo(staff_info.id.c_str(), error_info))
 	{
 		MessageBox(hwnd, TEXT("删除员工数据成功"), TEXT("成功"), MB_OK);
@@ -1030,8 +1029,8 @@ bool ModifyStaff(const HWND hwnd)
 	STAFFINFO staff_info;
 	GetStaffDlg(hwnd, &staff_info);/*获取对话框中的员工信息*/
 	CStaffForm staff_form;
-	/*TODO:尚未检测编号是否重复*///////////////////////
-	if(false == staff_form.UpdatetInfo(staff_info.old_id.c_str(), staff_info.id.c_str(), staff_info.name.c_str(),
+	/*TODO:尚未检测编号是否重复，无法更改主键 *///////////////////////
+	if(false == staff_form.UpdateInfo(staff_info.old_id.c_str(), staff_info.id.c_str(), staff_info.name.c_str(),
 		staff_info.sex.c_str(),staff_info.age.c_str(),staff_info.salary.c_str(),
 		staff_info.department.c_str(),staff_info.email_address.c_str(), staff_info.phone.c_str(),
 		staff_info.address.c_str(), error))
@@ -1046,28 +1045,6 @@ bool ModifyStaff(const HWND hwnd)
 	return true;
 }
 
-/*删除文本后多余的空格*/
-void del_sp(std::string &str)
-{
-	    char *tmp=new char[str.size()+1]; 
-		char *dept=new char[str.size()+1];
-	    memcpy(tmp, str.c_str(), str.size() + 1);
-		char *fp = dept;
-		while (*tmp)
-		{
-			if (*tmp != ' ')
-			{   
-				*fp = *tmp;   
-				fp++;   
-			} 
-			tmp++;   
-		}
-    *fp = '\0' ; //封闭字符串
-	str=dept;
-	/*TODO:此处还没释放动态申请*/
-//	delete tmp;
-//	delete dept;
-} 
 
 /*
  * 说明：
@@ -1093,7 +1070,6 @@ bool ShowStaffDlg(const HWND hwnd, LPARAM lParam)
 		SendMessage(GetDlgItem(hwnd, IDC_SEX_WOMAN), BM_SETCHECK, BST_CHECKED, 0);
 	}
 	InitComboBox(hwnd, IDC_STAFF_DEPT);/*初始化员工部门的下拉框*/
-	del_sp(info->department);
 	int ret=SendMessage(GetDlgItem(hwnd, IDC_STAFF_DEPT), CB_FINDSTRING, 0, (long)info->department.c_str());
 	SendMessage(GetDlgItem(hwnd, IDC_STAFF_DEPT), CB_SETCURSEL, ret, 0);
 	SetDlgItemText(hwnd, IDC_STAFF_AGE, info->age.c_str());
