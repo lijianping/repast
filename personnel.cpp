@@ -876,7 +876,7 @@ bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const UINT m_i
 	list.Initialization(GetParent(hwnd), ID_PERSONNEL_INFO);
 	select_row = list.GetSelectionMark();
 	staff_info.menu_id= m_id;
-	staff_info.id = list.GetItem(select_row, 0);
+	staff_info.id = staff_info.old_id = list.GetItem(select_row, 0);/*保存员工原来的id,在修改员工信息时使用*/
 	staff_info.name = list.GetItem(select_row, 1);
 	staff_info.sex = list.GetItem(select_row, 2);
 	staff_info.age = list.GetItem(select_row, 3);
@@ -1099,7 +1099,6 @@ bool GetStaffDlg(const HWND hwnd, STAFFINFO * info)
 	info->menu_id=1023;
 	staff_edit.Initialization(hwnd,IDC_STAFF_ID);
 	staff_edit.GetEditText(info->id);
-	staff_edit.GetEditText(info->old_id);/*保存员工原来的ID,在修改员工时使用*/
 	staff_edit.Initialization(hwnd, IDC_STAFF_NAME);
 	staff_edit.GetEditText(info->name);
     staff_button.Initialization(hwnd, IDC_SEX_MAN);
