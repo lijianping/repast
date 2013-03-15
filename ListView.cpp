@@ -200,7 +200,7 @@ bool CListView::SetItem(int item, int subitem, double item_text)
 
 std::string CListView::GetItem(int item, int subitem)
 {
-	char data[512] = "\0";
+	char data[513] = "\0";
 	ListView_GetItemText(m_hwnd_, item, subitem, data, 512);
 	return std::string(data);
 }

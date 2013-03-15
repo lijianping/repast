@@ -21,6 +21,7 @@
 typedef struct StaffInfo
 {
 	UINT menu_id;
+	std::string old_id;/*保存原来的ID，在修改员工信息时使用*/
     std::string id;
     std::string name;
     std::string sex;
@@ -82,15 +83,13 @@ bool SetModifyFocus(const HWND parent_hwnd, LPARAM lParam);
 
 bool AddStaff(const HWND parent_hwnd);
 
-bool DeleteStaff(const HWND parent_hwnd, LPARAM lParam);
+bool DeleteStaff(const HWND parent_hwnd);
 
-bool ModifyStaff(const HWND parent_hwnd, LPARAM lParam);
+bool ModifyStaff(const HWND parent_hwnd);
 
-void del_sp(std::string &str);   // 删除string字符串中的空格
 
-bool SetStaff(const HWND parent_hwnd, LPARAM lParam);
-
-bool GetStaff(const HWND hwnd, STAFFINFO *info);
+bool ShowStaffDlg(const HWND parent_hwnd, LPARAM lParam);
+bool GetStaffDlg(const HWND hwnd, STAFFINFO *info);
 
 
 

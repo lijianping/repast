@@ -138,6 +138,10 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\manager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\MenuForm.cpp
 # End Source File
 # Begin Source File
@@ -166,6 +170,10 @@ SOURCE=.\Static.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Tab.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TableInfo.cpp
 # End Source File
 # Begin Source File
@@ -176,10 +184,6 @@ SOURCE=.\Wind.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=.\Button.h
-# End Source File
 # Begin Source File
 
 SOURCE=.\childwindowid.h
@@ -222,6 +226,10 @@ SOURCE=.\LoginForm.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\manager.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\MenuForm.h
 # End Source File
 # Begin Source File
@@ -247,6 +255,10 @@ SOURCE=.\StaffForm.h
 # Begin Source File
 
 SOURCE=.\Static.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Tab.h
 # End Source File
 # Begin Source File
 

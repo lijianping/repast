@@ -10,9 +10,12 @@
 //////////////////////////////////////////////////////////////////////
 
 CDBForm::CDBForm()
-	: m_hdbc_(SQL_NULL_HDBC),
+	: m_henv_(SQL_NULL_HENV),
+      m_hdbc_(SQL_NULL_HDBC),
 	  m_hstmt_(SQL_NULL_HSTMT),
-	  m_return_code_(NULL)
+	  m_sql_pro_ret(SQL_NTS),
+	  m_pro_ret(0),
+	  m_return_code_(0)
 {
 	std::string error;
 	assert(true == this->Connect("repast", "repast", "repast", error));
@@ -29,6 +32,7 @@ CDBForm::CDBForm(std::string dns, std::string name, std::string password)
 
 CDBForm::~CDBForm()
 {
+	this->Disconnect();
 }
 
 /*
@@ -209,6 +213,20 @@ bool CDBForm::BindingParameter()
 }
 
 /*
+ * 说明: 绑定记录集参数，该函数用于子类完成具体操作,用于获取存储过程返回值。
+ * 返回值: 执行成功返回true, 否则返回false
+ */
+bool CDBForm::BindingParameter(bool is_out)
+{
+    MessageBox(NULL, TEXT("数据库表基类记录集绑定参数函数！用于获取返回值"),
+		TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+	return true;
+}
+
+
+
+
+/*
  * 说明: 执行数据库结构化查询语句
  * 参数:
  *       sql_statement [in]  结构化查询语句
@@ -274,7 +292,8 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 	char tmp[200]="\0";
 	sprintf(tmp, "%s, %ld", sql_state, native_error);
 	MessageBox(NULL, tmp, "sql_state, native_error", MB_OK);
-	MessageBox(NULL, error_info.c_str(), TEXT("error"), 0);
+	MessageBox(NULL, error_info.c_str(), "error", 0);
+
 // 	/////
     delete [] sql_state;
     sql_state = NULL;
