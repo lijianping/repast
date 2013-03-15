@@ -34,12 +34,12 @@ BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-bool SetListInfo(const HWND hwnd, const UINT id, std::string &error);
+bool SetListInfo(const HWND hwnd, const UINT id, const char *find, std::string &error);
 
 bool CreateRefeshButton(const HWND hwnd, const UINT id);
 
 BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
+std::string GetFloor(std::string floor);
 /*
  *  @ brief: 初始化换台对话框中的可用台号
  *  @ return: 若成功返回true，否则返回false

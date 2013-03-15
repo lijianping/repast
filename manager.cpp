@@ -20,13 +20,13 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			tab.InsertItem(3, "数据库还原");
 			tab.SetCurFocus(0);
 			tab.GetClientRect(&tab_rect);
-			tab_rect.top += 50;
+			tab_rect.top += 25;
 			tab_rect.bottom -= 20;
 			tab_rect.left += 1;
 			tab_rect.right -= 2;
 			HWND tab_hwnd = GetDlgItem(hwnd, IDC_TAB1);
 			page1 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_CHILD1), tab_hwnd, (DLGPROC)Page1Proc);
-			page2 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_CHILD2), tab_hwnd, NULL);
+			page2 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_CHILD2), tab_hwnd, (DLGPROC)Page2Proc);
 			
 			MoveWindow(page1, tab_rect.left, tab_rect.top, \
 				       tab_rect.right - tab_rect.left, tab_rect.bottom - tab_rect.top, TRUE);
@@ -83,6 +83,11 @@ BOOL CALLBACK Page1Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
+			CListView user;
+			user.Initialization(hwnd, IDC_USER_LIST);
+			user.InsertColumn(0, 100, "用户名");
+			user.InsertColumn(1, 100, " 权限");
+			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -90,6 +95,30 @@ BOOL CALLBACK Page1Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (LOWORD(wParam)) {
 			case IDC_ADD_USER:
 				MessageBox(hwnd, TEXT("Add user!"), TEXT("MANAGER"), MB_ICONINFORMATION);
+				break;
+			}
+		}
+	}
+	return FALSE;
+}
+
+
+BOOL CALLBACK Page2Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+	case WM_INITDIALOG:
+		{
+			CListView user;
+			user.Initialization(hwnd, IDC_);
+			user.InsertColumn(0, 100, "用户名");
+			user.InsertColumn(1, 100, " 权限");
+			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch (LOWORD(wParam)) {
+			case IDC_BUTTON1:
+				MessageBox(hwnd, TEXT("消费者明细!"), TEXT("MANAGER"), MB_ICONINFORMATION);
 				break;
 			}
 		}
