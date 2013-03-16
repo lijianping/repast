@@ -1,17 +1,17 @@
 #include "manager.h"
 
 
+
 BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static RECT tab_rect;
 	static HWND page1, page2;
-	static HINSTANCE hinstance = (HINSTANCE)lParam;
+    static HINSTANCE hinstance = (HINSTANCE)lParam;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
 		{
-			InitCommonControls();  
-			MessageBox(NULL, TEXT("I am comming!"), TEXT(""), 0);
+			InitCommonControls();
 			CTab tab;
 			tab.Initialization(hwnd, IDC_TAB1);
 			tab.InsertItem(0, "用户管理");
@@ -25,8 +25,8 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			tab_rect.left += 1;
 			tab_rect.right -= 2;
 			HWND tab_hwnd = GetDlgItem(hwnd, IDC_TAB1);
-			page1 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_CHILD1), tab_hwnd, (DLGPROC)Page1Proc);
-			page2 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_CHILD2), tab_hwnd, (DLGPROC)Page2Proc);
+			page1 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_CHILD1), tab_hwnd, (DLGPROC)SysManagementProc);
+			page2 = CreateDialog(hinstance, MAKEINTRESOURCE(IDD_TAB_FINANCE), tab_hwnd, (DLGPROC)FinanceProc);
 			
 			MoveWindow(page1, tab_rect.left, tab_rect.top, \
 				       tab_rect.right - tab_rect.left, tab_rect.bottom - tab_rect.top, TRUE);
@@ -79,7 +79,8 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL CALLBACK Page1Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+BOOL CALLBACK SysManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	HINSTANCE hinstance = (HINSTANCE)GetWindowLong(GetParent(hwnd), GWL_HINSTANCE);
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
@@ -88,13 +89,45 @@ BOOL CALLBACK Page1Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			user.InsertColumn(0, 100, "用户名");
 			user.InsertColumn(1, 100, " 权限");
 			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			CLoginForm login_user;
+			login_user.GetRecordSet();
+			login_user.MoveFirst();
+			int i=0;
+			while(!login_user.IsEOF())
+			{
+				user.InsertItem(i, login_user.name());
+				user.SetItem(i, 1, login_user.permission_name());
+				login_user.MoveNext();
+				i++;
+			}
 			return TRUE;
 		}
 	case WM_COMMAND:
 		{
 			switch (LOWORD(wParam)) {
 			case IDC_ADD_USER:
-				MessageBox(hwnd, TEXT("Add user!"), TEXT("MANAGER"), MB_ICONINFORMATION);
+				{
+				DialogBoxParam(hinstance,  MAKEINTRESOURCE(IDD_EDIT_USER), \
+						hwnd, (DLGPROC)EditUserProc,(LONG)&hinstance);
+				}
+				break;
+			case IDC_MODIFY_USER:
+				{
+				/*TODO: 获取用户信息*/
+					int select_row(0);
+					CListView list;
+					LoginUser login_user;
+					list.Initialization(hwnd, IDC_USER_LIST);
+// 					select_row = list.GetSelectionMark();
+// 					staff_info.menu_id= m_id;
+// 					staff_info.id = list.GetItem(select_row, 0);
+// 					staff_info.old_id = staff_info.id; /*保存员工原来的id,在修改员工信息时使用*/
+// 					staff_info.name = list.GetItem(select_row, 1);
+// 					staff_info.sex = list.GetItem(select_row, 2);
+// 	staff_info.age = list.GetItem(select_row, 3);
+				DialogBoxParam(hinstance,  MAKEINTRESOURCE(IDD_EDIT_USER), \
+						hwnd, (DLGPROC)EditUserProc,(LONG)&hinstance);
+				}
 				break;
 			}
 		}
@@ -103,24 +136,87 @@ BOOL CALLBACK Page1Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 
-BOOL CALLBACK Page2Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	HINSTANCE hinstance = (HINSTANCE)GetWindowLong(GetParent(hwnd), GWL_HINSTANCE);	
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
 			CListView user;
-			user.Initialization(hwnd, IDC_);
-			user.InsertColumn(0, 100, "用户名");
-			user.InsertColumn(1, 100, " 权限");
+			user.Initialization(hwnd, IDC_CONSUMPTION);
+			user.InsertColumn(0, 100, "消费者编号");
+			user.InsertColumn(1, 100, "消费金额");
+			user.InsertColumn(2, 100, "消费日期");
+			user.InsertColumn(3, 100, "营业员");
 			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			return TRUE;
 		}
 	case WM_COMMAND:
 		{
-			switch (LOWORD(wParam)) {
-			case IDC_BUTTON1:
-				MessageBox(hwnd, TEXT("消费者明细!"), TEXT("MANAGER"), MB_ICONINFORMATION);
+			switch (LOWORD(wParam))
+			{
+			case IDC_CONSUMPTION_DETAIL:
+				{
+					DialogBoxParam(hinstance,  MAKEINTRESOURCE(IDD_CONSUMPTION_DETAIL), \
+						hwnd, (DLGPROC)ConsumeDetailProc,(LONG)&hinstance);
+				}
 				break;
 			}
+		}
+	}
+	return FALSE;
+}
+
+BOOL CALLBACK ConsumeDetailProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+		case WM_INITDIALOG:
+			{
+				return TRUE;
+			}
+		case WM_COMMAND:
+			{
+				
+				return TRUE;
+			}
+		case WM_CLOSE:
+			{
+				EndDialog(hwnd, HIWORD(wParam));
+				return TRUE;
+			}
+	}
+	return FALSE;
+}
+
+
+BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		{
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch(LOWORD(wParam))
+			{
+			case IDC_E_ADD_USER:
+				MessageBox(hwnd, "DFF", "FDF",0);
+				break;
+			case IDC_E_MODIFY_USER:
+				break;
+			case IDC_E_CANCEL:
+				EndDialog(hwnd, TRUE);
+				break;
+			}
+			
+			return TRUE;
+		}
+	case WM_CLOSE:
+		{
+			EndDialog(hwnd, HIWORD(wParam));
+			return TRUE;
 		}
 	}
 	return FALSE;

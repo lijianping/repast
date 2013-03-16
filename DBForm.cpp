@@ -584,3 +584,21 @@ std::string CDBForm::GetSecondString() {
 	}
 	return server_second;
 }
+
+/*
+ * 说明：
+ *      删除字符串中的空格
+ * 参数：
+ *      src    [in]  需要删除空格的字符串
+ *      des    [out]  删除空格后的字符串
+ * 返回值：
+ *       void
+ */
+void CDBForm::DeleteSpace(const char * src, char * des)
+{
+	while(*src!=' ')
+	{
+		*des++=*src++;
+	}
+	*des='\0';
+}

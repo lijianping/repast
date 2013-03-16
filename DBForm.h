@@ -45,6 +45,7 @@ public:
 	bool Connect(const char *dsn, const char *id, 
 		const char *password, std::string &information);
     void Disconnect();
+	void DeleteSpace(const char * src, char * des);
 
 protected:
 	inline bool is_connect();

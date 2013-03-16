@@ -41,7 +41,6 @@ public:
 	bool UpdateInfo(STAFFINFO * staff_info,	std::string &error_info);
 	int GetStaffSum();
 	bool CheckStaff(STAFFINFO * staff_info, std::string &error_info);
-	void DeleteSpace(const char * src, char * des);
 	bool SetStaff(STAFFINFO * staff_info, std::string &error_info);
 
 private:

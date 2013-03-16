@@ -35,7 +35,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int user_permission = 0;  /* The user permission flag */
     user_permission = DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_LOGIN), NULL,
                                      (DLGPROC)LoginProcesses, (long)&hInstance);
-	user_permission = 5;
+	user_permission = 4;
     switch (user_permission)
     {
     case PERMISSION_SERVICE:
@@ -49,10 +49,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             user.set_show_state(nShowCmd);
             user.UserCreateWindow();
             user.MessageLoop();
-            break;
-        }
-    case PERMISSION_FINANCIAL:
-        {
             break;
         }
     case PERMISSION_INVENTORY: //≤÷ø‚π‹¿Ì
@@ -75,7 +71,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         }
     case PERMISSION_MANAGER:
         {
-			DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, (DLGPROC)ManagerProcesses, (LONG)&hInstance);
+			DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_SYS_MANAGEMENT), NULL, (DLGPROC)ManagerProcesses, (LONG)&hInstance);
             break;
         }
     default:

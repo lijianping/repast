@@ -10,7 +10,8 @@
 
 CLoginForm::CLoginForm()
 {
-    m_query_sql_ = "select * from Login";
+  //  m_query_sql_ = "select * from Login";
+	m_query_sql_ = "select Lname,Lpassword,Lpermission,LPname from Login,LoginPermission where Lpermission=LPpermission";
 }
 
 CLoginForm::~CLoginForm()
@@ -26,6 +27,8 @@ bool CLoginForm::BindingParameter()
                sizeof(m_password_), &m_sql_password_);
     SQLBindCol(m_hstmt_, 3, SQL_C_SSHORT, &m_permission_,
                0, &m_sql_permission_);
+	SQLBindCol(m_hstmt_, 4, SQL_C_CHAR, m_permission_name_, 
+		       sizeof(m_permission_name_), &m_sql_permission_name_);
     return true;
 }
 

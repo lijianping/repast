@@ -372,23 +372,7 @@ bool CStaffForm::CheckStaff(STAFFINFO * staff_info,std::string &error_info)
 	return true;
 }
 
-/*
- * 说明：
- *      删除字符串中的空格
- * 参数：
- *      src    [in]  需要删除空格的字符串
- *      des    [out]  删除空格后的字符串
- * 返回值：
- *       void
- */
-void CStaffForm::DeleteSpace(const char * src, char * des)
-{
-	while(*src!=' ')
-	{
-		*des++=*src++;
-	}
-	*des='\0';
-}
+
 
 /*
  * 说明：
