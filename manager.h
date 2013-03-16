@@ -19,7 +19,6 @@ struct LoginUser
 	UINT menu_id;
 };
 
-std::string permission[]={"", "前台管理", "仓库管理", "人事管理", "系统管理"};
 
 BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
