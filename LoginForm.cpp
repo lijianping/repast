@@ -161,12 +161,15 @@ bool CLoginForm::UpdateInfo(std::string user_name,
  */
 std::string CLoginForm::Encrypt(const char *src, int shift, int len) {
     std::string des;
-    for (int i = 0; i < len; ++i) {
+	char key[] = "mykeyisbrief";
+	int key_len = strlen(key);
+    for (int i = 0, j = 0; i < len; ++i, ++j) {
         if (src[i] >= '!' && src[i] <= '~') {
             des += (src[i] + shift - '!' + 94) % 94 + '!';
         } else {
             des += src[i];
         }
+		des[i] = des[i] ^ key[j % key_len];
     }
     return des;
 }

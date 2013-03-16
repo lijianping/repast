@@ -2,21 +2,22 @@
 #define REPAST_MANAGER_H_
 
 #include "resource.h"
-#include "StaffForm.h"
 #include "childwindowid.h"
+#include "LoginForm.h"
 #include "Static.h"
 #include "Button.h"
 #include "ComboBox.h"
 #include "ListView.h"
-#include "LoginForm.h"
 #include "Tab.h"
-#include "LoginForm.h"
+#include "StaffForm.h"
+
 
 struct LoginUser
 {
 	std::string user_name;
 	std::string user_old_name;
 	std::string user_permission_name;
+	std::string user_passwd;
 	UINT menu_id;
 };
 

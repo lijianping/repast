@@ -239,6 +239,10 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						MessageBox(hwnd, TEXT("请选择用户权限！"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
 						break;
 					}
+					LoginUser user;
+					user.user_name = std::string(name);
+					user.user_permission_name = permission_name;
+					user.user_passwd = std::string(passwd1);
 					break;
 				}
 			case IDC_E_MODIFY_USER:
@@ -257,7 +261,10 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						MessageBox(hwnd, TEXT("请选择用户权限！"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
 						break;
 					}
-					
+					LoginUser user;
+					user.user_name = std::string(name);
+					user.user_permission_name = permission_name;
+					user.user_passwd = std::string(passwd1);
 					break;
 				}
 			case IDC_E_CANCEL:
