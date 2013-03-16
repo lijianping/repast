@@ -89,16 +89,20 @@ bool CLoginForm::InsertInfo(LoginUser *login_user, std::string &error_info)
 	{
 		return false;
 	}
-	if (false == ExecuteSQL("{? = call InsertLoginUser(?,?,?)}", error_info))
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call InsertLoginUser(?,?,?)}", SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
 	{
+		error_info = "执行增加用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
 		return false;
-	}
+    }
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
 	{
 	}
 	if (m_pro_ret != 0)
 	{
-		error_info="员工编号不能重复！";
+		error_info="该用户已存在！";
 		return false;
 	}
 	return true;
@@ -113,23 +117,8 @@ bool CLoginForm::InsertInfo(LoginUser *login_user, std::string &error_info)
  **/
 bool CLoginForm::DeleteInfo(std::string user_name, std::string &error_info)
 {
-
 	char delete_sql[500];
-	char query_sql[500];
-	sprintf (delete_sql, "delete from Login where Lname='%s'", user_name);	/*格式化查询语句*/
-	sprintf (query_sql, "select Login from Staff where Lname='%s'", user_name);/*格式化删除语句*/
-	/*先查询是否有此记录，若有，则删除*/
-	if (false == ExecuteSQL(query_sql, error_info))
-	{
-		return false;
-	}
-	BindingParameter();
-	MoveFirst();
-	if (0 == strcmp("", name()))
-	{
-		error_info = "删除失败：无此记录";
-		return false;
-	}
+	sprintf (delete_sql, "delete from Login where Lname='%s'", user_name.c_str());	/*格式化删除语句*/
 	/* 执行语句 */
     if (false == ExecuteSQL(delete_sql, error_info))
     {
@@ -149,14 +138,34 @@ bool CLoginForm::DeleteInfo(std::string user_name, std::string &error_info)
  **/
 bool CLoginForm::UpdateInfo(LoginUser *login_user, std::string &error_info)
 {
-	char update_sql[200];
-// 	sprintf(update_sql, "update Login set Lpassword='%s', Lpermission='%d' where Lname='%s'",
-// 		user_password, user_permission, user_name);
-	/* 执行语句 */
-    if (false == ExecuteSQL(update_sql, error_info))
-    {
-        return false;
+	if (false == CheckLoginUser(login_user, error_info))
+	{
+		return false;
+	}
+	if (false == SetLoginUser(login_user, error_info))
+	{
+		return false;
+	}
+	if (false == BindingParameter(false, error_info))
+	{
+		return false;
+	}
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call UpdateLoginUser(?,?,?,?)}", SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
+		error_info = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+		return false;
     }
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
+	}
+	if (m_pro_ret != 0)
+	{
+		error_info="该用户已存在！";
+		return false;
+	}
 
 	return true;
 }
@@ -171,12 +180,16 @@ bool CLoginForm::UpdateInfo(LoginUser *login_user, std::string &error_info)
  */
 std::string CLoginForm::Encrypt(const char *src, int shift, int len) {
     std::string des;
-    for (int i = 0; i < len; ++i) {
-        if (src[i] >= '!' && src[i] <= '~') {
-            des += (src[i] + shift - '!' + 94) % 94 + '!';
+	std::string src_passwd(src);
+	char key[] = "mykeyisbrief";
+	int key_len = strlen(key);
+    for (int i = 0, j = 0; i < len; ++i, ++j) {
+        if (src_passwd[i] >= '!' && src_passwd[i] <= '~') {
+            des += (src_passwd[i] + shift - '!' + 94) % 94 + '!';
         } else {
-            des += src[i];
+            des += src_passwd[i];
         }
+		des[i] = des[i] ^ key[j % key_len];
     }
     return des;
 }
@@ -189,7 +202,7 @@ std::string CLoginForm::Encrypt(const char *src, int shift, int len) {
 bool CLoginForm::ModifyPasswd(std::string user_name, std::string password) {
 	std::string encrypted = Encrypt(password.c_str(), password.length() / 2, password.length());
 	char sql[64] = "\0";
-	sprintf(sql, "Exec UpdatePassword %s, %s", user_name.c_str(), encrypted.c_str());
+	sprintf(sql, "Exec UpdatePassword '%s', '%s'", user_name.c_str(), encrypted.c_str());
 	std::string error_string;
 	return ExecuteSQL(sql, error_string);
 }
@@ -281,6 +294,11 @@ bool CLoginForm::CheckLoginUser(LoginUser * login_user, std::string &error_info)
 		return false;
 	}
 	length = strlen(login_user->user_permission_name.c_str());
+	if (0 == length)
+	{
+		error_info = "请设置用户权限！";
+		return false;
+	}
 	if (length > sizeof(m_permission_name_)-1)
 	{
 		error_info = "用户权限太长，请适当减小后再试！";

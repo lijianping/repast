@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// Chinese (中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -299,13 +299,15 @@ BEGIN
                     BS_AUTORADIOBUTTON,62,123,48,10
     CONTROL         "前台管理",IDC_DESK_MANAGEMENT,"Button",
                     BS_AUTORADIOBUTTON,62,102,48,10
-    PUSHBUTTON      "添加",IDC_E_ADD_USER,21,204,28,14
+    PUSHBUTTON      "添加",IDC_E_ADD_USER,57,204,28,14
     PUSHBUTTON      "修改",IDC_E_MODIFY_USER,57,204,28,14
-    PUSHBUTTON      "取消",IDC_E_CANCEL,129,204,28,14
+    PUSHBUTTON      "取消",IDC_E_CANCEL,101,204,28,14
     EDITTEXT        IDC_E_USER_NAME,48,17,117,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_E_USER_PASSWD,47,37,117,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_E_USER_PASSWD,47,37,117,14,ES_PASSWORD | 
+                    ES_AUTOHSCROLL
     LTEXT           "密    码",IDC_USER_PASSWD2,17,60,24,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_E_CONFROM_PASSWD,47,60,117,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_E_CONFROM_PASSWD,47,60,117,14,ES_PASSWORD | 
+                    ES_AUTOHSCROLL
 END
 
 IDD_CONSUMPTION_DETAIL DIALOG DISCARDABLE  0, 0, 362, 192
@@ -487,7 +489,7 @@ BEGIN
     0
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // Chinese (中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

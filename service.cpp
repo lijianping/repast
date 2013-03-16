@@ -1164,7 +1164,12 @@ BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 						MessageBox(hwnd, TEXT("用户密码错误！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
 						return FALSE;
 					}
-					modify_passwd.ModifyPasswd(g_login_name, password1);
+					if (!modify_passwd.ModifyPasswd(g_login_name, password1))
+					{
+						MessageBox(hwnd, TEXT("修改用户密码失败！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					MessageBox(hwnd, TEXT("密码修改成功！"), TEXT("提示"), MB_OK);
 				}
 			case IDCANCEL:
 				{

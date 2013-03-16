@@ -220,10 +220,14 @@ bool CStaffForm::InsertInfo(STAFFINFO * staff_info,   std::string &error_info)
 		return false;
 	}
 	/*执行存储过程*/
-	if(false == ExecuteSQL("{? = call InsertStaff (?,?,?,?,?,?,?,?,?)}", error_info))
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call InsertStaff (?,?,?,?,?,?,?,?,?)}", SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
 	{
+		error_info = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
 		return false;
-	}
+    }
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
 	{
 	}
@@ -279,10 +283,13 @@ bool CStaffForm::UpdateInfo(STAFFINFO * staff_info,	 std::string &error_info)
 	{
 		return false;
 	}
-	/* 执行语句 */
-    if (false == ExecuteSQL("{? = call UpdateStaff (?,?,?,?,?,?,?,?,?,?)}", error_info))
-    {
-        return false;
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call UpdateStaff (?,?,?,?,?,?,?,?,?,?)}", SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
+		error_info = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+		return false;
     }
 	/*TDDO:添加错误处理*/
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )

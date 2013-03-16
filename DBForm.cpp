@@ -241,10 +241,10 @@ bool CDBForm::BindingParameter(bool is_out, std::string error)
 bool CDBForm::ExecuteSQL(const char *sql_statement, std::string &error_info )
 {
 	/*∑÷≈‰”Ôæ‰æ‰±˙*/
-//     if (false == SQLAllocHandleStmt(error_info))
-// 	{
-// 		return false;
-// 	}
+    if (false == SQLAllocHandleStmt(error_info))
+	{
+		return false;
+	}
     /* ÷¥––”Ôæ‰ */
     m_return_code_ = SQLExecDirect(m_hstmt_, 
                                    (unsigned char *)sql_statement,
