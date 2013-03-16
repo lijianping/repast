@@ -75,17 +75,30 @@ short CLoginForm::GetUserPermission(std::string user_name,
  *        error_info      [out] 错误信息
  *  返回值: 若成功返回true，否则返回false
  **/
-bool CLoginForm::InsertInfo(std::string user_name,
-							std::string user_password,
-							short user_permission, 
-							std::string error_info)
+bool CLoginForm::InsertInfo(LoginUser *login_user, std::string &error_info)
 {
-	char insert_sql[200];
-    /* 格式化插入语句 */
-    sprintf(insert_sql, "insert into Login values('%s', '%s', %d)",
-		user_name, user_password, user_permission);
-	if (false == ExecuteSQL(insert_sql, error_info))
+	if (false == CheckLoginUser(login_user, error_info))
 	{
+		return false;
+	}
+	if (false == SetLoginUser(login_user, error_info))
+	{
+		return false;
+	}
+	if (false == BindingParameter(true, error_info))
+	{
+		return false;
+	}
+	if (false == ExecuteSQL("{? = call InsertLoginUser(?,?,?)}", error_info))
+	{
+		return false;
+	}
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
+	}
+	if (m_pro_ret != 0)
+	{
+		error_info="员工编号不能重复！";
 		return false;
 	}
 	return true;
@@ -98,7 +111,7 @@ bool CLoginForm::InsertInfo(std::string user_name,
  *        error_info      [out] 错误信息
  *  返回值: 若成功返回true，否则返回false
  **/
-bool CLoginForm::DeleteInfo(std::string user_name, std::string error_info)
+bool CLoginForm::DeleteInfo(std::string user_name, std::string &error_info)
 {
 
 	char delete_sql[500];
@@ -134,14 +147,11 @@ bool CLoginForm::DeleteInfo(std::string user_name, std::string error_info)
  *        error_info      [out] 错误信息
  *  返回值: 若成功返回true，否则返回false
  **/
-bool CLoginForm::UpdateInfo(std::string user_name,
-							std::string user_password,
-							short user_permission, 
-							std::string error_info)
+bool CLoginForm::UpdateInfo(LoginUser *login_user, std::string &error_info)
 {
 	char update_sql[200];
-	sprintf(update_sql, "update Login set Lpassword='%s', Lpermission='%d' where Lname='%s'",
-		user_password, user_permission, user_name);
+// 	sprintf(update_sql, "update Login set Lpassword='%s', Lpermission='%d' where Lname='%s'",
+// 		user_password, user_permission, user_name);
 	/* 执行语句 */
     if (false == ExecuteSQL(update_sql, error_info))
     {
@@ -182,4 +192,127 @@ bool CLoginForm::ModifyPasswd(std::string user_name, std::string password) {
 	sprintf(sql, "Exec UpdatePassword %s, %s", user_name.c_str(), encrypted.c_str());
 	std::string error_string;
 	return ExecuteSQL(sql, error_string);
+}
+
+
+bool CLoginForm:: BindingParameter(bool is_add, std::string &error_info)
+{
+	m_sql_name_ = SQL_NTS;
+	m_sql_password_ = SQL_NTS;
+	m_sql_permission_name_ = SQL_NTS;
+	m_sql_pro_ret = SQL_NTS;
+	m_sql_old_name_ = SQL_NTS;
+
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, \
+		SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error_info = "绑定返回值失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+        return false;
+    }
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		SQL_CHAR,sizeof(m_name_)-1, 0, m_name_, 0, &m_sql_name_);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error_info = "绑定用户名失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+        return false;
+    }
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		SQL_CHAR,sizeof(m_password_)-1, 0, m_password_, 0, &m_sql_password_);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error_info = "绑定用户密码失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+        return false;
+    }
+	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		SQL_CHAR,sizeof(m_permission_name_)-1, 0, m_permission_name_, 0, &m_sql_permission_name_);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        error_info = "绑定用户权限失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+        return false;
+    }
+	if (!is_add)
+	{
+		m_return_code_ = SQLBindParameter(m_hstmt_, 5, SQL_PARAM_INPUT, SQL_C_CHAR, \
+			SQL_CHAR,sizeof(m_old_name_)-1, 0, m_old_name_, 0, &m_sql_old_name_);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "绑定旧用户名失败!";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+	}
+	return true;
+}
+
+
+bool CLoginForm::CheckLoginUser(LoginUser * login_user, std::string &error_info)
+{
+	unsigned int length=0;
+	length = strlen(login_user->user_name.c_str());
+	if (0 == length)
+	{
+		error_info = "用户名不能为空";
+		return false;
+	}
+	if (length > sizeof(m_name_)-1)
+	{
+		error_info = "用户名太长，请适当减小后再试！";
+		return false;
+	}
+	length = strlen(login_user->user_passwd.c_str());
+	if ( 0 == length)
+	{
+		error_info = "用户密码不能为空";
+		return false;
+	}
+	if (length > sizeof(m_password_)-1)
+	{
+		error_info = "用户密码太长，请适当减小后再试！";
+		return false;
+	}
+	length = strlen(login_user->user_permission_name.c_str());
+	if (length > sizeof(m_permission_name_)-1)
+	{
+		error_info = "用户权限太长，请适当减小后再试！";
+		return false;
+	}
+	return true;
+}
+bool CLoginForm:: SetLoginUser(LoginUser * login_user, std::string &error_info)
+{
+	if (false == CheckLoginUser(login_user, error_info))
+	{
+		return false;
+	}
+	if (NULL == strcpy(m_name_, login_user->user_name.c_str()))
+	{
+		error_info = "用户名赋值失败！";
+		return false;
+	}
+	if (NULL == strcpy(m_password_, login_user->user_passwd.c_str()))
+	{
+		error_info = "用户密码赋值失败！";
+		return false;
+	}
+	if (NULL == strcpy(m_permission_name_, login_user->user_permission_name.c_str()))
+	{
+		error_info = "用户权限赋值失败！";
+		return false;
+	}
+	if (NULL == strcpy(m_old_name_, login_user->user_old_name.c_str()))
+	{
+		error_info = "旧用户名赋值失败！";
+		return false;
+	}
+	return true;
 }
