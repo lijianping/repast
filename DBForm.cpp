@@ -213,10 +213,15 @@ bool CDBForm::BindingParameter()
 }
 
 /*
- * 说明: 绑定记录集参数，该函数用于子类完成具体操作,用于获取存储过程返回值。
- * 返回值: 执行成功返回true, 否则返回false
+ * 说明: 
+ *       绑定记录集参数,用于获取存储过程返回值,该函数用于子类完成具体操作
+ * 参数：
+ *       is_add       [in]  标志是否是添加员工功能的参数绑定函数：是为true,否则为false
+ *       error_info   [out] 获取错误信息
+ * 返回值: 
+ *       执行成功返回true, 否则返回false
  */
-bool CDBForm::BindingParameter(bool is_out)
+bool CDBForm::BindingParameter(bool is_out, std::string error)
 {
     MessageBox(NULL, TEXT("数据库表基类记录集绑定参数函数！用于获取返回值"),
 		TEXT("提示"), MB_OK | MB_ICONINFORMATION);
@@ -236,10 +241,10 @@ bool CDBForm::BindingParameter(bool is_out)
 bool CDBForm::ExecuteSQL(const char *sql_statement, std::string &error_info )
 {
 	/*分配语句句柄*/
-    if (false == SQLAllocHandleStmt(error_info))
-	{
-		return false;
-	}
+//     if (false == SQLAllocHandleStmt(error_info))
+// 	{
+// 		return false;
+// 	}
     /* 执行语句 */
     m_return_code_ = SQLExecDirect(m_hstmt_, 
                                    (unsigned char *)sql_statement,

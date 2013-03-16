@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// Chinese (中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -303,6 +303,24 @@ BEGIN
     EDITTEXT        IDC_E_CONFROM_PASSWD,47,60,117,14,ES_AUTOHSCROLL
 END
 
+IDD_CONSUMPTION_DETAIL DIALOG DISCARDABLE  0, 0, 362, 192
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "消费明细"
+FONT 10, "System"
+BEGIN
+    CONTROL         "List1",IDC_LIST1,"SysListView32",LVS_REPORT | WS_BORDER | 
+                    WS_TABSTOP,149,28,196,143
+    RTEXT           "消费金额",IDC_STATIC,18,100,44,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT1,64,100,57,14,ES_AUTOHSCROLL | WS_DISABLED
+    RTEXT           "消费者编号",IDC_STATIC,18,42,44,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT2,64,42,57,14,ES_AUTOHSCROLL | WS_DISABLED
+    RTEXT           "消费日期",IDC_STATIC,18,71,44,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT3,64,71,57,14,ES_AUTOHSCROLL | WS_DISABLED
+    RTEXT           "营业员",IDC_STATIC,18,129,44,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT4,64,129,57,14,ES_AUTOHSCROLL | WS_DISABLED
+    GROUPBOX        "消费记录",IDC_STATIC,140,14,214,165
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -400,6 +418,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 234
     END
+
+    IDD_CONSUMPTION_DETAIL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 355
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 185
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -456,7 +482,7 @@ BEGIN
     0
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // Chinese (中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

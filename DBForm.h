@@ -27,7 +27,7 @@ public:
     bool GetRecordSet();
     bool ExecuteSQL(const char *sql_statement, std::string &error_info);
     virtual bool BindingParameter();
-	virtual bool BindingParameter(bool is_out);
+	virtual bool BindingParameter(bool is_out, std::string error);
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &error_info);
 	virtual void SetSQLStatement(const std::string statement);
 	int GetYear();

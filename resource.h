@@ -24,6 +24,7 @@
 #define IDD_TAB_CHILD2                  114
 #define IDD_TAB_CHILD1                  115
 #define IDD_EDIT_USER                   116
+#define IDD_CONSUMPTION_DETAIL          117
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -119,6 +120,11 @@
 #define IDC_E_USER_NAME                 1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
+#define IDC_LIST1                       1110
+#define IDC_EDIT1                       1111
+#define IDC_EDIT2                       1112
+#define IDC_EDIT3                       1113
+#define IDC_EDIT4                       1114
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -127,9 +133,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        117
+#define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1110
+#define _APS_NEXT_CONTROL_VALUE         1112
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
