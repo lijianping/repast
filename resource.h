@@ -119,6 +119,7 @@
 #define IDC_E_USER_NAME                 1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
+#define IDC_DATETIMEPICKER1             1116
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -129,7 +130,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        117
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1110
+#define _APS_NEXT_CONTROL_VALUE         1117
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -8,6 +8,7 @@
 #include "Button.h"
 #include "ComboBox.h"
 #include "ListView.h"
+#include "LoginForm.h"
 #include "Tab.h"
 
 BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

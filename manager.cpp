@@ -10,8 +10,6 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	{
 	case WM_INITDIALOG:
 		{
-			InitCommonControls();  
-			MessageBox(NULL, TEXT("I am comming!"), TEXT(""), 0);
 			CTab tab;
 			tab.Initialization(hwnd, IDC_TAB1);
 			tab.InsertItem(0, "用户管理");
@@ -53,22 +51,7 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				}
 				break;
 			}
-		
 			return TRUE;
-		}
-	case WM_COMMAND:
-		{
-			switch (LOWORD(wParam)) 
-			{
-			case IDC_ADD_USER:
-				CTab tab;
-				tab.Initialization(hwnd, IDC_TAB1);
-				int selected = tab.GetCurFocus();
-				char sel[32];
-				sprintf(sel, "you choose the %d", selected);
-				MessageBox(hwnd, sel, TEXT("tab"), MB_ICONINFORMATION);
-				return TRUE;
-			}
 		}
 	case WM_CLOSE:
 		{
@@ -88,6 +71,15 @@ BOOL CALLBACK Page1Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			user.InsertColumn(0, 100, "用户名");
 			user.InsertColumn(1, 100, " 权限");
 			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			CLoginForm login;
+			login.GetRecordSet();
+			login.MoveFirst();
+			int i = 0;
+			while (!login.IsEOF()) {
+				user.InsertItem(i, login.name());
+				user.SetItem(i, 1, login.permission());
+				login.MoveNext();
+			}
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -109,8 +101,9 @@ BOOL CALLBACK Page2Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		{
 			CListView user;
 			user.Initialization(hwnd, IDC_);
-			user.InsertColumn(0, 100, "用户名");
-			user.InsertColumn(1, 100, " 权限");
+			user.InsertColumn(0, 150, "顾客编号");
+			user.InsertColumn(1, 150, "开台时间");
+			user.InsertColumn(2, 100, " 消费金额");
 			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			return TRUE;
 		}
