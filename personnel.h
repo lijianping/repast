@@ -17,22 +17,7 @@
 
 
 
-/* struct define */
-typedef struct StaffInfo
-{
-	UINT menu_id;
-	std::string old_id;/*保存原来的ID，在修改员工信息时使用*/
-    std::string id;
-    std::string name;
-    std::string sex;
-    std::string age;
-    std::string salary;
-	std::string department;
-	std::string email_address;
-	std::string phone;
-	std::string address;
-	
-}STAFFINFO;
+
 
 
 LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -81,11 +66,11 @@ bool SetDeleteFocus(const HWND parent_hwnd, LPARAM lParam);
  
 bool SetModifyFocus(const HWND parent_hwnd, LPARAM lParam);
 
-bool AddStaff(const HWND parent_hwnd);
+bool AddStaff(const HWND parent_hwnd, std::string user_old_id);
 
-bool DeleteStaff(const HWND parent_hwnd);
+bool DeleteStaff(const HWND parent_hwnd, std::string user_old_id);
 
-bool ModifyStaff(const HWND parent_hwnd);
+bool ModifyStaff(const HWND parent_hwnd, std::string user_old_id);
 
 
 bool ShowStaffDlg(const HWND parent_hwnd, LPARAM lParam);

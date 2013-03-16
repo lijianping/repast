@@ -11,6 +11,7 @@ public:
     inline short permission() const;
     inline char* password();
     inline char* name();
+	inline char* permission_name();
     virtual bool BindingParameter();
     short GetUserPermission(std::string user_name,
                             std::string user_password,
@@ -33,9 +34,11 @@ private:
     char m_name_[20];              /* staff's name in login form */
     char m_password_[30];          /* staff's password */
     short m_permission_;           /* staff's permission */
+	char m_permission_name_[33];       /* staff's permission name */
     SQLINTEGER m_sql_name_;        /* sql type staff's name */
     SQLINTEGER m_sql_password_;    /* sql type staff's password */
     SQLINTEGER m_sql_permission_;  /* sql type staff's permission */
+	SQLINTEGER m_sql_permission_name_; /* sql type staff's permission name */
 };
 
 /*
@@ -65,4 +68,13 @@ char* CLoginForm::name()
     return m_name_;
 }
 
+/*
+ * 说明: 获取用户权限的具体内容
+ * 返回值: 用户权限的具体内容
+ **/
+char* CLoginForm::permission_name()
+{
+	DeleteSpace(m_permission_name_, m_permission_name_);
+	return m_permission_name_;
+}
 #endif /* end #define REPAST_LOGINFORM_H_ */

@@ -2,6 +2,23 @@
 #define REPAST_StaffForm_H_
 #include "DBForm.h"
 
+/* struct define */
+typedef struct StaffInfo
+{
+	UINT menu_id;
+	std::string old_id;/*保存原来的ID，在修改员工信息时使用*/
+    std::string id;
+    std::string name;
+    std::string sex;
+    std::string age;
+    std::string salary;
+	std::string department;
+	std::string email_address;
+	std::string phone;
+	std::string address;
+	
+}STAFFINFO;
+
 class CStaffForm : public CDBForm
 {
 public:
@@ -18,33 +35,16 @@ public:
 	inline char* phone_num();
 	inline char* address();
     virtual bool BindingParameter();
-    virtual bool BindingParameter(bool is_out, std::string &error_info);
-	bool InsertInfo(const char *user_id, const char *user_name,
-		const char *user_sex, const char * user_age,
-		const char *user_salary, const char *user_dept_name, 
-		const char *user_email, const char *user_phone,
-   	    const char *user_address, std::string &error_info);
+    virtual bool BindingParameter(bool is_add, std::string &error_info);
+	bool InsertInfo(STAFFINFO * staff_info, std::string &error_info);
 	bool DeleteInfo(const char *user_id, std::string &error_info);
-	bool UpdateInfo(const char * old_id, const char *user_id,
-		const char *user_name,	const char *user_sex,
-		const char * user_age,const char *user_salary, 
-		const char *user_dept_name, const char *user_email,
-		const char *user_phone,const char *user_address,
-		std::string &error_info);
+	bool UpdateInfo(STAFFINFO * staff_info,	std::string &error_info);
 	int GetStaffSum();
-	bool CheckStaff(const char *user_id, const char *user_name,
-		const char *user_sex, const char * user_age,
-		const char *user_salary, const char *user_dept_name, 
-		const char *user_email, const char *user_phone,
-   	    const char *user_address, std::string &error_info);
-	void DeleteSpace(const char * src, char * des);
-	bool SetStaff(const char *user_id, const char *user_name,
-		const char *user_sex, const char * user_age,
-		const char *user_salary, const char *user_dept_name, 
-		const char *user_email, const char *user_phone,
-   	    const char *user_address, std::string &error_info);
+	bool CheckStaff(STAFFINFO * staff_info, std::string &error_info);
+	bool SetStaff(STAFFINFO * staff_info, std::string &error_info);
 
 private:
+	char m_old_id_[9];
     char m_id_[9];                /* staff's id */
     char m_name_[10];             /* staff's name */
     char m_sex_[3];               /* staff's sex */
@@ -56,7 +56,7 @@ private:
 	char m_phone_num_[21];        /* staff's phone number */
 	char m_address_[1001];       /* staff's mailbox*/
 
-
+    SQLINTEGER m_sql_old_id_;
     SQLINTEGER m_sql_id_;         /* the staff's id in database Staff form */
     SQLINTEGER m_sql_name_;       /* the staff's name in database Staff form */
     SQLINTEGER m_sql_sex_;        /* the staff's sex in database Staff form */
@@ -75,6 +75,7 @@ private:
  **/
 char* CStaffForm::id()
 {
+	DeleteSpace(m_id_, m_id_);
     return m_id_;
 }
 
@@ -84,6 +85,7 @@ char* CStaffForm::id()
  **/
 char* CStaffForm::name()
 {
+	DeleteSpace(m_name_, m_name_);
     return m_name_;
 }
 
@@ -139,6 +141,7 @@ double CStaffForm::salary() const
  **/
 char* CStaffForm::mailbox()
 {
+	DeleteSpace(m_mailbox_, m_mailbox_);
     return m_mailbox_;
 }
 
@@ -148,6 +151,7 @@ char* CStaffForm::mailbox()
  **/
 char* CStaffForm::phone_num()
 {
+	DeleteSpace(m_phone_num_, m_phone_num_);
     return m_phone_num_;
 }
 
@@ -157,6 +161,7 @@ char* CStaffForm::phone_num()
  **/
 char* CStaffForm::address()
 {
+	DeleteSpace(m_address_, m_address_);
     return m_address_;
 }
 

@@ -79,13 +79,6 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 					{
 						MessageBox(hwnd, TEXT("没有匹配的记录"), TEXT("查询结果"),
 			           MB_ICONINFORMATION | MB_OK);
-
-// 						CListView list;
-// 						list.Initialization(hwnd, ID_PERSONNEL_INFO);
-// 						int count = list.GetItemCount();
-// 						char number[10];
-// 						sprintf(number, "%d 人", count);
-// 						SetWindowText(GetDlgItem(hwnd, ID_CURRENT_RECORD_SUM), number);
 					}
 					break;
 				}
@@ -158,7 +151,7 @@ LRESULT CALLBACK StaffListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
  **/
 BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-
+	static std::string user_old_id;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -176,7 +169,8 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				       (screen_height - height) / 2,
 					   width, height, TRUE);
-			STAFFINFO *info = (STAFFINFO *)lParam;
+		     STAFFINFO *info = (STAFFINFO *)lParam;
+			 user_old_id = info->old_id;
 			/*根据从弹出对话框函数的附加消息判断用户在员工列表的右键菜单中选择了哪个选项*/
 			switch(info->menu_id)
 			{
@@ -206,12 +200,12 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case ID_ADD_STAFF:
 				{
-					AddStaff(hwnd);
+					AddStaff(hwnd, user_old_id);
 					break;
 				}
 			case ID_DELETE_STAFF:
 				{
-					if (true == DeleteStaff(hwnd))
+					if (true == DeleteStaff(hwnd, user_old_id))
 					{
 						EndDialog(hwnd, LOWORD(wParam));
 					}
@@ -219,13 +213,14 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 			case ID_MOTIFY_STAFF:
 				{
-					ModifyStaff(hwnd);
+					if (true == ModifyStaff(hwnd, user_old_id))
+					{
+						EndDialog(hwnd, LOWORD(wParam));
+					}
 					break;
 				}
 			case ID_CANCEL_STAFF:
 				{
-					/*重新查询，刷新数据*/
-					OnStartQuery(hwnd);
 					EndDialog(hwnd, LOWORD(wParam));
 					break;
 				}
@@ -234,8 +229,6 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_CLOSE:
 		{
-			/*重新查询，刷新数据*/
-			OnStartQuery(hwnd);
 			EndDialog(hwnd, HIWORD(wParam));
 			return TRUE;
 		}
@@ -877,6 +870,7 @@ bool GetStaffToDialog(const HINSTANCE hinstance, const HWND hwnd, const UINT m_i
 	select_row = list.GetSelectionMark();
 	staff_info.menu_id= m_id;
 	staff_info.id = list.GetItem(select_row, 0);
+    staff_info.old_id = staff_info.id; /*保存员工原来的id,在修改员工信息时使用*/
 	staff_info.name = list.GetItem(select_row, 1);
 	staff_info.sex = list.GetItem(select_row, 2);
 	staff_info.age = list.GetItem(select_row, 3);
@@ -966,17 +960,15 @@ bool SetModifyFocus(const HWND hwnd, LPARAM lParam)
  * 返回值：
  *         成功返回ture, 否则返回false
  */
-bool AddStaff(const HWND hwnd)
+bool AddStaff(const HWND hwnd, std::string user_old_id)
 {
 	std::string error;
 	STAFFINFO staff_info;
 	GetStaffDlg(hwnd, &staff_info);/*获取对话框中的员工信息*/
+	staff_info.old_id = user_old_id;
 	CStaffForm staff_form;
 	/*TODO:尚未检测编号是否重复*/
-	if(false == staff_form.InsertInfo(staff_info.id.c_str(), staff_info.name.c_str(),
-		staff_info.sex.c_str(),staff_info.age.c_str(),staff_info.salary.c_str(),
-		staff_info.department.c_str(),staff_info.email_address.c_str(), staff_info.phone.c_str(),
-		staff_info.address.c_str(), error))
+	if(false == staff_form.InsertInfo(&staff_info, error))
 	{
 		MessageBox(hwnd, error.c_str(), TEXT("添加员工数据失败"), MB_OK);
 			staff_form.Disconnect();
@@ -997,11 +989,12 @@ bool AddStaff(const HWND hwnd)
  * 返回值：
  *         成功返回ture, 否则返回false
  */
-bool DeleteStaff(const HWND hwnd)
+bool DeleteStaff(const HWND hwnd, std::string user_old_id)
 {
 	std::string error_info;
 	STAFFINFO staff_info;
     GetStaffDlg(hwnd, &staff_info);/*获取对话框中的员工信息*/
+	staff_info.old_id = user_old_id;
 	CStaffForm staff_form;
 	if (true == staff_form.DeleteInfo(staff_info.id.c_str(), error_info))
 	{
@@ -1023,17 +1016,15 @@ bool DeleteStaff(const HWND hwnd)
  * 返回值：
  *         成功返回ture, 否则返回false
  */
-bool ModifyStaff(const HWND hwnd)
+bool ModifyStaff(const HWND hwnd, std::string user_old_id)
 {
 	std::string error;
 	STAFFINFO staff_info;
 	GetStaffDlg(hwnd, &staff_info);/*获取对话框中的员工信息*/
+	staff_info.old_id = user_old_id;
 	CStaffForm staff_form;
 	/*TODO:尚未检测编号是否重复，无法更改主键 *///////////////////////
-	if(false == staff_form.UpdateInfo(staff_info.old_id.c_str(), staff_info.id.c_str(), staff_info.name.c_str(),
-		staff_info.sex.c_str(),staff_info.age.c_str(),staff_info.salary.c_str(),
-		staff_info.department.c_str(),staff_info.email_address.c_str(), staff_info.phone.c_str(),
-		staff_info.address.c_str(), error))
+	if(false == staff_form.UpdateInfo(&staff_info, error))
 	{
 		MessageBox(hwnd, error.c_str(), TEXT("修改员工数据失败"), MB_OK);
 		return false;
@@ -1099,7 +1090,6 @@ bool GetStaffDlg(const HWND hwnd, STAFFINFO * info)
 	info->menu_id=1023;
 	staff_edit.Initialization(hwnd,IDC_STAFF_ID);
 	staff_edit.GetEditText(info->id);
-	staff_edit.GetEditText(info->old_id);/*保存员工原来的ID,在修改员工时使用*/
 	staff_edit.Initialization(hwnd, IDC_STAFF_NAME);
 	staff_edit.GetEditText(info->name);
     staff_button.Initialization(hwnd, IDC_SEX_MAN);

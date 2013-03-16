@@ -47,7 +47,7 @@ CStaffForm::~CStaffForm()
  */
 bool CStaffForm::BindingParameter()
 {
-    /* 绑定列 *///TODO:尚未检测返回值
+    /* 绑定列 *//*TODO:尚未检查返回值 */
     SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_id_, sizeof(m_id_), &m_sql_id_);
     SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
     SQLBindCol(m_hstmt_, 3, SQL_C_CHAR, m_sex_, sizeof(m_sex_), &m_sql_sex_);
@@ -61,11 +61,17 @@ bool CStaffForm::BindingParameter()
     return true;
 }
 
+
 /*
- * 说明: 绑定记录集参数,用于获取存储过程返回值
- * 返回值: 执行成功返回true, 否则返回false
+ * 说明: 
+ *       绑定记录集参数,用于获取存储过程返回值
+ * 参数：
+ *       is_add       [in]  标志是否是添加员工功能的参数绑定函数：是为true,否则为false
+ *       error_info   [out] 获取错误信息
+ * 返回值: 
+ *       执行成功返回true, 否则返回false
  */
-bool CStaffForm::BindingParameter(bool is_out, std::string &error_info)
+bool CStaffForm::BindingParameter(bool is_add, std::string &error_info)
 {
 	m_sql_id_=SQL_NTS;         /* the staff's id in database Staff form */
 	m_sql_name_=SQL_NTS;       /* the staff's name in database Staff form */
@@ -77,119 +83,134 @@ bool CStaffForm::BindingParameter(bool is_out, std::string &error_info)
 	m_sql_mailbox_=SQL_NTS;    /* the staff's mailbox in database Dept form */
 	m_sql_phone_num_=SQL_NTS;  /* the staff's phone number in database Dept form */
 	m_sql_address_=SQL_NTS;    /* the staff's address in database Dept form */
-	 m_sql_pro_ret =SQL_NTS;
+	m_sql_pro_ret =SQL_NTS;
+	m_sql_old_id_ =SQL_NTS;
+
 	/*绑定存储过程返回值*/
-	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, \
+		                              SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定返回值失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
     /* 绑定列参数*/
-    m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_id_)-1, 0, m_id_, sizeof(m_id_), &m_sql_id_);
+    m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, \
+									SQL_CHAR, sizeof(m_id_)-1, 0, m_id_, sizeof(m_id_), &m_sql_id_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数2失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_name_)-1, 0, m_name_, sizeof(m_name_), &m_sql_name_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		                              SQL_CHAR, sizeof(m_name_)-1, 0, m_name_, sizeof(m_name_), &m_sql_name_);
    	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数3失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_sex_)-1, 0, m_sex_, sizeof(m_sex_),  &m_sql_sex_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		                             SQL_CHAR, sizeof(m_sex_)-1, 0, m_sex_, sizeof(m_sex_),  &m_sql_sex_);
    	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数4失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 5, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT, 0, 0, &m_age_, 0, &m_sql_age_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 5, SQL_PARAM_INPUT, SQL_C_SSHORT,\
+									 SQL_SMALLINT, 0, 0, &m_age_, 0, &m_sql_age_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数5失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 6, SQL_PARAM_INPUT, SQL_C_FLOAT, SQL_FLOAT, 0, 0, &m_salary_, 0, &m_sql_salary_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 6, SQL_PARAM_INPUT, SQL_C_FLOAT, \
+		                              SQL_FLOAT, 0, 0, &m_salary_, 0, &m_sql_salary_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数6失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 7, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_dept_name_)-1, 0, m_dept_name_, 0, &m_sql_dept_name_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 7, SQL_PARAM_INPUT, SQL_C_CHAR,\
+		                             SQL_CHAR, sizeof(m_dept_name_)-1, 0, m_dept_name_, 0, &m_sql_dept_name_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数7失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 8, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_mailbox_)-1, 0, m_mailbox_, 0, &m_sql_mailbox_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 8, SQL_PARAM_INPUT, SQL_C_CHAR,\
+		                              SQL_CHAR, sizeof(m_mailbox_)-1, 0, m_mailbox_, 0, &m_sql_mailbox_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数8失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 9, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_phone_num_)-1, 0, m_phone_num_, 0, &m_sql_phone_num_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 9, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		                              SQL_CHAR, sizeof(m_phone_num_)-1, 0, m_phone_num_, 0, &m_sql_phone_num_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数9失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-	m_return_code_ = SQLBindParameter(m_hstmt_, 10, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(m_address_)-1, 0, m_address_, 0, &m_sql_address_);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 10, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		                              SQL_CHAR, sizeof(m_address_)-1, 0, m_address_, 0, &m_sql_address_);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
         error_info = "绑定参数10失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, error_info);
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
+	/*绑定员工的旧ID*/
+	if (is_add == false)
+	{
+		m_return_code_ = SQLBindParameter(m_hstmt_, 11, SQL_PARAM_INPUT, \
+			SQL_C_CHAR, SQL_CHAR, sizeof(m_old_id_)-1, 0, m_old_id_, 0, &m_sql_old_id_);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "绑定参数11失败!";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+	}
 	return true;
 }
 
 /*
  * 说明： 新增员工信息
  * 参数：
- *        user_id		     [in] 员工编号
- *        user_name			 [in] 员工姓名
- *        user_sex			 [in] 员工性别
- *        user_age           [in] 员工年龄
- *        user_salary        [in] 员工工资
- *        user_user_dept_num [in] 员工所属部门编号
- *        error_info		 [out] 错误信息
+ *        staff_info	     [in] 员工信息
+ *         error_info		 [out] 错误信息
  * 返回值：
  *        执行成功返回true,否则返回false
  **/
-bool CStaffForm::InsertInfo(const char *user_id, 
-							const char *user_name,
-                            const char *user_sex, 
-						    const char *user_age,
-                            const char *user_salary,
-						    const char *user_dept_name, 
-					        const char *user_email, 
-						    const char *user_phone,
-						    const char *user_address, 
-						    std::string &error_info)
+bool CStaffForm::InsertInfo(STAFFINFO * staff_info,   std::string &error_info)
 {
 	/*检查输入是否正确*/
-	if (false == CheckStaff(user_id,user_name,user_sex,user_age,user_salary, 
-		user_dept_name, user_email,user_phone,user_address, error_info))
+	if (false == CheckStaff(staff_info, error_info))
+	{
+		return false;
+	}
+	/*填充员工数据*/
+	if (false == SetStaff(staff_info, error_info))
 	{
 		return false;
 	}
@@ -198,19 +219,9 @@ bool CStaffForm::InsertInfo(const char *user_id,
 	{
 		return false;
 	}
-	/*填充员工数据*/
-	if (false == SetStaff(user_id,user_name,user_sex,user_age,user_salary, 
-		user_dept_name, user_email,user_phone,user_address, error_info))
-	{
-		return false;
-	}
 	/*执行存储过程*/
-	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char*)"{? = call InsertStaff (?,?,?,?,?,?,?,?,?)}", SQL_NTS);
-	if ((m_return_code_ != SQL_SUCCESS) && 
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	if(false == ExecuteSQL("{? = call InsertStaff (?,?,?,?,?,?,?,?,?)}", error_info))
 	{
-		std::string error_info;
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
 		return false;
 	}
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
@@ -218,8 +229,7 @@ bool CStaffForm::InsertInfo(const char *user_id,
 	}
 	if (m_pro_ret != 0)
 	{
-		/*TODO: 尚未添加错误分类处理*/
-		error_info="shibai";
+		error_info="员工编号不能重复！";
 		return false;
 	}
     return true;
@@ -240,7 +250,7 @@ bool CStaffForm::DeleteInfo(const char *user_id, std::string &error_info)
 	/* 执行语句 */
     if (false == ExecuteSQL(delete_sql, error_info))
     {
-		/*TODO:是否弹出错误对话框？*/
+		error_info = "删除员工数据失败！";
         return false;
     }
 	return true;
@@ -250,47 +260,48 @@ bool CStaffForm::DeleteInfo(const char *user_id, std::string &error_info)
 /*
  * 说明： 更新员工信息
  * 参数：
- *        user_id		     [in] 员工编号
- *        user_name			 [in] 员工姓名
- *        user_sex			 [in] 员工性别
- *        user_age           [in] 员工年龄
- *        user_salary        [in] 员工工资
- *        user_user_dept_num [in] 员工所属部门编号
+ *        staff_info	     [in] 员工信息
  *        error_info		 [out] 错误信息
  *返回值：
  *        执行成功返回true,否则返回false
  **/
-bool CStaffForm::UpdateInfo(const char *old_id,
-							 const char *user_id,
-							 const char *user_name,
-							 const char *user_sex,
-							 const char *user_age,
-							 const char *user_salary, 
-							 const char *user_dept_name, 
-							 const char *user_email, 
-							 const char *user_phone,
-                        	 const char *user_address,
-							 std::string &error_info)
+bool CStaffForm::UpdateInfo(STAFFINFO * staff_info,	 std::string &error_info)
 {
-	char update_sql[1024];
-	if (false == CheckStaff(user_id, user_name, user_sex, user_age, 
-		user_salary, user_dept_name,user_email,user_phone, user_address,error_info))
+	if (false == CheckStaff(staff_info,error_info))
 	{
 		return false;
 	}
-	/*TODO: 不能修改主键*/
-	sprintf(update_sql,
-		"execute UpdateStaff '%s', '%s', '%s', '%s', '%d', '%f', '%s', '%s', '%s','%s'",
-		old_id, user_id, user_name, user_sex, atoi(user_age), (float)atoi(user_salary), 
-		user_dept_name, user_email, user_phone, user_address);
+	if (false == SetStaff(staff_info, error_info))
+	{
+		return false;
+	}
+	if (false == BindingParameter(false, error_info))
+	{
+		return false;
+	}
 	/* 执行语句 */
-    if (false == ExecuteSQL(update_sql, error_info))
+    if (false == ExecuteSQL("{? = call UpdateStaff (?,?,?,?,?,?,?,?,?,?)}", error_info))
     {
         return false;
     }
+	/*TDDO:添加错误处理*/
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
+	}
+	if (m_pro_ret != 0)
+	{
+		error_info="员工编号不能重复！";
+		return false;
+	}
 	return true;
 }
 
+
+/* 说明：
+ *    统计员工数量
+ * 返回值
+ *       成功返回员工数量，失败返回-1
+ */
 int CStaffForm::GetStaffSum()
 {
 	int staff_sum=-1;
@@ -307,53 +318,53 @@ int CStaffForm::GetStaffSum()
 	return staff_sum;
 }
 
-bool CStaffForm::CheckStaff(const char *user_id,
-				const char *user_name,
-				const char *user_sex,
-				const char *user_age,
-				const char *user_salary, 
-				const char *user_dept_name, 
-				const char *user_email,
-				const char *user_phone,
-   				const char *user_address, 
-				std::string &error_info)
+/*
+ * 说明：
+ *      检查员工数据是否正确
+ * 参数：
+ *      staff_info    [in]  员工信息
+ *      error_info    [out]  错误信息
+ * 返回值：
+ *       成功返回true,否则返回false
+ */
+bool CStaffForm::CheckStaff(STAFFINFO * staff_info,std::string &error_info)
 {
-	if (strlen(user_id)>sizeof(m_id_)-1)
+	if (strlen(staff_info->id.c_str())>sizeof(m_id_)-1)
 	{
 		error_info ="员工编号太长！  规定员工编号最长为8个英文或数字";
 		return false;
 	}
-	if (strlen(user_name)>sizeof(m_name_)-1)
+	if (strlen(staff_info->name.c_str())>sizeof(m_name_)-1)
 	{
 		error_info = "员工姓名太长 ！ 规定员工姓名最长为9个英文字符或4个汉字";
 		return false;
 	}
-	if (atoi(user_age)<16||atoi(user_age)>150)
+	if (atoi(staff_info->age.c_str())<16||atoi(staff_info->age.c_str())>150)
 	{
 		error_info = "员工年龄不正确，请仔细检查！";
 		return false;
 	}
-	if (atof(user_salary)<0||atof(user_salary)>12345678)
+	if (atof(staff_info->salary.c_str())<0||atof(staff_info->salary.c_str())>12345678)
 	{
 		error_info = "员工工资不正确，请仔细检查！";
 		return false;
 	}
-	if (NULL == strchr(user_email, '@'))
+	if (NULL == strchr(staff_info->email_address.c_str(), '@'))
 	{
 		error_info = "员工邮箱格式不正确，请仔细检查";
 		return false;
 	}
-	if (strlen(user_email)>sizeof(m_mailbox_)-1)
+	if (strlen(staff_info->email_address.c_str())>sizeof(m_mailbox_)-1)
 	{
 		error_info = "员工邮箱地址太长，正确输入";
 		return false;
 	}
-	if (strlen(user_phone)>sizeof(m_phone_num_)-1)
+	if (strlen(staff_info->phone.c_str())>sizeof(m_phone_num_)-1)
 	{
 		error_info = "员工的电话号码太长，请适当减少输入";
 		return false;
 	}
-	if (strlen(user_address)>sizeof(m_address_)-1)
+	if (strlen(staff_info->address.c_str())>sizeof(m_address_)-1)
 	{
 		error_info = "员工地址长度太长，请适当减少输入";
 		return false;
@@ -361,30 +372,54 @@ bool CStaffForm::CheckStaff(const char *user_id,
 	return true;
 }
 
-void CStaffForm::DeleteSpace(const char * src, char * des)
+
+
+/*
+ * 说明：
+ *      填充员工信息
+ * 参数：
+ *      staff_info    [in]  员工信息
+ *      error_info    [out]  错误信息  
+ * 返回值：
+ *       成功返回true,否则返回false
+ */
+bool CStaffForm::SetStaff(STAFFINFO * staff_info,std::string &error_info)
 {
-	while(*src!=' ')
+	if (NULL == strcpy(m_old_id_, staff_info->old_id.c_str()))
 	{
-		*des++=*src++;
+		return false;
 	}
-	*des='\0';
-}
-
-
-bool CStaffForm::SetStaff(const char *user_id, const char *user_name,
-			  const char *user_sex, const char * user_age,
-			  const char *user_salary, const char *user_dept_name, 
-			  const char *user_email, const char *user_phone,
-   	    const char *user_address, std::string &error_info)
-{
-	strcpy(m_id_, user_id);
-	strcpy(m_name_, user_name);	
-	strcpy(m_sex_, user_sex);
-	m_age_ = (short)atoi(user_age);
-	m_salary_ = atof(user_salary);
-	strcpy(m_dept_name_, "02");
-	strcpy(m_mailbox_, user_email);
-	strcpy(m_phone_num_, user_phone);
- 	strcpy(m_address_, user_address); 
+	if (NULL == strcpy(m_id_, staff_info->id.c_str()))
+	{
+		return false;
+	}
+	if (NULL == strcpy(m_name_, staff_info->name.c_str()))
+	{
+		return false;
+	}
+	if (NULL == strcpy(m_sex_, staff_info->sex.c_str()))
+	{
+		return false;
+	}
+	m_age_ = (short)atoi(staff_info->age.c_str());
+	m_salary_ = atof(staff_info->salary.c_str());
+	char department[41];
+	DeleteSpace(staff_info->department.c_str(), department);
+	if (NULL == strcpy(m_dept_name_, department))
+	{
+		return false;
+	}
+	if (NULL == strcpy(m_mailbox_, staff_info->email_address.c_str()))
+	{
+		return false;
+	}
+	if (NULL == strcpy(m_phone_num_, staff_info->phone.c_str()))
+	{
+		return false;
+	}
+ 	if (NULL ==  strcpy(m_address_, staff_info->address.c_str()))
+	{
+		return false;
+	}
 	return true;
 }
