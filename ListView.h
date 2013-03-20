@@ -20,6 +20,7 @@ public:
     bool Initialization(HWND parent_hwnd, UINT id);
     int InsertColumn(int column, int width, std::string column_head);
     int InsertItem(int item, std::string item_text);
+	int InsertItem(int item, int item_values);
     bool SetItem(int item, int subitem, std::string item_text);
 	bool SetItem(int item, int subitem, int item_text);
 	bool SetItem(int item, int subitem, double item_text);

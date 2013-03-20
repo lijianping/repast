@@ -32,6 +32,7 @@
 #define IDD_TAB_SERVER                  119
 #define IDD_TAB_BASIC_INFO              120
 #define IDD_EDIT_COMMODITY              121
+#define IDD_EDIT_COMMODITY_CATEGORY     122
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -89,6 +90,7 @@
 #define IDC_CONSUMPTION_DETAIL          1063
 #define ID_SERVICE_START                1063
 #define IDC_BASIC_INFO_ADD              1063
+#define IDC_COMMODITY_CANCEL            1063
 #define IDC_BUTTON2                     1064
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
@@ -99,6 +101,7 @@
 #define IDC_BASIC_INFO_DELETE           1065
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
+#define IDC_BASIC_EDIT_CATEGORY         1066
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_START_TABLE                 1071
@@ -166,6 +169,29 @@
 #define IDC_BASIC_INFO                  1137
 #define IDC_S_BASIC_INFO_OPERATE        1140
 #define IDC_TREE_COMMODITY              1141
+#define IDC_E_S_COMMODITY               1143
+#define IDC_E_S_COMMODITY_ID            1146
+#define IDC_E_S_COMMODITY_NAME          1147
+#define IDC_E_COMMODITY_NAME            1148
+#define IDC_E_S_COMMODITY_PURCHASE      1149
+#define IDC_E_S_COMMODITY_SUM           1150
+#define IDC_E_S_COMMODITY_CATEGORY      1151
+#define IDC_E_S_COMMODITY_UNIT          1152
+#define IDC_E_S_COMMODITY_SALE          1154
+#define IDC_E_COMMODITY_ID              1155
+#define IDC_E_COMMODITY_PURCHASE        1156
+#define IDC_E_COMMODITY_SUM             1157
+#define IDC_E_COMMODITY_CATEGORY        1158
+#define IDC_E_COMMODITY_UNIT            1159
+#define IDC_E_COMMODITY_SALE            1160
+#define IDC_CATEGORY_DELETE             1167
+#define IDC_CATEGORY_SAVE               1168
+#define IDC_CATEGORY_CANCEL             1169
+#define IDC_S_COMMODITY_CATEGORY        1170
+#define IDC_S_CATEGORY_NAME             1171
+#define IDC_S_CATEGORY_ID               1172
+#define IDC_E_CATEGORY_ID               1173
+#define IDC_E_CATEGORY_NAME             1174
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -174,9 +200,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        122
+#define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1143
+#define _APS_NEXT_CONTROL_VALUE         1174
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
