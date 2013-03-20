@@ -20,34 +20,50 @@ extern std::string g_login_name;
 
 char* status[3] = {"未开台", "已开台", "已预订"};
 
-LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
+BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
 {
-    static HINSTANCE hinstance;
-    switch (message)
-    {
-    case WM_CREATE:
-        {
-            hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
-			CreateGroupBox(hwnd);   /* Create the table information group box */
-			CreateTableListView(hwnd); /* Create the table information list view */
+	static HINSTANCE hinstance = (HINSTANCE)lParam;
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		{
+	//		CreateGroupBox(hwnd);   /* Create the table information group box */
+	//		CreateTableListView(hwnd); /* Create the table information list view */
 			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
-			CreateComboBox(hwnd);
+	//		CreateComboBox(hwnd);
 			InitComboBox(hwnd, ID_SERVICE_COMBO);
-			CreateButton(hwnd);
-			CreateRefeshButton(hwnd, ID_SERVICE_REFRESH);
+	//		CreateButton(hwnd);
+	//		CreateRefeshButton(hwnd, ID_SERVICE_REFRESH);
 			std::string error_info;
 			SetListInfo(hwnd, ID_SERVICE_LIST, "01", error_info);
-            return 0;
-        }
+//     static HINSTANCE hinstance;
+//     switch (message)
+//     {
+//     case WM_CREATE:
+//         {
+//             hinstance = ((LPCREATESTRUCT)lParam)->hInstance;
+// 			CreateGroupBox(hwnd);   /* Create the table information group box */
+// 			CreateTableListView(hwnd); /* Create the table information list view */
+// 			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
+// 			CreateComboBox(hwnd);
+// 			InitComboBox(hwnd, ID_SERVICE_COMBO);
+// 			CreateButton(hwnd);
+// 			CreateRefeshButton(hwnd, ID_SERVICE_REFRESH);
+// 			std::string error_info;
+// 			SetListInfo(hwnd, ID_SERVICE_LIST, "01", error_info);
+//             return 0;
+//         }
+		}
+		return TRUE;
     case WM_SETFOCUS:
         {
             SetFocus(GetDlgItem(hwnd, ID_SERVICE_LIST));
-            return 0;
+            		return TRUE;
         }
     case WM_LBUTTONDOWN:
         {
-            return 0;
+     		return TRUE;
         }
     case WM_COMMAND:
         {
@@ -189,15 +205,17 @@ LRESULT CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					break;
 				}
 			}
-            return 0;
+          		return TRUE;
         }
-    case WM_DESTROY:
+    case WM_CLOSE:
         {
-            PostQuitMessage(0);
-            return 0;
+			EndDialog(hwnd, LOWORD(wParam));
+         //   PostQuitMessage(0);
+           		return TRUE;
         }
     }
-    return DefWindowProc(hwnd, message, wParam, lParam);
+	return FALSE;
+ //   return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 /*

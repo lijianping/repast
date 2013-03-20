@@ -10,19 +10,20 @@
 #include "ListView.h"
 #include "Tab.h"
 #include "StaffForm.h"
-#include "service.h"
-#include "personnel.h"
-#include "tabctrl.h"
-#include "pagectrl.h"
 
 
+struct LoginUser
+{
+	std::string user_name;
+	std::string user_old_name;
+	std::string user_permission_name;
+	std::string user_passwd;
+	UINT menu_id;
+};
 
-
-BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
-                                  WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK SysManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -32,5 +33,4 @@ BOOL CALLBACK ConsumeDetailProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 std::string GetPermissionName(HWND hwnd);
 
-bool ShowLoginUser(HWND hwnd);
 #endif

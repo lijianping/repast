@@ -90,6 +90,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\basic_info.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Button.cpp
 # End Source File
 # Begin Source File
@@ -99,6 +103,10 @@ SOURCE=.\ComboBox.cpp
 # Begin Source File
 
 SOURCE=.\Commodity.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\CommodityCategoryForm.cpp
 # End Source File
 # Begin Source File
 
@@ -146,6 +154,10 @@ SOURCE=.\MenuForm.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\pagectrl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\personnel.cpp
 # End Source File
 # Begin Source File
@@ -174,7 +186,15 @@ SOURCE=.\Tab.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\tabctrl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TableInfo.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\treectrl.cpp
 # End Source File
 # Begin Source File
 
@@ -186,6 +206,10 @@ SOURCE=.\Wind.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\basic_info.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\childwindowid.h
 # End Source File
 # Begin Source File
@@ -195,6 +219,10 @@ SOURCE=.\ComboBox.h
 # Begin Source File
 
 SOURCE=.\Commodity.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\CommodityCategoryForm.h
 # End Source File
 # Begin Source File
 
@@ -234,6 +262,10 @@ SOURCE=.\MenuForm.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\pagectrl.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\personnel.h
 # End Source File
 # Begin Source File
@@ -262,7 +294,15 @@ SOURCE=.\Tab.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\tabctrl.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\TableInfo.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\treectrl.h
 # End Source File
 # Begin Source File
 

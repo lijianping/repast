@@ -13,6 +13,7 @@ public:
 	virtual ~CListView();
     inline void set_new_process(WNDPROC process);
     inline WNDPROC old_process();
+	inline HWND hwnd();
     inline bool is_set_process() const;
     bool Create(DWORD style, const RECT &rect,
                 HWND parent_hwnd, UINT id);
@@ -52,7 +53,8 @@ private:
  **/
 void CListView::set_new_process(WNDPROC process)
 {
-    m_new_process_ = process;
+	m_old_process_ = (WNDPROC) SetWindowLong(m_hwnd_, GWL_WNDPROC, (LONG)process);
+	m_new_process_ = process;
 }
 
 /*
@@ -68,6 +70,10 @@ WNDPROC CListView::old_process()
 bool CListView::is_set_process() const
 {
     return m_is_set_process_;
+}
+HWND CListView::hwnd()
+{
+	return m_hwnd_;
 }
 
 #endif // !defined(AFX_LISTVIEW_H__77342954_5258_41DF_87F6_267D6A706457__INCLUDED_)
