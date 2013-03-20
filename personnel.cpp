@@ -7,25 +7,20 @@ WNDPROC g_OldListProc;   /* The list view processes */
 /*
  * 说明：人事部主窗口窗口处理函数
  */
-LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static HINSTANCE hInstance;
+	static HINSTANCE hInstance = (HINSTANCE)lParam;
 	switch (msg)
 	{
-	case WM_CREATE:
+	case WM_INITDIALOG:
 		{
-			hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-			/* Create name check box */
 			std::string error;
-			CreateGroupBox(hwnd);
-			CreateChildWindow(hwnd, error);
-			CreateStaffListView(hwnd);
+ 			CreateChildWindow(hwnd, error);
 			InitListView(hwnd, ID_PERSONNEL_INFO);
-//			OnStartQuery(hwnd); /*执行查询，显示查询结果*/
-		//	SetListViewData(hwnd, ID_PERSONNEL_INFO);
-//			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
-			return 0;
+			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
+	    	OnStartQuery(hwnd);/*执行查询，显示查询结果*/
 		}
+		return TRUE;
 	case WM_COMMAND:
 		{
 			bool is_check = false;
@@ -82,16 +77,17 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 					}
 					break;
 				}
+			
 			}
-			return 0;
+        	return TRUE;
 		}
-	case WM_DESTROY:
+		case WM_CLOSE:
 		{
-			PostQuitMessage(0);
-			return 0;
+			EndDialog(hwnd, HIWORD(wParam));
+			return TRUE;
 		}
 	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+	return FALSE;
 	
 }
 
@@ -257,7 +253,7 @@ bool CreateStaffListView(HWND parent_hwnd)
 	list_rect.bottom = height / 4 * 3 - 40;
 	DWORD style = LVS_REPORT | LVS_EDITLABELS; /* Set the list view's style */
 	/* Set the new list view process */
-	staff_list.set_new_process(StaffListProc);
+//	staff_list.set_new_process(StaffListProc);
 	bool is_ok = staff_list.Create(style, list_rect, parent_hwnd,
                                    ID_PERSONNEL_INFO);
 	/* When the list view create successfully and
@@ -283,16 +279,18 @@ bool InitListView(HWND parent_hwnd, UINT id)
 {
 	CListView staff_list;
 	/* Initialization the list view */
-	staff_list.Initialization(parent_hwnd, id);
+	staff_list.Initialization(parent_hwnd, id);	
+	staff_list.set_new_process(StaffListProc);
+	g_OldListProc = staff_list.old_process();
 	/* Set the full row selected and grid lines */
 	staff_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	/* Insert the list view's column title */
-	if (-1 != staff_list.InsertColumn(0, 100, "员工编号") &&
+	if (-1 != staff_list.InsertColumn(0, 80, "员工编号") &&
 	    -1 != staff_list.InsertColumn(1, 100, "员工姓名") &&
-		-1 != staff_list.InsertColumn(2, 40,  "性别") &&
-		-1 != staff_list.InsertColumn(3, 40,  "年龄") &&
+		-1 != staff_list.InsertColumn(2, 45,  "性别") &&
+		-1 != staff_list.InsertColumn(3, 45,  "年龄") &&
 		-1 != staff_list.InsertColumn(4, 100, "员工工资") &&
-		-1 != staff_list.InsertColumn(5, 50,  "员工部门") &&
+		-1 != staff_list.InsertColumn(5, 80,  "员工部门") &&
 		-1 != staff_list.InsertColumn(6, 100, "员工邮箱") &&
 		-1 != staff_list.InsertColumn(7, 100, "员工电话") &&
 		-1 != staff_list.InsertColumn(8, 100, "员工地址"))
@@ -360,27 +358,14 @@ void SetListViewData(HWND parent_hwnd, UINT id)
  */
 bool CreateGroupBox(HWND parent_hwnd)
 {
-
-	CButton group, modify_passwd;
-	RECT group_rect, modify_passwd_rect, window_rect;
-	GetClientRect(parent_hwnd, &window_rect);
-	char window_size[256];
-	sprintf(window_size, "left: %d, top: %d, right: %d, bottom: %d", window_rect.left,
-		    window_rect.top, window_rect.right, window_rect.bottom);
-	MessageBox(parent_hwnd, window_size, TEXT("window size"), MB_OK | MB_ICONINFORMATION);
-	group_rect.left = window_rect.left + 20;
-	group_rect.top = window_rect.top +10;
+	CButton group;
+	RECT group_rect;
+	group_rect.left = 20;
+	group_rect.top = 10;
 	group_rect.right = 400;
-	group_rect.bottom = window_rect.top + 125;
-	modify_passwd_rect.left = window_rect.left + 610;
-	modify_passwd_rect.top = window_rect.top + 10;
-	modify_passwd_rect.right = window_rect.right - 20;
-	modify_passwd_rect.bottom = window_rect.top + 125;
-	bool is_ok = group.Create("查询条件", BS_GROUPBOX,
-		                      group_rect, parent_hwnd, 0);
-	is_ok = modify_passwd.Create("账号管理", BS_GROUPBOX, 
-		                         modify_passwd_rect, parent_hwnd, 1);
-	return is_ok;
+	group_rect.bottom = 125;
+	return group.Create("查询条件", BS_GROUPBOX,
+		                group_rect, parent_hwnd, 0);
 }
 
 /* 
@@ -393,165 +378,27 @@ bool CreateGroupBox(HWND parent_hwnd)
  */
 bool CreateChildWindow(HWND parent_hwnd, std::string &error)
 {
-	HDC hdc;
-	TEXTMETRIC metric;
-	hdc = GetDC(parent_hwnd);
-	GetTextMetrics(hdc, &metric);
-	ReleaseDC(parent_hwnd, hdc);
-	int width = (metric.tmPitchAndFamily & 1 ? 3 : 2) * 
-		        metric.tmAveCharWidth / 2;
-	int height = metric.tmHeight + metric.tmExternalLeading;
-	int col1 = 30, col2 = 100, col3 = 225, col4 = 295, col5 = 440, col6 = 520;
-	/* Create id text and id edit box */
-	CStatic id_static;
-	RECT id_rect = {col1, 50, 6 * width, height + 5};
-	if (!id_static.Create("编号", ES_CENTER, id_rect, parent_hwnd))
-	{
-		error = "创建“编号”提示失败！";
-		return false;
-	}
-	CEdit id_edit;
-	id_rect.left = col2;
-	id_rect.right = 10 * width;
-	if (!id_edit.Create(WS_BORDER, id_rect, parent_hwnd,
-		                   ID_PERSONNEL_STAFF_ID))
-	{
-		error = "创建“编号”编辑框失败！";
-		return false;
-	}
-	/* Create the name check box and name edit box */
-	CButton name;
-	RECT name_rect = {col3, 50, 6 * width, height + 5};
-	if (!name.Create("姓名", ES_CENTER | BS_AUTOCHECKBOX, name_rect,
-					 parent_hwnd, ID_PERSONNEL_NAME))
-	{
-		error = "创建“姓名”复选框失败！";
-		return false;
-	}
 	CEdit name_edit;
-	name_rect.left = col4;
-	name_rect.right = 10 * width;
-	if (!name_edit.Create(WS_BORDER, name_rect, parent_hwnd,
-		                  ID_PERSONNEL_STAFF_NAME))
-	{
-		error = "创建“姓名”编辑框失败！";
-		return false;
-	}
+	name_edit.Initialization(parent_hwnd, ID_PERSONNEL_STAFF_NAME);
 	/* By default, disable the name edit box */
 	name_edit.EnableWindow(FALSE);
 	/* Create sex check box and sex button */
-	CButton sex;
-	RECT sex_rect = {col1, 90, 6 * width, height + 5};
-	if (!sex.Create("性别", ES_CENTER | BS_AUTOCHECKBOX, sex_rect,
-		            parent_hwnd, ID_PERSONNEL_SEX))
-	{
-		error = "创建“性别”复选框失败！";
-		return false;
-	}
+
 	CButton man;
-	sex_rect.left = col2;
-	sex_rect.right = 4 * width;
-	if (!man.Create("男", ES_CENTER | BS_AUTORADIOBUTTON, sex_rect,
-		            parent_hwnd, ID_MAN))
-	{
-		error = "创建“男”选择按钮失败！";
-		return false;
-	}
+    man.Initialization(parent_hwnd, ID_MAN);
 	/* By default, disable this child window and select it */
 	man.EnableWindow(FALSE);
 	man.SetChecked(TRUE);
 	CButton woman;
-	sex_rect.left = col2 + 4 * width + 10;
-	if (!woman.Create("女", ES_CENTER | BS_AUTORADIOBUTTON, sex_rect,
-		              parent_hwnd, ID_WOMAN))
-	{
-		error = "创建“女”选择按钮失败！";
-		return false;
-	}
+	woman.Initialization(parent_hwnd, ID_WOMAN);
 	/* By default, disable this child window */
 	woman.EnableWindow(FALSE);
 	/* Create the department check box and department combo box */
-	CButton dept;
-	RECT dept_rect = {col3, 90, 6 * width, height + 5};
-	if (!dept.Create("部门", ES_CENTER | BS_AUTOCHECKBOX, dept_rect,
-		             parent_hwnd, ID_PERSONNEL_DEPT))
-	{
-		error = "创建“部门”复选框失败！";
-		return false;
-	}
 	CComboBox dept_combo;
-	dept_rect.left = col4;
-	dept_rect.right = 10 * width;
-	dept_rect.bottom = 100;
-	if (!dept_combo.Create(ES_CENTER | CBS_DROPDOWNLIST | CBS_HASSTRINGS,
-		                   dept_rect, parent_hwnd, ID_PERSONNEL_DEPT_COMBO))
-	{
-		error = "创建“部门”下拉框失败！";
-        return false;
-	}
+    dept_combo.Initialization(parent_hwnd, ID_PERSONNEL_DEPT_COMBO);
 	/* By default, disable the department combo box */
 	dept_combo.EnableWindow(FALSE);
 	/* Create the staff sum text and edit box which is read only */
-	CStatic staff_sum;
-	RECT staff_sum_rect = {col5, 10, 7 * width, height + 5};
-	if (!staff_sum.Create("员工人数", ES_CENTER | WS_BORDER, 
-		                   staff_sum_rect, parent_hwnd))
-	{
-		error = "创建“员工人数”提示失败！";
-		return false;
-	}
-	CEdit staff_sum_edit;
-	staff_sum_rect.left = col6;
-	if (!staff_sum_edit.Create(ES_READONLY | ES_CENTER | WS_BORDER,
-		                       staff_sum_rect, parent_hwnd, ID_PERSONNEL_STAFF_SUM))
-	{
-		error = "创建“员工人数”编辑框失败！";
-		return false;
-	}
-	/* Create the department sum text and edit box which is read only */
-	CStatic dept_sum;
-	RECT dept_sum_rect = {col5, 50, 7 * width, height + 5};
-	if (!dept_sum.Create("部门总数", ES_CENTER | WS_BORDER,
-		                 dept_sum_rect, parent_hwnd))
-	{
-		error = "创建“部门总数”编辑框失败！";
-		return false;
-	}
-	CEdit dept_sum_edit;
-	dept_sum_rect.left = col6;
-	if (!dept_sum_edit.Create(ES_READONLY | ES_CENTER | WS_BORDER,
-		                       dept_sum_rect, parent_hwnd, ID_PERSONNEL_DEPT_SUM))
-	{
-		error = "创建“部门总数”编辑框失败！";
-		return false;
-	}
-	/* Create the current sum text and edit box which is read only */
-	CStatic current_sum;
-	RECT current_sum_rect = {col5, 90, 7 * width, height + 5};
-	if (!current_sum.Create("当前人数", ES_CENTER | WS_BORDER,
-		                    current_sum_rect, parent_hwnd))
-	{
-		error= "创建“当前人数”提示失败！";
-		return false;
-	}
-	CEdit current_sum_edit;
-	current_sum_rect.left = col6;
-	if (!current_sum_edit.Create(ES_READONLY | ES_CENTER | WS_BORDER,
-		                        current_sum_rect, parent_hwnd, 
-								ID_CURRENT_RECORD_SUM))
-	{
-		error= "创建“当前人数”编辑框失败！";
-		return false;
-	}
-	/* Create the start query button */
-	CButton start_query;
-	RECT start_query_rect = {col5, 120, 150, height + 5};
-	if (!start_query.Create("开始查询", ES_CENTER | BS_PUSHBUTTON,
-		                    start_query_rect, parent_hwnd, ID_PERSONNEL_QUERY))
-	{
-		error = "创建“开始查询”按钮失败！";
-        return false;
-	}
 	return true;
 }
 
@@ -767,7 +614,6 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &error)
 {
 	CStaffForm staff;
-	staff.Connect("repast", "repast", "repast", error);
 	if (!staff.ExecuteSQL(sql_query, error))
 	{
 	//	MessageBox(hwnd,error.c_str(),"error",MB_ICONINFORMATION|MB_OK);
@@ -813,8 +659,6 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 			item++;
 		}
 	}
-	/* Disconnect from database */
-	staff.Disconnect();
 	return true;
 }
 

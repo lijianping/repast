@@ -65,6 +65,7 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
@@ -77,7 +78,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SkinPPWTL.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
+# SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
@@ -90,6 +92,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\basic_info.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Button.cpp
 # End Source File
 # Begin Source File
@@ -99,6 +105,10 @@ SOURCE=.\ComboBox.cpp
 # Begin Source File
 
 SOURCE=.\Commodity.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\CommodityCategoryForm.cpp
 # End Source File
 # Begin Source File
 
@@ -146,6 +156,10 @@ SOURCE=.\MenuForm.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\pagectrl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\personnel.cpp
 # End Source File
 # Begin Source File
@@ -174,7 +188,15 @@ SOURCE=.\Tab.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\tabctrl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TableInfo.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\treectrl.cpp
 # End Source File
 # Begin Source File
 
@@ -186,7 +208,7 @@ SOURCE=.\Wind.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\Button.h
+SOURCE=.\basic_info.h
 # End Source File
 # Begin Source File
 
@@ -199,6 +221,10 @@ SOURCE=.\ComboBox.h
 # Begin Source File
 
 SOURCE=.\Commodity.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\CommodityCategoryForm.h
 # End Source File
 # Begin Source File
 
@@ -238,6 +264,10 @@ SOURCE=.\MenuForm.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\pagectrl.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\personnel.h
 # End Source File
 # Begin Source File
@@ -266,7 +296,15 @@ SOURCE=.\Tab.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\tabctrl.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\TableInfo.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\treectrl.h
 # End Source File
 # Begin Source File
 

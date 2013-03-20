@@ -81,6 +81,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                 }
             case IDCANCEL:
                 {
+					wParam = 0;
                     EndDialog(hwnd, LOWORD(wParam));
                     break;
                 }

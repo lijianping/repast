@@ -358,22 +358,22 @@ bool CStaffForm::CheckStaff(STAFFINFO * staff_info,std::string &error_info)
 	}
 	if (NULL == strchr(staff_info->email_address.c_str(), '@'))
 	{
-		error_info = "员工邮箱格式不正确，请仔细检查";
+		error_info = "员工邮箱格式不正确，请仔细检查！";
 		return false;
 	}
 	if (strlen(staff_info->email_address.c_str())>sizeof(m_mailbox_)-1)
 	{
-		error_info = "员工邮箱地址太长，正确输入";
+		error_info = "员工邮箱地址太长，正确输入！";
 		return false;
 	}
-	if (strlen(staff_info->phone.c_str())>sizeof(m_phone_num_)-1)
+	if (staff_info->phone.length() != 11)
 	{
-		error_info = "员工的电话号码太长，请适当减少输入";
+		error_info = "员工电话号码为11位，请修正！";
 		return false;
 	}
 	if (strlen(staff_info->address.c_str())>sizeof(m_address_)-1)
 	{
-		error_info = "员工地址长度太长，请适当减少输入";
+		error_info = "员工地址长度太长，请适当减少输入！";
 		return false;
 	}
 	return true;

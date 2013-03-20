@@ -4,12 +4,14 @@
 #include <string>
 #include <WINDOWS.H>
 #include <COMMCTRL.H>
+#include <ASSERT.H>
 #pragma comment(lib, "comctl32.lib")
 
 class CComboBox  
 {
 public:
 	CComboBox();
+	CComboBox(HWND hwnd, UINT id);
 	virtual ~CComboBox();
     bool Create(DWORD style, const RECT &rect,
                 HWND parent_hwnd, UINT id);
