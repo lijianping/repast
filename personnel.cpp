@@ -21,9 +21,9 @@ LRESULT CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			CreateChildWindow(hwnd, error);
 			CreateStaffListView(hwnd);
 			InitListView(hwnd, ID_PERSONNEL_INFO);
-			OnStartQuery(hwnd);/*执行查询，显示查询结果*/
+//			OnStartQuery(hwnd); /*执行查询，显示查询结果*/
 		//	SetListViewData(hwnd, ID_PERSONNEL_INFO);
-			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
+//			InitComboBox(hwnd, ID_PERSONNEL_DEPT_COMBO); /* Insert item to the combo box */
 			return 0;
 		}
 	case WM_COMMAND:
@@ -360,14 +360,27 @@ void SetListViewData(HWND parent_hwnd, UINT id)
  */
 bool CreateGroupBox(HWND parent_hwnd)
 {
-	CButton group;
-	RECT group_rect;
-	group_rect.left = 20;
-	group_rect.top = 10;
+
+	CButton group, modify_passwd;
+	RECT group_rect, modify_passwd_rect, window_rect;
+	GetClientRect(parent_hwnd, &window_rect);
+	char window_size[256];
+	sprintf(window_size, "left: %d, top: %d, right: %d, bottom: %d", window_rect.left,
+		    window_rect.top, window_rect.right, window_rect.bottom);
+	MessageBox(parent_hwnd, window_size, TEXT("window size"), MB_OK | MB_ICONINFORMATION);
+	group_rect.left = window_rect.left + 20;
+	group_rect.top = window_rect.top +10;
 	group_rect.right = 400;
-	group_rect.bottom = 125;
-	return group.Create("查询条件", BS_GROUPBOX,
-		                group_rect, parent_hwnd, 0);
+	group_rect.bottom = window_rect.top + 125;
+	modify_passwd_rect.left = window_rect.left + 610;
+	modify_passwd_rect.top = window_rect.top + 10;
+	modify_passwd_rect.right = window_rect.right - 20;
+	modify_passwd_rect.bottom = window_rect.top + 125;
+	bool is_ok = group.Create("查询条件", BS_GROUPBOX,
+		                      group_rect, parent_hwnd, 0);
+	is_ok = modify_passwd.Create("账号管理", BS_GROUPBOX, 
+		                         modify_passwd_rect, parent_hwnd, 1);
+	return is_ok;
 }
 
 /* 

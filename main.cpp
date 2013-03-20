@@ -35,7 +35,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int user_permission = 0;  /* The user permission flag */
     user_permission = DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_LOGIN), NULL,
                                      (DLGPROC)LoginProcesses, (long)&hInstance);
-//	user_permission = 4;
+	user_permission = 4;
     switch (user_permission)
     {
     case PERMISSION_SERVICE:
