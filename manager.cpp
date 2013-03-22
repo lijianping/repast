@@ -212,6 +212,7 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
+				InitStaffNo(hwnd, IDC_E_USER_ID);
 				ShowWindow(GetDlgItem(hwnd, IDC_E_MODIFY_USER), SW_HIDE);
 			}
 			return TRUE;
@@ -222,22 +223,19 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_E_ADD_USER:
 				{
+					
 					CLoginForm login_form;
 					std::string error;
 					char name[20];
 					GetDlgItemText(hwnd, IDC_E_USER_NAME, name, 32);
 					char passwd1[30], passwd2[30];
-					//passwd1 = new char[30];
-					//passwd2 = new char[30];
 					memset(passwd1, 0, sizeof(passwd1));
 					memset(passwd2, 0, sizeof(passwd2));
 					std::string p1, p2;
 					GetDlgItemText(hwnd, IDC_E_USER_PASSWD, passwd1, 30);
-					p1 = login_form.Encrypt(passwd1, strlen(passwd1)/2, strlen(passwd1));
-				//	delete [] passwd1;
+					p1 = login_form.Encrypt(passwd1, strlen(passwd1)/2, strlen(passwd1));	
 					GetDlgItemText(hwnd, IDC_E_CONFROM_PASSWD, passwd2, 30);
 					p2 = login_form.Encrypt(passwd2, strlen(passwd2)/2, strlen(passwd2));
-				//	delete [] passwd1;
 					if (p1 != p2) {
 						MessageBox(hwnd, TEXT("两次密码不一致！"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
 						break;
@@ -390,3 +388,14 @@ int ConvertDate(const char *date, std::string &out_date) {
 	return atoi(data.c_str());
 }
 
+bool InitStaffNo(HWND hwnd, UINT id) {
+	CComboBox staff_no(hwnd, id);
+	CStaffForm staff;
+	std::string err_info;
+	staff.GetStaffNo(err_info);
+	while (!staff.IsEOF()) {
+		staff_no.AddString(staff.id());
+		staff.MoveNext();
+	}
+	return true;
+}

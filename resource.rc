@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (中国) resources
+// Chinese (P.R.C.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -301,8 +301,8 @@ BEGIN
     EDITTEXT        IDC_E_CONFROM_PASSWD,45,91,105,14,ES_PASSWORD | 
                     ES_AUTOHSCROLL
     LTEXT           "用户名",IDC_USER_NAME2,18,25,25,14,SS_CENTERIMAGE
-    COMBOBOX        IDC_E_USER_ID,45,24,105,45,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_E_USER_ID,45,24,105,45,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
     COMBOBOX        IDC_E_USER_PERMISSION,45,114,105,43,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "权  限",IDC_USER_PERMISSION,18,113,24,14,SS_CENTERIMAGE
@@ -640,7 +640,7 @@ BEGIN
     0
 END
 
-#endif    // Chinese (中国) resources
+#endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

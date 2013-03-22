@@ -745,3 +745,17 @@ bool CDBForm::GetSQLProcRet(std::string &error)
 	}
 	return true;
 }
+
+/*
+ * @ brief: 绑定返回值
+ * @ return: 若成功返回true，否则返回false
+ *           当执行失败时，可立即通过ReportError函数获取错误信息
+ **/
+bool CDBForm::BindReturn() {
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SHORT,\
+		                              SQL_INTEGER, 0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
+	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
+		return true;
+	}
+	return false;
+}

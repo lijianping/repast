@@ -51,6 +51,7 @@ public:
 	bool RollBack();
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
     bool GetSQLProcRet(std::string &error);
+	bool BindReturn();
 
 protected:
 	inline bool is_connect();
