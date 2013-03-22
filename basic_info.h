@@ -11,7 +11,11 @@
 
 BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+BOOL CALLBACK EditCategoryProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool InitBasicInfoList(HWND parent_hwnd, UINT id);
 bool InitCommodityTree(HWND parent_hwnd, UINT id);
 bool ShowCommodity(HWND hwnd);
+bool ShowCategoryList(HWND hwnd, UINT id);

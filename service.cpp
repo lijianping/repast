@@ -782,9 +782,9 @@ bool SetListInfo(const HWND hwnd, const UINT id,
 	CTableInfo table_info;
 	CCustomer customer;
 	char sql[256];
-	sprintf(sql, "select Tno,Cno,Tstatus,Ctime from Customer,TableInfo,CustomerTable \
-		    where Cno=Ccustomerno and Ctableno=Tno and Ctableno like '%s%c'", find, '%');
-	customer.SetSQLStatement(sql);
+// 	sprintf(sql, "select Tno,Cno,Tstatus,Ctime from Customer,TableInfo,CustomerTable \
+// 		    where Cno=Ccustomerno and Ctableno=Tno and Ctableno like '%s%c'", find, '%');
+// 	customer.SetSQLStatement(sql);
 //	customer.SetSQLStatement("execute SelectCustomer");
 	if (!customer.GetRecordSet())
 	{
