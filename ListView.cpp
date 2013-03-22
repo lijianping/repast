@@ -19,6 +19,21 @@ CListView::CListView()
     InitCommonControlsEx(&icex);
 }
 
+CListView::CListView(HWND hwnd, UINT id)
+: m_hwnd_(NULL),
+m_new_process_(NULL),
+m_old_process_(NULL),
+m_is_set_process_(false)
+{
+    INITCOMMONCONTROLSEX icex;
+    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icex.dwICC  = ICC_TREEVIEW_CLASSES;
+    InitCommonControlsEx(&icex);
+	m_hwnd_ = GetDlgItem(hwnd, id);
+	assert(m_hwnd_ != NULL);
+	m_id_ = id;
+}
+
 CListView::~CListView()
 {
 
@@ -119,6 +134,17 @@ int CListView::InsertItem(int item, std::string item_text)
     return SendMessage(m_hwnd_, LVM_INSERTITEM, 0, (WPARAM)&item_data);
 }
 
+int CListView::InsertItem(int item, int item_values)
+{
+	char item_text[32]={0};
+	LVITEM item_data;
+    item_data.mask = LVIF_TEXT;
+    item_data.iItem = item;
+    item_data.iSubItem = 0;
+	itoa(item_values, item_text, 10);
+    item_data.pszText = item_text;
+	return SendMessage(m_hwnd_, LVM_INSERTITEM, 0, (WPARAM)&item_data);
+}
 /*
  * @ Description: This method Sets some or all of a list 
  *               view item's attributes.

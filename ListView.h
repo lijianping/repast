@@ -4,12 +4,14 @@
 #include <string>
 #include <WINDOWS.H>
 #include <COMMCTRL.H>
+#include <ASSERT.H>
 #pragma comment(lib, "comctl32.lib")
 
 class CListView  
 {
 public:
 	CListView();
+	CListView(HWND hwnd, UINT id);
 	virtual ~CListView();
     inline void set_new_process(WNDPROC process);
     inline WNDPROC old_process();
@@ -20,6 +22,7 @@ public:
     bool Initialization(HWND parent_hwnd, UINT id);
     int InsertColumn(int column, int width, std::string column_head);
     int InsertItem(int item, std::string item_text);
+	int InsertItem(int item, int item_values);
     bool SetItem(int item, int subitem, std::string item_text);
 	bool SetItem(int item, int subitem, int item_text);
 	bool SetItem(int item, int subitem, double item_text);
