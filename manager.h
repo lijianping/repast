@@ -43,4 +43,5 @@ std::string GetPermissionName(HWND hwnd);
 int ConvertDate(const char *date, std::string &out_date);
 
 bool ShowLoginUser(HWND hwnd);
+bool InitStaffNo(HWND hwnd, UINT id);
 #endif

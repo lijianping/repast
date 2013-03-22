@@ -866,10 +866,6 @@ bool SetListInfo(const HWND hwnd, const UINT id,
 {
 	CTableInfo table_info;
 	CCustomer customer;
-	char sql[256];
-	sprintf(sql, "select Tno,Cno,Tstatus,Ctime_start from Customer,TableInfo,CustomerTable \
-		    where Cno=Ccustomerno and Ctableno=Tno and Ctableno like '%s%c'", find, '%');
-	customer.SetSQLStatement(sql);
 	if (!customer.GetRecordSet())
 	{
 		error = "获取记录集失败！";

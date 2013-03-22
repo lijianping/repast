@@ -42,6 +42,8 @@ public:
 	int GetStaffSum();
 	bool CheckStaff(STAFFINFO * staff_info, std::string &error_info);
 	bool SetStaff(STAFFINFO * staff_info, std::string &error_info);
+	bool GetStaffNo(std::string &err_info);
+	bool GetStaffName(const char *no, std::string &err_info);
 
 private:
 	char m_old_id_[9];

@@ -33,6 +33,7 @@ public:
 	bool ModifyPasswd(std::string user_name, std::string password);
 	std::string Encrypt(const char *src, int shift, int len);
 protected:
+	void Initialization();
     virtual	bool BindingParameter(bool is_add, std::string &error_info);
 	bool CheckLoginUser(LoginUser * login_user, std::string &error_info);
 	bool SetLoginUser(LoginUser * login_user, std::string &error_info);

@@ -430,3 +430,35 @@ bool CStaffForm::SetStaff(STAFFINFO * staff_info,std::string &error_info)
 	}
 	return true;
 }
+
+bool CStaffForm::GetStaffNo(std::string &err_info) {
+	m_sql_pro_ret = SQL_NTS;
+	m_sql_id_ = SQL_NTS;
+// 	if (!BindReturn()) {
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+// 		return false;
+// 	}
+	if (!ExecSQLProc("{call GetStaffNo}", err_info)) {
+		return false;
+	}
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_id_, sizeof(m_id_), &m_sql_id_);
+	return MoveFirst();
+}
+
+bool CStaffForm::GetStaffName(const char *no, std::string &err_info) {
+	m_sql_name_ = SQL_NTS;
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+		                              sizeof(m_id_) - 1, 0, m_id_, sizeof(m_id_), &m_sql_id_);
+	strcpy(m_id_, no);
+	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
+		if (ExecSQLProc("{call GetStaffName(?)}", err_info)) {
+			MoveFirst();
+			m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+		                              sizeof(m_name_) - 1, 0, m_name_, sizeof(m_name_), &m_sql_name_);
+			if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
+				return true;
+			}
+		}
+	}
+	return false;
+}

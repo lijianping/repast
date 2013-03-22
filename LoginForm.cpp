@@ -373,3 +373,13 @@ bool CLoginForm:: SetLoginUser(LoginUser * login_user, std::string &error_info)
 	}
 	return true;
 }
+
+/*
+ * @ brief: 初始化SQL相关类型数据
+ **/
+void CLoginForm::Initialization() {
+	this->m_sql_name_ = SQL_NTS;
+	this->m_sql_old_name_ = SQL_NTS;
+	this->m_sql_password_ = SQL_NTS;
+	this->m_sql_permission_name_ = SQL_NTS;
+}
