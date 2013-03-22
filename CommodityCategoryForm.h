@@ -11,20 +11,28 @@
 
 #include "DBForm.h"
 
+
 class CCommodityCategoryForm  : public CDBForm
 {
 public:
 	CCommodityCategoryForm();
 	virtual ~CCommodityCategoryForm();
-	bool BindingParameter();
+	virtual bool BindingParameter();
+   virtual bool BindingParameter(bool is_add, std::string &error_info);
+    bool InsertCategory(std::string id, std::string name,std::string &error);
+    bool UpdateCategory(std::string old_id, std::string id, std::string name,std::string &error);
+	bool DeleteCategory(std::string id,std::string &error);
 	inline int no();
 	inline char* name();
+	bool CheckCategory(std::string id, std::string name, std::string &error);
 private:
 	int m_no_;        /*商品分类编号*/
 	char m_name_[33]; /*商品分类名称*/
+	int m_old_no_;    /*商品分类的旧编号*/
 	
 	SQLINTEGER m_sql_no_;
 	SQLINTEGER m_sql_name_;
+	SQLINTEGER m_sql_old_no;
 
 };
 

@@ -18,6 +18,7 @@ BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 bool InitBasicInfoList(HWND parent_hwnd, UINT id);
 bool InitCommodityTree(HWND parent_hwnd, UINT id);
 bool ShowCommodity(HWND hwnd);
+bool ShowCategoryList(HWND hwnd, UINT id);
 
 /* 商品信息 */
 struct CommodityInfo {
@@ -30,3 +31,4 @@ struct CommodityInfo {
 	std::string commodity_unit;   // 商品单位
 	std::string commodity_sale;   // 商品卖价
 };
+

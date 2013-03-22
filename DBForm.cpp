@@ -17,6 +17,7 @@ CDBForm::CDBForm()
 	  m_pro_ret(0),
 	  m_return_code_(0)
 {
+	m_auto_commit_ = SQL_AUTOCOMMIT_ON;
 	std::string error;
 	assert(true == this->Connect("repast", "repast", "repast", error));
 }
@@ -315,6 +316,8 @@ void CDBForm::SetSQLStatement(const std::string statement)
 	m_query_sql_ = statement;
 }
 
+
+
 bool CDBForm::Connect(const char *dsn, const char *id, 
 					  const char *password, std::string &information)
 {
@@ -326,6 +329,7 @@ bool CDBForm::Connect(const char *dsn, const char *id,
         information = "分配环境句柄失败!";
         return false;
     }
+
     /* 设置ODBC版本的环境属性 */
     m_return_code_ = SQLSetEnvAttr(m_henv_, SQL_ATTR_ODBC_VERSION,
         (void *)SQL_OV_ODBC3, 0);
@@ -343,6 +347,15 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 		information = "分配连接句柄失败!";
         return false;
     }
+    /* 设置数据库事务提交方式，默认为自动提交方式*/
+	m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)m_auto_commit_, SQL_IS_POINTER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "设置数据库手动提交失败！";
+        return false;
+    }
+
 	/*设置连接属性（登录超时：5s)*/
     m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_LOGIN_TIMEOUT, (void *)5, 0);
     if ((m_return_code_ != SQL_SUCCESS) &&
@@ -602,3 +615,58 @@ void CDBForm::DeleteSpace(const char * src, char * des)
 	}
 	*des='\0';
 }
+
+
+bool CDBForm::SetAutoCommit(bool is_auto_commit)
+{
+	if (true == is_auto_commit)
+	{
+		m_auto_commit_ = SQL_AUTOCOMMIT_ON;
+	}
+	else
+	{
+		m_auto_commit_ = SQL_AUTOCOMMIT_OFF;
+	}
+	/* 设置数据库事务提交方式，默认为自动提交方式*/
+	m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)m_auto_commit_, SQL_IS_POINTER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		std::string error;
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, error);
+        return false;
+    }
+	return true;
+}
+
+bool CDBForm::Commit()
+{
+	
+	m_return_code_ = SQLEndTran(SQL_HANDLE_DBC, m_hdbc_, SQL_COMMIT);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		std::string error;
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, error);
+        return false;
+    }
+	return true;
+}
+bool CDBForm::RollBack()
+{
+	m_return_code_ = SQLEndTran(SQL_HANDLE_DBC, m_hdbc_, SQL_ROLLBACK);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		std::string error;
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, error);
+        return false;
+    }
+	return true;
+}
+
+
+bool CDBForm::ExecuteProc(const char * sql_proc, std::string error)
+	{
+		return true;
+	}

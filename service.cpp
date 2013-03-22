@@ -870,7 +870,6 @@ bool SetListInfo(const HWND hwnd, const UINT id,
 	sprintf(sql, "select Tno,Cno,Tstatus,Ctime_start from Customer,TableInfo,CustomerTable \
 		    where Cno=Ccustomerno and Ctableno=Tno and Ctableno like '%s%c'", find, '%');
 	customer.SetSQLStatement(sql);
-//	customer.SetSQLStatement("execute SelectCustomer");
 	if (!customer.GetRecordSet())
 	{
 		error = "获取记录集失败！";
@@ -991,13 +990,11 @@ std::string GetFloor(std::string text) {
 LRESULT CALLBACK ChangeTableListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	HINSTANCE hinstance = (HINSTANCE)GetWindowLong(GetParent(hwnd), GWL_HINSTANCE);
-	int select_row(0);
 	switch (msg)
 	{
 	case WM_LBUTTONUP:
-		{   /*弹出右键菜单*/
+		{  
 			HWND parent = GetParent(hwnd);
-		//	MessageBox(hwnd, TEXT("TEXT"), TEXT("TEXT"), MB_ICONINFORMATION);
 			CListView list_view(parent, IDC_TABLE_AVAILABLE);
 			int select = list_view.GetSelectionMark();
 			SetDlgItemText(parent, IDC_TABLE_NUM_NEW, list_view.GetItem(select, 0).c_str());

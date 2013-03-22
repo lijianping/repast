@@ -190,7 +190,7 @@
 #define IDC_E_COMMODITY_UNIT            1159
 #define IDC_E_COMMODITY_SALE            1160
 #define IDC_CATEGORY_DELETE             1167
-#define IDC_CATEGORY_SAVE               1168
+#define IDC_CATEGORY_ADD                1168
 #define IDC_CATEGORY_CANCEL             1169
 #define IDC_S_COMMODITY_CATEGORY        1170
 #define IDC_S_CATEGORY_NAME             1171
@@ -200,6 +200,7 @@
 #define IDC_START_DATE                  1176
 #define IDC_END_DATE                    1177
 #define IDC_E_START_TIME                1177
+#define IDC_CATEGORY_MODIFY             1175
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
