@@ -46,7 +46,7 @@ public:
 private:
 	char m_old_id_[9];
     char m_id_[9];                /* staff's id */
-    char m_name_[10];             /* staff's name */
+    char m_name_[33];             /* staff's name */
     char m_sex_[3];               /* staff's sex */
     char m_dept_num_[3];          /* staff's department number */
     char m_dept_name_[10];        /* staff's department name */

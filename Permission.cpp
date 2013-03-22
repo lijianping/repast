@@ -24,6 +24,6 @@ bool CPermission::BindingParameter()
 {
 	//TODO:Œ¥ºÏ≤‚∑µªÿ÷µ
 	SQLBindCol(m_hstmt_, 1, SQL_C_SHORT, &m_no_, 0, &m_sql_no_);
-	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, 0, &m_sql_name_);
+	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
 	return true;
 }

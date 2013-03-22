@@ -33,6 +33,7 @@
 #define IDD_TAB_BASIC_INFO              120
 #define IDD_EDIT_COMMODITY              121
 #define IDD_EDIT_COMMODITY_CATEGORY     122
+#define IDD_EDIT_PERMISSION             123
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -103,6 +104,7 @@
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
 #define IDC_BASIC_EDIT_CATEGORY         1066
+#define IDC_DELETE_PERMISSION           1066
 #define ID_SERVICE_BOOK                 1067
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
@@ -137,14 +139,17 @@
 #define IDC_PERSONNEL_MANAGEMENT        1098
 #define IDC_USER_PERMISSION             1098
 #define IDC_STOCK_MANAGEMENT            1099
+#define IDC_USER_NAME3                  1099
 #define IDC_DESK_MANAGEMENT             1100
 #define IDC_E_ADD_USER                  1101
 #define IDC_E_MODIFY_USER               1102
 #define IDC_E_DELETE_USER               1103
 #define IDC_E_CANCEL                    1104
 #define IDC_E_USER_NAME                 1105
+#define IDC_E_STAFF_NAME1               1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
+#define IDC_E_USER_NAME2                1108
 #define IDC_LIST1                       1110
 #define IDC_EDIT1                       1111
 #define IDC_EDIT2                       1112
@@ -213,9 +218,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_RESOURCE_VALUE        124
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1179
+#define _APS_NEXT_CONTROL_VALUE         1180
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

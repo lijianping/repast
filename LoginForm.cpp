@@ -23,8 +23,9 @@ bool CLoginForm::BindingParameter()
 {
 	//TODO£∫…–Œ¥ºÏ≤È∑µªÿ÷µ
 	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_no_, sizeof(m_no_), &m_sql_no_);
-    SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_,sizeof(m_name_), &m_sql_name_);
-	SQLBindCol(m_hstmt_, 3, SQL_C_CHAR, m_permission_name_, sizeof(m_permission_name_), &m_sql_permission_name_);
+	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_staff_name_,sizeof(m_staff_name_), &m_sql_staff_name_);
+    SQLBindCol(m_hstmt_, 3, SQL_C_CHAR, m_name_,sizeof(m_name_), &m_sql_name_);
+	SQLBindCol(m_hstmt_, 4, SQL_C_CHAR, m_permission_name_, sizeof(m_permission_name_), &m_sql_permission_name_);
     return true;
 }
 
