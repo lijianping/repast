@@ -49,7 +49,8 @@ public:
 	bool SetAutoCommit(bool is_auto_commit);
 	bool Commit();
 	bool RollBack();
-	bool ExecuteProc(const char * sql_proc, std::string error);
+	bool ExecSQLProc(const char * sql_proc, std::string &error);
+    bool GetSQLProcRet(std::string &error);
 
 protected:
 	inline bool is_connect();

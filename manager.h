@@ -14,6 +14,7 @@
 #include "personnel.h"
 #include "tabctrl.h"
 #include "pagectrl.h"
+#include "Permission.h"
 
 
 // 顾客详细信息数据传送

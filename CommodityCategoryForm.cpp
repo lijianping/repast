@@ -87,15 +87,21 @@ bool CCommodityCategoryForm::InsertCategory(
 											std::string name,
 											std::string &error)
 {
-	char insert[128];
+	char insert[128]={0};
 	if (!CheckCategory(id,name,error))
 	{
 		return false;
 	}
-	/*TODO: 绑定存储过程返回值*/
-	sprintf(insert, "insert into CommodityCategory values(%d, '%s')", \
-		atoi(id.c_str()),name.c_str());
-	if (false == ExecuteSQL(insert,error))
+	if (!BindingParameter(true, error))
+	{
+		return false;
+	}
+	sprintf(insert, "{?=call InsertCommodityCategory(?,?)}");
+	if (!ExecSQLProc(insert, error))
+	{
+		return false;
+	}
+	if (!GetSQLProcRet(error))
 	{
 		return false;
 	}
@@ -141,5 +147,7 @@ bool CCommodityCategoryForm::CheckCategory(std::string id, std::string name, std
 		error = "商品分类名称不能为空";
 		return false;
 	}
+	m_no_=atoi(id.c_str());
+	strcpy(m_name_,name.c_str());
 	return true;
 }

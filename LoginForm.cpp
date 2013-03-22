@@ -21,14 +21,10 @@ CLoginForm::~CLoginForm()
 
 bool CLoginForm::BindingParameter()
 {
-    SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_name_,
-               sizeof(m_name_), &m_sql_name_);
-    SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_password_,
-               sizeof(m_password_), &m_sql_password_);
-    SQLBindCol(m_hstmt_, 3, SQL_C_SSHORT, &m_permission_,
-               0, &m_sql_permission_);
-	SQLBindCol(m_hstmt_, 4, SQL_C_CHAR, m_permission_name_, 
-		       sizeof(m_permission_name_), &m_sql_permission_name_);
+	//TODO：尚未检查返回值
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_no_, sizeof(m_no_), &m_sql_no_);
+    SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_,sizeof(m_name_), &m_sql_name_);
+	SQLBindCol(m_hstmt_, 3, SQL_C_CHAR, m_permission_name_, sizeof(m_permission_name_), &m_sql_permission_name_);
     return true;
 }
 
@@ -44,17 +40,54 @@ short CLoginForm::GetUserPermission(std::string user_name,
                                     std::string user_password,
                                     std::string &information)
 {
-	std::string password = Encrypt(user_password.c_str(), user_password.length() / 2, user_password.length());
-    std::string sql_statement = "select Lpermission from Login where Lname = '";
-    sql_statement += user_name;
-    sql_statement += "' and Lpassword = '";
-    sql_statement += password;
-    sql_statement += "'";
-    this->ExecuteSQL((char *)sql_statement.c_str(), information);
-    short permission = 0;
-    SQLINTEGER sql_permission;
-    SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &permission, 0, &sql_permission);
-    m_return_code_ = SQLFetch(m_hstmt_);
+//	std::string password = Encrypt(user_password.c_str(), user_password.length() / 2, user_password.length());
+
+	m_sql_name_ = SQL_NTS;
+	m_sql_password_ = SQL_NTS;
+	m_sql_pro_ret = SQL_NTS;
+	m_sql_permission_ = SQL_NTS;
+	/*绑定存储过程返回值*/
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, \
+		SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "绑定返回值失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
+        return false;
+    }
+	// 绑定列参数
+    m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		SQL_CHAR, sizeof(m_name_)-1, 0, m_name_, sizeof(m_name_), &m_sql_name_);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "绑定参数1失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
+        return false;
+    }
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		SQL_CHAR, sizeof(m_password_)-1, 0, m_password_, sizeof(m_password_), &m_sql_password_);
+   	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "绑定参数2失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
+        return false;
+    }
+	//TODO: 添加检查用户信息长度
+	strcpy(m_name_, user_name.c_str());
+	strcpy(m_password_, user_password.c_str());
+
+    if(false == ExecSQLProc("{?=call GetPermission(?,?)}", information))
+	{
+		return false;
+	}
+
+//     short permission = 0;
+//     SQLINTEGER sql_permission=SQL_NTS;
+    SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &m_permission_, 0, &m_sql_permission_);
+	    m_return_code_ = SQLFetch(m_hstmt_);
     if ((SQL_SUCCESS != m_return_code_) &&
         (SQL_SUCCESS_WITH_INFO != m_return_code_))
     {
@@ -62,8 +95,13 @@ short CLoginForm::GetUserPermission(std::string user_name,
         {
             information = "用户名或密码错误!";
         }
+		return false;
     }
-    return permission;
+	if (false == GetSQLProcRet(information))
+	{
+		return false;
+	}
+    return m_permission_;
 }
 
 /*

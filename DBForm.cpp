@@ -617,6 +617,14 @@ void CDBForm::DeleteSpace(const char * src, char * des)
 }
 
 
+ /*
+  * 说明：
+  *       设置事务提交方式，默认为自动提交
+  * 参数：
+  *       is_auto_commit   [in]  ture为自动提交，false为手动提交
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
 bool CDBForm::SetAutoCommit(bool is_auto_commit)
 {
 	if (true == is_auto_commit)
@@ -639,6 +647,13 @@ bool CDBForm::SetAutoCommit(bool is_auto_commit)
 	return true;
 }
 
+
+ /*
+  * 说明：
+  *       事务提交，用于在程序中控制SQL语句的执行，使用前需要设置事务的提交方式为手动提交
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
 bool CDBForm::Commit()
 {
 	
@@ -652,6 +667,13 @@ bool CDBForm::Commit()
     }
 	return true;
 }
+
+ /*
+  * 说明：
+  *       事务回滚，用于在程序中回滚执行的SQL语句，使用前需要设置事务的提交方式为手动提交
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
 bool CDBForm::RollBack()
 {
 	m_return_code_ = SQLEndTran(SQL_HANDLE_DBC, m_hdbc_, SQL_ROLLBACK);
@@ -666,7 +688,60 @@ bool CDBForm::RollBack()
 }
 
 
-bool CDBForm::ExecuteProc(const char * sql_proc, std::string error)
+ /*
+  * 说明：
+  *      执行需要返回参数的存储过程
+  * 参数：
+  *      sql_proc [in] 执行的存储过程语句， 形如：“{? = call 存储过程名(?,?.........)}”
+  *      error    [out] 记录错误信息
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+ bool CDBForm::ExecSQLProc(const char * sql_proc, std::string &error)
+ {
+	/*执行存储过程*/
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
+		error = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		return false;
+    }
+ 	return true;
+ }
+
+
+ /*
+  * 说明：
+  *      获取执行存储过程的返回值,若是存储过程的返回值和其他数据记录集一起返回，
+  *      请先取数据记录集里的数据，再调用此函数获取存储过程的返回值
+  * 参数：
+  *      error    [out] 记录错误信息
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+bool CDBForm::GetSQLProcRet(std::string &error)
+{
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
+	}
+	if (0 == m_pro_ret)
 	{
 		return true;
 	}
+	else if (2627 == m_pro_ret )
+	{
+		error="员工编号不能重复！";
+		return false;
+	}
+	else
+	{
+		char ret[10];
+		sprintf(ret, "%d",m_pro_ret);
+		error="未处理错误：存储过程返回值->";
+		error+=ret;
+		return false;
+	}
+	return true;
+}
