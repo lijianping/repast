@@ -667,6 +667,31 @@ bool CDBForm::RollBack()
 
 
 bool CDBForm::ExecuteProc(const char * sql_proc, std::string error)
+{
+	/*执行存储过程*/
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
 	{
-		return true;
+		error = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		return false;
+    }
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
 	}
+	if (2627 == m_pro_ret )
+	{
+		error="员工编号不能重复！";
+		return false;
+	}
+	else
+	{
+		char ret[10];
+		sprintf(ret, "%d",m_pro_ret);
+		error="未处理错误：存储过程返回值->";
+		error+=ret;
+		return false;
+	}
+	return true;
+}
