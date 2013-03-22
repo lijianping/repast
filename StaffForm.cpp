@@ -430,3 +430,9 @@ bool CStaffForm::SetStaff(STAFFINFO * staff_info,std::string &error_info)
 	}
 	return true;
 }
+
+bool CStaffForm::GetStaffNo() {
+	SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT,SQL_C_SSHORT, \
+		             SQL_INTEGER, 0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
+	return false;
+}
