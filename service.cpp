@@ -34,10 +34,10 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 	{
 	case WM_INITDIALOG:
 		{
-			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
-			InitComboBox(hwnd, ID_SERVICE_COMBO);
+//			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
+//			InitComboBox(hwnd, ID_SERVICE_COMBO);
 			std::string error_info;
-			SetListInfo(hwnd, ID_SERVICE_LIST, "01", error_info);
+//			SetListInfo(hwnd, ID_SERVICE_LIST, "01", error_info);
 			return TRUE;
 		}
     case WM_SETFOCUS:

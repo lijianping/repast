@@ -160,6 +160,10 @@ SOURCE=.\pagectrl.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Permission.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\personnel.cpp
 # End Source File
 # Begin Source File
@@ -265,6 +269,10 @@ SOURCE=.\MenuForm.h
 # Begin Source File
 
 SOURCE=.\pagectrl.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Permission.h
 # End Source File
 # Begin Source File
 

@@ -133,7 +133,9 @@
 #define IDC_USER_PASSWD                 1095
 #define IDC_USER_PASSWD2                1096
 #define IDC_SYS_MANAGEMENT              1097
+#define IDC_USER_NAME2                  1097
 #define IDC_PERSONNEL_MANAGEMENT        1098
+#define IDC_USER_PERMISSION             1098
 #define IDC_STOCK_MANAGEMENT            1099
 #define IDC_DESK_MANAGEMENT             1100
 #define IDC_E_ADD_USER                  1101
@@ -197,10 +199,12 @@
 #define IDC_S_CATEGORY_ID               1172
 #define IDC_E_CATEGORY_ID               1173
 #define IDC_E_CATEGORY_NAME             1174
+#define IDC_CATEGORY_MODIFY             1175
 #define IDC_START_DATE                  1176
 #define IDC_END_DATE                    1177
 #define IDC_E_START_TIME                1177
-#define IDC_CATEGORY_MODIFY             1175
+#define IDC_E_USER_ID                   1178
+#define IDC_E_USER_PERMISSION           1179
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -211,7 +215,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1178
+#define _APS_NEXT_CONTROL_VALUE         1179
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -10,8 +10,9 @@ BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 		{
 			CListView user;
 			user.Initialization(hwnd, IDC_USER_LIST);
-			user.InsertColumn(0, 200, "用户名");
-			user.InsertColumn(1, 200, " 权限");
+			user.InsertColumn(0, 100, "编号");
+			user.InsertColumn(1, 100, "登录名");
+			user.InsertColumn(2, 100, "权限");
 			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	        ShowLoginUser(hwnd);
 			return TRUE;
@@ -186,6 +187,12 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			login_user = (LoginUser *)lParam;
 			CButton button;
+			CPermission all_permission;
+			CComboBox permission_combo;
+			permission_combo.Initialization(hwnd, IDC_E_USER_PERMISSION);
+			all_permission.SetSQLStatement("exec SelectPermissionAll");
+			all_permission.GetRecordSet();
+
 			if (login_user->menu_id == IDC_MODIFY_USER) {
 				ShowWindow(GetDlgItem(hwnd, IDC_E_ADD_USER), SW_HIDE);
 				SetDlgItemText(hwnd, IDC_E_USER_NAME, login_user->user_old_name.c_str());
@@ -340,13 +347,15 @@ bool ShowLoginUser(HWND hwnd)
 	user.Initialization(hwnd, IDC_USER_LIST);
 	user.DeleteAllItems();
 	CLoginForm login_user;
+	login_user.SetSQLStatement("exec GetLoginUserInfo");
 	login_user.GetRecordSet();
 	login_user.MoveFirst();
 	int i=0;
 	while(!login_user.IsEOF())
 	{
-		user.InsertItem(i, login_user.name());
-		user.SetItem(i, 1, login_user.permission_name());
+		user.InsertItem(i, login_user.no());
+		user.SetItem(i,1, login_user.name());
+		user.SetItem(i, 2, login_user.permission_name());
 		login_user.MoveNext();
 		i++;
 	}
