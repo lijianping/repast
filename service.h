@@ -54,10 +54,13 @@ LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARA
  * @ param: floor [in] Â¥²ã±àºÅ
  **/
 void GetTableInfo(const HWND hwnd, const int id, const char *floor = "01", int use = 0);
+
+LRESULT CALLBACK ChangeTableListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 /* struct define */
 
 /* Ì¨ºÅÐÅÏ¢ */
 struct CustomerTable {
+	UINT menu_id;
 	std::string table_no;
 	std::string table_state;
 	std::string customer_no;

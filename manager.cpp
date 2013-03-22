@@ -85,22 +85,58 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			user.Initialization(hwnd, IDC_CONSUMPTION);
 			user.InsertColumn(0, 100, "消费者编号");
 			user.InsertColumn(1, 100, "消费金额");
-			user.InsertColumn(2, 100, "消费日期");
-			user.InsertColumn(3, 100, "营业员");
+			user.InsertColumn(2, 100, "开台/预定时间");
+			user.InsertColumn(3, 100, "结束时间");
+			user.InsertColumn(4, 100, "营业员");
 			user.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			// TODO: 查询数据库，显示时间段的消费者，默认当天
 			return TRUE;
 		}
 	case WM_COMMAND:
 		{
 			switch (LOWORD(wParam))
 			{
-			case IDC_CONSUMPTION_DETAIL:
+			case IDC_CONSUMPTION_DETAIL: // 消费者明细
 				{
+					CListView consumption(hwnd, IDC_CONSUMPTION);
+					int select = consumption.GetSelectionMark();
+// 					if (-1 == select) {
+// 						MessageBox(hwnd, TEXT("请选择一个消费者"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+// 						break;
+// 					}
+                    ConsumerInfo consumer_info;
+					consumer_info.consumer_id = consumption.GetItem(select, 0);
+					consumer_info.consumption_amount = consumption.GetItem(select, 1);
+					consumer_info.start_time = consumption.GetItem(select, 2);
+					consumer_info.end_time = consumption.GetItem(select, 3);
+					consumer_info.clerk = consumption.GetItem(select, 4);
 					DialogBoxParam(hinstance,  MAKEINTRESOURCE(IDD_CONSUMPTION_DETAIL), \
-						hwnd, (DLGPROC)ConsumeDetailProc,(LONG)&hinstance);
+						hwnd, (DLGPROC)ConsumeDetailProc,(LONG)&consumer_info);
+					break;
+				}	
+			case IDC_QUERY_DETAIL:  // 查询时间段内的消费者
+				{
+					TCHAR start_date[256], end_date[256];
+					memset(start_date, 0, sizeof(start_date));
+					memset(end_date, 0, sizeof(end_date));
+					GetDlgItemText(hwnd, IDC_START_DATE,start_date, 256);  // 获取时间
+					GetDlgItemText(hwnd, IDC_END_DATE, end_date, 256);
+					TCHAR date[256];
+					std::string start_date_str, end_date_str;
+					// 转换日期格式
+					int start_date_int = ConvertDate((const char *)start_date, start_date_str);
+					int end_date_int = ConvertDate((const char *)end_date, end_date_str);
+					sprintf(date, "start:%s--end:%s", start_date_str.c_str(), end_date_str.c_str());
+					MessageBox(hwnd, date, TEXT("time"), MB_OK | MB_ICONINFORMATION);
+					if (start_date_int > end_date_int) {
+						MessageBox(hwnd, TEXT("Error"), TEXT("time"), MB_OK | MB_ICONINFORMATION);
+					}
+					// TODO: 查询数据库，显示时间段的消费者
+					break;
 				}
 				break;
 			}
+			return TRUE;
 		}
 	}
 	return FALSE;
@@ -108,10 +144,22 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 BOOL CALLBACK ConsumeDetailProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static ConsumerInfo consumer_info;
 	switch (msg)
 	{
 		case WM_INITDIALOG:
 			{
+				ConsumerInfo *info = (ConsumerInfo *)lParam;         // 接收数据,静态保存
+				consumer_info.consumer_id = info->consumer_id;
+				consumer_info.consumption_amount = info->consumption_amount;
+				consumer_info.start_time = info->start_time;
+				consumer_info.end_time = info->end_time;
+				consumer_info.clerk = info->clerk;
+				CListView custom_list(hwnd, IDC_LIST1);
+				custom_list.InsertColumn(0, 120, "名称");
+				custom_list.InsertColumn(1, 120, "单价");
+				custom_list.InsertColumn(2, 120, "数量");
+				custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 				return TRUE;
 			}
 		case WM_COMMAND:
@@ -304,3 +352,32 @@ bool ShowLoginUser(HWND hwnd)
 	}
 	return true;
 }
+
+/*
+ * @ brief: 转换日期，如将 2012年12月20日 转换为2012-12-20 以及数字型 20121220
+ * @ param: date [in] 日期字符串
+ * @ param: out_date [out] yyyy-mm-dd型字符日期
+ * @ return: 数字型日期
+ **/
+int ConvertDate(const char *date, std::string &out_date) {
+	std::string in_date(date);
+	std::string year("年");
+	std::string month("月");
+	std::string day("日");
+	std::string data;
+	size_t index = 0;
+	size_t pos = in_date.find(year);
+	data = in_date.substr(index, pos);
+	in_date.replace(pos, year.length(), "-");
+	index = pos + 1;
+	pos = in_date.find(month);
+	data += in_date.substr(index, pos - index);
+	in_date.replace(pos, month.length(), "-");
+	index = pos + 1;
+	pos = in_date.find(day);
+	data += in_date.substr(index, pos - index);
+	in_date.erase(pos, day.length());
+	out_date = in_date;
+	return atoi(data.c_str());
+}
+

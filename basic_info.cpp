@@ -89,6 +89,23 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY),hwnd,EditCommodityProc);
 					break;
 				}
+			case IDC_BASIC_INFO_MODIFY:
+				{
+					CListView commodity_list(hwnd, IDC_BASIC_INFO);
+					int select = commodity_list.GetSelectionMark();
+					CommodityInfo commodity_info;
+					commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
+					commodity_info.commodity_no = commodity_list.GetItem(select, 0);
+					commodity_info.commodity_name = commodity_list.GetItem(select, 1);
+					commodity_info.commodity_purchase = commodity_list.GetItem(select, 2);
+					commodity_info.commodity_sum = commodity_list.GetItem(select, 3);
+					commodity_info.commodity_unit = commodity_list.GetItem(select, 4);
+					commodity_info.commodity_category = commodity_list.GetItem(select, 5);
+					commodity_info.commodity_sale = commodity_list.GetItem(select, 6);
+					DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY), hwnd, \
+						           EditCommodityProc, (long)&commodity_info);
+					break;
+				}
 			case IDC_BASIC_EDIT_CATEGORY:
 				{
 					DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY_CATEGORY),hwnd,EditCategoryProc);
@@ -272,10 +289,29 @@ return FALSE;
 
 BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static CommodityInfo commodity_info;
 	switch(msg)
 	{
 	case WM_INITDIALOG:
 		{
+			CommodityInfo *info = (CommodityInfo *)lParam;
+			commodity_info.menu_id = info->menu_id;
+			commodity_info.commodity_no = info->commodity_no;
+			commodity_info.commodity_name = info->commodity_name;
+			commodity_info.commodity_category = info->commodity_category;
+			commodity_info.commodity_purchase = info->commodity_purchase;
+			commodity_info.commodity_sale = info->commodity_sale;
+			commodity_info.commodity_sum = info->commodity_sum;
+			commodity_info.commodity_unit = info->commodity_unit;
+			if (info->menu_id == IDC_BASIC_INFO_MODIFY) {
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_ID, info->commodity_no.c_str());
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_NAME, info->commodity_name.c_str());
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_PURCHASE, info->commodity_purchase.c_str());
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_SUM, info->commodity_sum.c_str());
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_CATEGORY, info->commodity_category.c_str());
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_UNIT, info->commodity_unit.c_str());
+				SetDlgItemText(hwnd, IDC_E_COMMODITY_SALE, info->commodity_sale.c_str());
+			}
 			return TRUE;
 		}
 	case WM_CLOSE:

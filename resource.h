@@ -95,6 +95,7 @@
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
 #define IDC_BASIC_INFO_MODIFY           1064
+#define IDC_QUERY_DETAIL                1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
@@ -121,6 +122,7 @@
 #define IDC_MODIFY_USER                 1082
 #define IDC_                            1083
 #define IDC_CONSUMPTION                 1083
+#define IDC_E_END_TIME                  1083
 #define IDC_CHOICE_YEAR                 1084
 #define IDC_CHOICE_DATE                 1085
 #define IDC_YEAR                        1086
@@ -195,6 +197,9 @@
 #define IDC_S_CATEGORY_ID               1172
 #define IDC_E_CATEGORY_ID               1173
 #define IDC_E_CATEGORY_NAME             1174
+#define IDC_START_DATE                  1176
+#define IDC_END_DATE                    1177
+#define IDC_E_START_TIME                1177
 #define IDC_CATEGORY_MODIFY             1175
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
@@ -206,7 +211,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1174
+#define _APS_NEXT_CONTROL_VALUE         1178
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
