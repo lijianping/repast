@@ -8,11 +8,10 @@ struct LoginUser
 {
 	UINT menu_id;            // 选项按钮id
 	std::string staff_no;    // 员工编号
-	std::string login_name;  // 用户登录名
+//	std::string login_name;  // 用户登录名
 	std::string new_login_name; // 修改后的用户登录名
 	std::string login_permission; // 用户登录权限
 	std::string password1;     // 用户密码
-	std::string password2;     // 用户确认密码
 };
 
 class CLoginForm : public CDBForm  
@@ -30,10 +29,10 @@ public:
     short GetUserPermission(std::string user_name,
                             std::string user_password,
                             std::string &information);
-	bool InsertInfo(LoginUser *login_user, std::string &error_info);
 	bool AddUser(LoginUser *login_user, std::string &err_info);
+	bool ModifyUser(LoginUser *login_user, std::string &err_info);
+	bool DeleteUser(const char *staff_no, std::string &err_info);
 	bool DeleteInfo(std::string user_name, std::string &error_info);
-	bool UpdateInfo(LoginUser *login_user, std::string &error_info);
 	bool ModifyPasswd(std::string user_name, std::string password);
 	std::string Encrypt(const char *src, int shift, int len);
 protected:

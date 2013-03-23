@@ -45,7 +45,7 @@ BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 					// 员工姓名在子对话框中进行数据库操作获取
 					login_user.menu_id = IDC_MODIFY_USER;     // 按钮id
 					login_user.staff_no = list.GetItem(select_row, 0);  // 员工编号
-					login_user.login_name = list.GetItem(select_row, 2);  // 用户当前登录名
+					login_user.new_login_name = list.GetItem(select_row, 2);  // 用户当前登录名
 					login_user.login_permission = list.GetItem(select_row, 3); // 用户当前权限
 			    	DialogBoxParam(hinstance,  MAKEINTRESOURCE(IDD_EDIT_USER), \
 						hwnd, (DLGPROC)EditUserProc,(LONG)&login_user);
@@ -68,7 +68,7 @@ BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 					}
 					CLoginForm login_form;
 					std::string error;
-					if (!login_form.DeleteInfo(list.GetItem(select_row, 0), error))
+					if (!login_form.DeleteUser(list.GetItem(select_row, 0).c_str(), error))
 					{
 						MessageBox(hwnd, error.c_str(), TEXT("删除用户"), MB_OK);
 						break;
@@ -141,8 +141,9 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					int end_date_int = ConvertDate((const char *)end_date, end_date_str);
 					sprintf(date, "start:%s--end:%s", start_date_str.c_str(), end_date_str.c_str());
 					MessageBox(hwnd, date, TEXT("time"), MB_OK | MB_ICONINFORMATION);
-					if (start_date_int > end_date_int) {
-						MessageBox(hwnd, TEXT("Error"), TEXT("time"), MB_OK | MB_ICONINFORMATION);
+					if (start_date_int > end_date_int) {  // 时间输入不合法
+						MessageBox(hwnd, TEXT("时间输入不合法"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						break;
 					}
 					// TODO: 查询数据库，显示时间段的消费者
 					break;
@@ -221,7 +222,7 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				
 			} else {
 				login_user_info.staff_no = login_user->staff_no;    // 用户编号
-				login_user_info.login_name = login_user->login_name;  // 用户当前登录名
+				login_user_info.new_login_name = login_user->new_login_name;  // 用户当前登录名
 				login_user_info.login_permission = login_user->login_permission;  // 用户当前登录权限
 				int index = permission_combo.FindString(login_user_info.login_permission.c_str());
 				if (-1 != index) {
@@ -236,6 +237,9 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				if (staff.GetStaffName(login_user_info.staff_no.c_str(), err_info)) {	
 					staff_name.SetEditText(staff.name());  // 编号不重复，只有一条记录
 				}
+				CEdit login_name(hwnd, IDC_E_LOGIN_NAME);
+				login_name.SetEditText(login_user_info.new_login_name);  // 显示登陆用户名
+				ShowWindow(GetDlgItem(hwnd, IDC_E_ADD_USER), SW_HIDE); // 隐藏增加按钮
 			}
 			return TRUE;
 		}
@@ -262,69 +266,38 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}   // end IDC_E_ADD_USER
 			case IDC_E_MODIFY_USER:
 				{
-					CLoginForm login_form;
-					std::string error;
-					char name[20];
-					GetDlgItemText(hwnd, IDC_E_LOGIN_NAME, name, 32);  // 获取用户登录名
-					char passwd1[30], passwd2[30];
-					memset(passwd1, 0, sizeof(passwd1));
-					memset(passwd2, 0, sizeof(passwd2));
-					std::string p1, p2;
-					GetDlgItemText(hwnd, IDC_E_USER_PASSWD, passwd1, 30);  // 获取用户密码
-					p1 = login_form.Encrypt(passwd1, strlen(passwd1)/2, strlen(passwd1)); // 加密
-					GetDlgItemText(hwnd, IDC_E_CONFROM_PASSWD, passwd2, 30);  // 获取用户确认密码
-					p2 = login_form.Encrypt(passwd2, strlen(passwd2)/2, strlen(passwd2)); // 加密
-					if (p1 != p2) {  // 密码比对
-						MessageBox(hwnd, TEXT("两次密码不一致！"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
-						break;
-					}
-					CComboBox permission_box(hwnd, IDC_E_USER_PERMISSION);
-					std::string user_permission;
-					if (!permission_box.GetComboBoxText(user_permission)) {  // 获取权限信息
-						MessageBox(hwnd, TEXT("获取用户权限失败"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
-						break;
-					}
-					CComboBox staff(hwnd, IDC_E_USER_ID);
-					std::string staff_no;
-					if (!staff.GetComboBoxText(staff_no)) {
-						MessageBox(hwnd, TEXT("获取员工编号失败"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
-						break;
-					}
 					LoginUser user;
-					user.staff_no = staff_no;   // 新建用户对应的员工编号
-					user.new_login_name = std::string(name);  // 新建用户的登录名
-					user.password1 = p1;    // 新建用户密码
-					user.login_permission = user_permission;  // 新建用户权限
-					if (false == login_form.UpdateInfo(&user, error))
-					{
-						MessageBox(hwnd, error.c_str(), TEXT("修改用户信息失败！"), MB_OK);
+					std::string err_info;
+					if (!GetLoginUserInfo(hwnd, &user, err_info)) {
+						MessageBox(hwnd, err_info.c_str(), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
 						break;
 					}
-					MessageBox(hwnd,TEXT("修改用户信息成功！"), TEXT("系统管理"), MB_OK);
+					CLoginForm login;
+					if (!login.ModifyUser(&user, err_info)) {
+						MessageBox(hwnd, err_info.c_str(), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					MessageBox(hwnd, TEXT("修改用户信息成功！"), TEXT("系统管理"), MB_OK | MB_ICONINFORMATION);
 					EndDialog(hwnd, TRUE);
 					break;
 				}
-				case IDC_E_USER_ID:
+			case IDC_E_USER_ID:  // 员工编号下拉框
+			{
+				if (HIWORD(wParam) == CBN_SELCHANGE)
 				{
-					if (HIWORD(wParam) == CBN_SELCHANGE)
-					{
-						/* 
-						 * HIT: When you change the combo box item, if you want 
-						 *      make some change, you can add it at here. 
-						 */
-						CComboBox staff_no(hwnd, IDC_E_USER_ID);
-						std::string number;
-						staff_no.GetComboBoxText(number);
-						CStaffForm staff;
-						std::string err_info;   
-						// 获取员工姓名
-						if (staff.GetStaffName(number.c_str(), err_info)) {
-							CEdit staff_name(hwnd, IDC_E_STAFF_NAME);
-							staff_name.SetEditText(staff.name());  // 编号不重复，只有一条记录
-						}
+					CComboBox staff_no(hwnd, IDC_E_USER_ID);
+					std::string number;
+					staff_no.GetComboBoxText(number);
+					CStaffForm staff;
+					std::string err_info;   
+					// 根据选择的员工编号获取员工姓名
+					if (staff.GetStaffName(number.c_str(), err_info)) {
+						CEdit staff_name(hwnd, IDC_E_STAFF_NAME);
+						staff_name.SetEditText(staff.name());  // 编号不重复，只有一条记录
 					}
-					break;
 				}
+				break;
+			}  // end IDC_E_USER_ID
 			case IDC_E_CANCEL:
 				EndDialog(hwnd, TRUE);
 				break;
@@ -681,7 +654,7 @@ bool GetLoginUserInfo(HWND hwnd, LoginUser *user, std::string &err_info) {
 	}
 	user->login_permission = permission_name;
 	CEdit edit(hwnd, IDC_E_LOGIN_NAME);  // 初始化用户名编辑框
-	std::string login_name, password1, password2;
+	std::string login_name, password1, password2, p1, p2;
 	if (!edit.GetEditText(login_name)) {  // 获取用户登录名
 		err_info = "获取用户登录名失败";
 		return false;
@@ -692,16 +665,18 @@ bool GetLoginUserInfo(HWND hwnd, LoginUser *user, std::string &err_info) {
 		err_info = "获取用户密码失败";
 		return false;
 	}
+	CLoginForm lo;
+	p1 = lo.Encrypt(password1.c_str(), password1.length() / 2, password1.length());
 	edit.Initialization(hwnd, IDC_E_CONFROM_PASSWD); // 获取用户确认密码
 	if (!edit.GetEditText(password2)) {
 		err_info = "获取用户确认密码失败";
 		return false;
 	}
-	if (password1 != password2) {
+	p2 = lo.Encrypt(password2.c_str(), password2.length() / 2, password2.length());
+	if (p1 != p2) {
 		err_info = "两次输入密码不一致";
 		return false;
 	}
-	// TODO: 对密码加密
-	user->password1 = password1;
+	user->password1 = p1;
 	return true;
 }

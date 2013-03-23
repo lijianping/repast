@@ -35,7 +35,7 @@ bool CLoginForm::BindingParameter()
  *        name [in] 用户姓名
  *        password [in] 用户密码
  *        information [out] 错误信息
- *  返回值: 若失败返回0，否则返回用户权限
+ *  返回值: 若失败返回-1，否则返回用户权限
  **/
 short CLoginForm::GetUserPermission(std::string user_name, 
                                     std::string user_password,
@@ -55,7 +55,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
     {
         information = "绑定返回值失败!";
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return false;
+        return -1;
     }
 	// 绑定列参数
     m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, \
@@ -65,7 +65,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
     {
         information = "绑定参数1失败!";
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return false;
+        return -1;
     }
 	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, \
 		SQL_CHAR, sizeof(m_password_)-1, 0, m_password_, sizeof(m_password_), &password_len_);
@@ -74,7 +74,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
     {
         information = "绑定参数2失败!";
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return false;
+        return -1;
     }
 	//TODO: 添加检查用户信息长度
 	strcpy(m_name_, user_name.c_str());
@@ -82,7 +82,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
 
     if(false == ExecSQLProc("{?=call GetPermission(?,?)}", information))
 	{
-		return false;
+		return -1;
 	}
 
 //     short permission = 0;
@@ -96,53 +96,21 @@ short CLoginForm::GetUserPermission(std::string user_name,
         {
             information = "用户名或密码错误!";
         }
-		return false;
+		return -1;
     }
 	if (false == IsSQLProcRetRight(information))
 	{
-		return false;
+		return -1;
 	}
     return m_permission_;
 }
 
 /*
- *  说明: 新增系统登录用户信息
- *  参数:
- *        user_name       [in] 用户姓名
- *        user_password   [in] 用户密码
- *        user_permission [in] 用户权限
- *        error_info      [out] 错误信息
- *  返回值: 若成功返回true，否则返回false
+ * @ brief: 增加用户信息
+ * @ param: login_user [in]  登陆用户信息
+ * @ param: err_info [out] 错误信息
+ * @ return: 若成功返回true，否则返回false
  **/
-bool CLoginForm::InsertInfo(LoginUser *login_user, std::string &error_info)
-{
-	if (false == SetLoginUser(login_user, error_info))
-	{
-		return false;
-	}
-	if (false == BindingParameter(true, error_info))
-	{
-		return false;
-	}
-	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call InsertLoginUser(?,?,?)}", SQL_NTS);
-	if ((m_return_code_ != SQL_SUCCESS) &&
-		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
-	{
-		error_info = "执行增加用户存储过程出错!";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-		return false;
-    }
-	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
-	{
-	}
-	if (m_pro_ret != 0)
-	{
-		error_info="该用户已存在！";
-		return false;
-	}
-	return true;
-}
-
 bool CLoginForm::AddUser(LoginUser *login_user, std::string &err_info) {
 	if (!SetLoginUser(login_user, err_info)) {
 		return false;
@@ -170,6 +138,88 @@ bool CLoginForm::AddUser(LoginUser *login_user, std::string &err_info) {
 }
 
 /*
+ * @ brief: 修改用户信息
+ * @ param: login_user [in]  登陆用户信息
+ * @ param: err_info [out] 错误信息
+ * @ return: 若成功返回true，否则返回false
+ **/
+bool CLoginForm::ModifyUser(LoginUser *login_user, std::string &err_info) {
+	if (!SetLoginUser(login_user, err_info)) {
+		return false;
+	}
+	if (!BindingParameter(true, err_info)) {
+		return false;
+	}
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call ModifyLoginUser(?,?,?,?)}", SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
+		err_info = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+		return false;
+    }
+	while ((m_return_code_ = SQLMoreResults(m_hstmt_)) != SQL_NO_DATA)
+	{
+	}
+	if (m_pro_ret != 0)
+	{
+		err_info="修改用户信息失败！";
+		return false;
+	}
+	return true;
+}
+
+/*
+ * @ brief: 删除用户信息
+ * @ param: staff_no [in]
+ * @ return: 若成功返回true，否则返回false
+ **/
+bool CLoginForm::DeleteUser(const char *staff_no, std::string &err_info) {
+	if (!staff_no) {
+		err_info = "用户编号为空";
+		return false;
+	}
+	this->Initialization();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, \
+		SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        err_info = "绑定返回值失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+        return false;
+    }
+	// 员工编号绑定
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, \
+		SQL_CHAR,sizeof(m_staff_no_)-1, 0, m_staff_no_, 0, &staff_no_len_);
+	strcpy(m_staff_no_, staff_no);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        err_info = "绑定员工编号失败!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+        return false;
+    }
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call DeleteLoginUser(?)}", SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
+		err_info = "执行删除用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+		return false;
+    }
+	while ((m_return_code_ = SQLMoreResults(m_hstmt_)) != SQL_NO_DATA)
+	{
+	}
+	if (m_pro_ret != 0)
+	{
+		err_info="删除用户信息失败！";
+		return false;
+	}
+	return true;
+}
+
+/*
  *  说明: 删除系统登录用户信息
  *  参数:
  *        user_name       [in] 用户姓名
@@ -187,50 +237,6 @@ bool CLoginForm::DeleteInfo(std::string user_name, std::string &error_info)
     }
 	return true;
 }
-
-/*
- *  说明: 更新系统登录用户信息
- *  参数:
- *        user_name       [in] 用户姓名
- *        user_password   [in] 用户密码
- *        user_permission [in] 用户权限
- *        error_info      [out] 错误信息
- *  返回值: 若成功返回true，否则返回false
- **/
-bool CLoginForm::UpdateInfo(LoginUser *login_user, std::string &error_info)
-{
-	if (false == CheckLoginUser(login_user, error_info))
-	{
-		return false;
-	}
-	if (false == SetLoginUser(login_user, error_info))
-	{
-		return false;
-	}
-	if (false == BindingParameter(false, error_info))
-	{
-		return false;
-	}
-	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)"{? = call UpdateLoginUser(?,?,?,?)}", SQL_NTS);
-	if ((m_return_code_ != SQL_SUCCESS) &&
-		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
-	{
-		error_info = "执行修改用户存储过程出错!";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-		return false;
-    }
-	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
-	{
-	}
-	if (m_pro_ret != 0)
-	{
-		error_info="该用户已存在！";
-		return false;
-	}
-
-	return true;
-}
-
 
 /*
  * @ brief: caesar密码加密
@@ -261,9 +267,8 @@ std::string CLoginForm::Encrypt(const char *src, int shift, int len) {
  * @ return: 若成功返回true，否则返回false
  **/
 bool CLoginForm::ModifyPasswd(std::string user_name, std::string password) {
-	std::string encrypted = Encrypt(password.c_str(), password.length() / 2, password.length());
 	char sql[64] = "\0";
-	sprintf(sql, "Exec UpdatePassword '%s', '%s'", user_name.c_str(), encrypted.c_str());
+	sprintf(sql, "Exec UpdatePassword '%s', '%s'", user_name.c_str(), password.c_str());
 	std::string error_string;
 	return ExecuteSQL(sql, error_string);
 }
