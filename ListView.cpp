@@ -119,6 +119,17 @@ int CListView::InsertItem(int item, std::string item_text)
     return SendMessage(m_hwnd_, LVM_INSERTITEM, 0, (WPARAM)&item_data);
 }
 
+int CListView::InsertItem(int item, int item_values)
+{
+	char item_text[32]={0};
+	LVITEM item_data;
+    item_data.mask = LVIF_TEXT;
+    item_data.iItem = item;
+    item_data.iSubItem = 0;
+	itoa(item_values, item_text, 10);
+    item_data.pszText = item_text;
+	return SendMessage(m_hwnd_, LVM_INSERTITEM, 0, (WPARAM)&item_data);
+}
 /*
  * @ Description: This method Sets some or all of a list 
  *               view item's attributes.
