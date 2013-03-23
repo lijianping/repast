@@ -1,3 +1,6 @@
+#ifndef REPAST_BASIC_INFO_H_
+#define REPAST_BASIC_INFO_H_
+
 #include "ListView.h"
 #include "Button.h"
 #include "Static.h"
@@ -32,3 +35,4 @@ struct CommodityInfo {
 	std::string commodity_sale;   // ÉÌÆ·Âô¼Û
 };
 
+#endif

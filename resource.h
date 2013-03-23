@@ -99,6 +99,7 @@
 #define IDC_BASIC_INFO_MODIFY           1064
 #define IDC_QUERY_DETAIL                1064
 #define IDC_E_PERMISSION_MODIFY         1064
+#define IDC_PERMISSION_ADD              1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
@@ -152,9 +153,11 @@
 #define IDC_E_CANCEL                    1104
 #define IDC_E_USER_NAME                 1105
 #define IDC_E_STAFF_NAME1               1105
+#define IDC_E_STAFF_NAME                1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
 #define IDC_E_USER_NAME2                1108
+#define IDC_E_LOGIN_NAME                1108
 #define IDC_LIST1                       1110
 #define IDC_EDIT1                       1111
 #define IDC_EDIT2                       1112
@@ -219,7 +222,9 @@
 #define IDC_S_PERMISSION_NO             1181
 #define IDC_S_PERMISSION_NAME           1182
 #define IDC_E_PERMISSION_NO             1183
+
 #define IDC_E_PERMISSION_NAME           1184
+
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
