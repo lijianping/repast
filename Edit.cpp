@@ -19,6 +19,12 @@ CEdit::~CEdit()
 
 }
 
+CEdit::CEdit(HWND parent, UINT id) {
+	m_hwnd_ = GetDlgItem(parent, id);
+	assert(m_hwnd_ != NULL);
+	m_id_ = id;
+}
+
 /*
  * @ Description: This method creates the window edit control.
  * @ Parameters:
@@ -128,3 +134,14 @@ bool CEdit::EnableWindow(const BOOL enable /* = TRUE */)
     return false;
 }
 
+int CEdit::CanUndo() {
+	return ::SendMessage(this->m_hwnd_, EM_CANUNDO, (WPARAM)0, (LPARAM)0);
+}
+
+void CEdit::EmptyUndoBuffer() {
+	::SendMessage(this->m_hwnd_, EM_EMPTYUNDOBUFFER, (WPARAM)0, (LPARAM)0);
+}
+
+void CEdit::Empty() {
+	::SetWindowText(m_hwnd_, "");
+}

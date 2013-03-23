@@ -46,6 +46,12 @@ public:
 		const char *password, std::string &information);
     void Disconnect();
 	void DeleteSpace(const char * src, char * des);
+	bool SetAutoCommit(bool is_auto_commit);
+	bool Commit();
+	bool RollBack();
+	bool ExecSQLProc(const char * sql_proc, std::string &error);
+    bool IsSQLProcRetRight(std::string &error);
+	bool BindReturn();
 
 protected:
 	inline bool is_connect();
@@ -55,6 +61,7 @@ protected:
 	char *GetDatePartString(const char *datepart);
 
 protected:
+	ULONG m_auto_commit_;      /* 事务自动提交指针*/
 	SQLHENV m_henv_;           /* 环境句柄 */
     SQLHDBC m_hdbc_;           /* 连接句柄 */ 
 	SQLHSTMT m_hstmt_;         /* 语句句柄 */

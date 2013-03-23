@@ -20,6 +20,8 @@ public:
     inline short permission() const;
     inline char* password();
     inline char* name();
+	inline char* staff_name();
+	inline char* no();
 	inline char* permission_name();
     virtual bool BindingParameter();
     short GetUserPermission(std::string user_name,
@@ -31,16 +33,22 @@ public:
 	bool ModifyPasswd(std::string user_name, std::string password);
 	std::string Encrypt(const char *src, int shift, int len);
 protected:
+	void Initialization();
     virtual	bool BindingParameter(bool is_add, std::string &error_info);
 	bool CheckLoginUser(LoginUser * login_user, std::string &error_info);
 	bool SetLoginUser(LoginUser * login_user, std::string &error_info);
 
 private:
-    char m_name_[20];              /* staff's name in login form */
-    char m_password_[30];          /* staff's password */
+	char m_no_[9];                 /* 登录用户编号，与员工编号相同*/
+	char m_staff_name_[33];        /* 员工姓名*/
+    char m_name_[21];              /* staff's name in login form */
+    char m_password_[31];          /* staff's password */
     short m_permission_;           /* staff's permission */
 	char m_permission_name_[33];       /* staff's permission name */
-	char m_old_name_[20];
+	char m_old_name_[21];
+
+	SQLINTEGER m_sql_no_;
+	SQLINTEGER m_sql_staff_name_;
     SQLINTEGER m_sql_name_;        /* sql type staff's name */
     SQLINTEGER m_sql_password_;    /* sql type staff's password */
     SQLINTEGER m_sql_permission_;  /* sql type staff's permission */
@@ -66,14 +74,36 @@ char* CLoginForm::password()
     return m_password_;
 }
 
+
+/*
+ * 说明: 获取用户编号
+ * 返回值: 用户编号
+ **/
+char*  CLoginForm::no()
+{
+	return m_no_;
+}
+
 /*
  * 说明: 获取用户姓名
  * 返回值: 用户姓名字符串
  **/
 char* CLoginForm::name()
 {
+	DeleteSpace(m_name_, m_name_);
     return m_name_;
 }
+
+/*
+ * 说明: 获取员工姓名
+ * 返回值: 员工姓名字符串
+ **/
+char* CLoginForm::staff_name()
+{
+	DeleteSpace(m_staff_name_, m_staff_name_);
+    return m_staff_name_;
+}
+
 
 /*
  * 说明: 获取用户权限的具体内容

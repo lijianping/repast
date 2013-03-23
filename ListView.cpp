@@ -19,6 +19,21 @@ CListView::CListView()
     InitCommonControlsEx(&icex);
 }
 
+CListView::CListView(HWND hwnd, UINT id)
+: m_hwnd_(NULL),
+m_new_process_(NULL),
+m_old_process_(NULL),
+m_is_set_process_(false)
+{
+    INITCOMMONCONTROLSEX icex;
+    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icex.dwICC  = ICC_TREEVIEW_CLASSES;
+    InitCommonControlsEx(&icex);
+	m_hwnd_ = GetDlgItem(hwnd, id);
+	assert(m_hwnd_ != NULL);
+	m_id_ = id;
+}
+
 CListView::~CListView()
 {
 

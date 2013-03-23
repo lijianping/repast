@@ -14,6 +14,12 @@ CComboBox::CComboBox()
 
 }
 
+CComboBox::CComboBox(HWND hwnd, UINT id) {
+	m_hwnd_ = ::GetDlgItem(hwnd, id);
+	assert(m_hwnd_ != NULL);
+	m_id_ = id;
+}
+
 CComboBox::~CComboBox()
 {
 

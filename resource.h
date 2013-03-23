@@ -33,6 +33,7 @@
 #define IDD_TAB_BASIC_INFO              120
 #define IDD_EDIT_COMMODITY              121
 #define IDD_EDIT_COMMODITY_CATEGORY     122
+#define IDD_EDIT_PERMISSION             123
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -91,17 +92,25 @@
 #define ID_SERVICE_START                1063
 #define IDC_BASIC_INFO_ADD              1063
 #define IDC_COMMODITY_CANCEL            1063
+#define IDC_E_PERMISSION_ADD            1063
 #define IDC_BUTTON2                     1064
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
 #define IDC_BASIC_INFO_MODIFY           1064
+#define IDC_QUERY_DETAIL                1064
+#define IDC_E_PERMISSION_MODIFY         1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
 #define IDC_BASIC_INFO_DELETE           1065
+#define IDC_E_PERMISSION_DELETE         1065
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
 #define IDC_BASIC_EDIT_CATEGORY         1066
+#define IDC_DELETE_PERMISSION           1066
+#define IDC_E_PERMISSION_CANCEL         1066
+#define IDC_EDIT_PERMISSION             1066
+#define ID_SERVICE_BOOK                 1067
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_START_TABLE                 1071
@@ -120,6 +129,7 @@
 #define IDC_MODIFY_USER                 1082
 #define IDC_                            1083
 #define IDC_CONSUMPTION                 1083
+#define IDC_E_END_TIME                  1083
 #define IDC_CHOICE_YEAR                 1084
 #define IDC_CHOICE_DATE                 1085
 #define IDC_YEAR                        1086
@@ -130,16 +140,21 @@
 #define IDC_USER_PASSWD                 1095
 #define IDC_USER_PASSWD2                1096
 #define IDC_SYS_MANAGEMENT              1097
+#define IDC_USER_NAME2                  1097
 #define IDC_PERSONNEL_MANAGEMENT        1098
+#define IDC_USER_PERMISSION             1098
 #define IDC_STOCK_MANAGEMENT            1099
+#define IDC_USER_NAME3                  1099
 #define IDC_DESK_MANAGEMENT             1100
 #define IDC_E_ADD_USER                  1101
 #define IDC_E_MODIFY_USER               1102
 #define IDC_E_DELETE_USER               1103
 #define IDC_E_CANCEL                    1104
 #define IDC_E_USER_NAME                 1105
+#define IDC_E_STAFF_NAME1               1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
+#define IDC_E_USER_NAME2                1108
 #define IDC_LIST1                       1110
 #define IDC_EDIT1                       1111
 #define IDC_EDIT2                       1112
@@ -169,7 +184,9 @@
 #define IDC_BASIC_INFO                  1137
 #define IDC_S_BASIC_INFO_OPERATE        1140
 #define IDC_TREE_COMMODITY              1141
+#define IDC_CHECKOUT_TABLE_NO           1142
 #define IDC_E_S_COMMODITY               1143
+#define IDC_MENU_TREE                   1144
 #define IDC_E_S_COMMODITY_ID            1146
 #define IDC_E_S_COMMODITY_NAME          1147
 #define IDC_E_COMMODITY_NAME            1148
@@ -185,13 +202,24 @@
 #define IDC_E_COMMODITY_UNIT            1159
 #define IDC_E_COMMODITY_SALE            1160
 #define IDC_CATEGORY_DELETE             1167
-#define IDC_CATEGORY_SAVE               1168
+#define IDC_CATEGORY_ADD                1168
 #define IDC_CATEGORY_CANCEL             1169
 #define IDC_S_COMMODITY_CATEGORY        1170
 #define IDC_S_CATEGORY_NAME             1171
 #define IDC_S_CATEGORY_ID               1172
 #define IDC_E_CATEGORY_ID               1173
 #define IDC_E_CATEGORY_NAME             1174
+#define IDC_CATEGORY_MODIFY             1175
+#define IDC_START_DATE                  1176
+#define IDC_END_DATE                    1177
+#define IDC_E_START_TIME                1177
+#define IDC_E_USER_ID                   1178
+#define IDC_E_USER_PERMISSION           1179
+#define IDC_S_PERMISSION                1180
+#define IDC_S_PERMISSION_NO             1181
+#define IDC_S_PERMISSION_NAME           1182
+#define IDC_E_PERMISSION_NO             1183
+#define IDC_E_PERMISSION_NAME           1184
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -200,9 +228,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_RESOURCE_VALUE        124
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1174
+#define _APS_NEXT_CONTROL_VALUE         1184
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

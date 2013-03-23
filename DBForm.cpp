@@ -17,6 +17,7 @@ CDBForm::CDBForm()
 	  m_pro_ret(0),
 	  m_return_code_(0)
 {
+	m_auto_commit_ = SQL_AUTOCOMMIT_ON;
 	std::string error;
 	assert(true == this->Connect("repast", "repast", "repast", error));
 }
@@ -315,6 +316,8 @@ void CDBForm::SetSQLStatement(const std::string statement)
 	m_query_sql_ = statement;
 }
 
+
+
 bool CDBForm::Connect(const char *dsn, const char *id, 
 					  const char *password, std::string &information)
 {
@@ -326,6 +329,7 @@ bool CDBForm::Connect(const char *dsn, const char *id,
         information = "分配环境句柄失败!";
         return false;
     }
+
     /* 设置ODBC版本的环境属性 */
     m_return_code_ = SQLSetEnvAttr(m_henv_, SQL_ATTR_ODBC_VERSION,
         (void *)SQL_OV_ODBC3, 0);
@@ -343,6 +347,15 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 		information = "分配连接句柄失败!";
         return false;
     }
+    /* 设置数据库事务提交方式，默认为自动提交方式*/
+	m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)m_auto_commit_, SQL_IS_POINTER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+        information = "设置数据库手动提交失败！";
+        return false;
+    }
+
 	/*设置连接属性（登录超时：5s)*/
     m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_LOGIN_TIMEOUT, (void *)5, 0);
     if ((m_return_code_ != SQL_SUCCESS) &&
@@ -601,4 +614,149 @@ void CDBForm::DeleteSpace(const char * src, char * des)
 		*des++=*src++;
 	}
 	*des='\0';
+}
+
+
+ /*
+  * 说明：
+  *       设置事务提交方式，默认为自动提交
+  * 参数：
+  *       is_auto_commit   [in]  ture为自动提交，false为手动提交
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+bool CDBForm::SetAutoCommit(bool is_auto_commit)
+{
+	if (true == is_auto_commit)
+	{
+		m_auto_commit_ = SQL_AUTOCOMMIT_ON;
+	}
+	else
+	{
+		m_auto_commit_ = SQL_AUTOCOMMIT_OFF;
+	}
+	/* 设置数据库事务提交方式，默认为自动提交方式*/
+	m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)m_auto_commit_, SQL_IS_POINTER);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		std::string error;
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, error);
+        return false;
+    }
+	return true;
+}
+
+
+ /*
+  * 说明：
+  *       事务提交，用于在程序中控制SQL语句的执行，使用前需要设置事务的提交方式为手动提交
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+bool CDBForm::Commit()
+{
+	
+	m_return_code_ = SQLEndTran(SQL_HANDLE_DBC, m_hdbc_, SQL_COMMIT);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		std::string error;
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, error);
+        return false;
+    }
+	return true;
+}
+
+ /*
+  * 说明：
+  *       事务回滚，用于在程序中回滚执行的SQL语句，使用前需要设置事务的提交方式为手动提交
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+bool CDBForm::RollBack()
+{
+	m_return_code_ = SQLEndTran(SQL_HANDLE_DBC, m_hdbc_, SQL_ROLLBACK);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		std::string error;
+		ReportError(m_hdbc_, SQL_HANDLE_DBC, error);
+        return false;
+    }
+	return true;
+}
+
+
+ /*
+  * 说明：
+  *      执行需要返回参数的存储过程
+  * 参数：
+  *      sql_proc [in] 执行的存储过程语句， 形如：“{? = call 存储过程名(?,?.........)}”
+  *      error    [out] 记录错误信息
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+ bool CDBForm::ExecSQLProc(const char * sql_proc, std::string &error)
+ {
+	/*执行存储过程*/
+	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
+		error = "执行修改用户存储过程出错!";
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		return false;
+    }
+ 	return true;
+ }
+
+
+ /*
+  * 说明：
+  *      判断存储过程执行是否成功
+         若是存储过程的返回值和其他数据记录集一起返回，
+  *      请先取数据记录集里的数据，再调用此函数判断存储过程的执行是否成功
+  * 参数：
+  *      error    [out] 记录错误信息
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+bool CDBForm::IsSQLProcRetRight(std::string &error)
+{
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
+	}
+	if (0 == m_pro_ret)
+	{
+		return true;
+	}
+	else if (2627 == m_pro_ret )
+	{
+		error="字段重复！请更正为不同的值！";
+		return false;
+	}
+	else
+	{
+		char ret[10];
+		sprintf(ret, "%d",m_pro_ret);
+		error="未处理错误：存储过程返回值->";
+		error+=ret;
+		return false;
+	}
+	return true;
+}
+
+/*
+ * @ brief: 绑定返回值
+ * @ return: 若成功返回true，否则返回false
+ *           当执行失败时，可立即通过ReportError函数获取错误信息
+ **/
+bool CDBForm::BindReturn() {
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SHORT,\
+		                              SQL_INTEGER, 0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
+	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
+		return true;
+	}
+	return false;
 }

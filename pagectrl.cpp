@@ -25,3 +25,14 @@ BOOL PageCtrl::MoveWindow(const RECT rect) {
 BOOL PageCtrl::ShowWindow(int show_state) {
 	return ::ShowWindow(hwnd_, show_state);
 }
+
+HWND PageCtrl::hwnd() const {
+	return hwnd_;
+}
+
+COLORREF PageCtrl::SetBKColor(COLORREF color) {
+	HDC hdc = ::GetDC(hwnd_);
+	COLORREF cr = ::SetBkColor(hdc, color);
+	::ReleaseDC(hwnd_, hdc);
+	return cr;
+}

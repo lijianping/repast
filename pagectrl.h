@@ -13,6 +13,8 @@ public:
 	bool CreatePage(HINSTANCE hInstance, HWND hwnd, UINT id, DLGPROC func);
 	BOOL MoveWindow(const RECT rect);
 	BOOL ShowWindow(int show_state);
+	COLORREF SetBKColor(COLORREF color);
+	HWND hwnd() const;
 
 private:
 	HWND hwnd_;

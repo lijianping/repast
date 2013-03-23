@@ -4,12 +4,14 @@
 #include <string>
 #include <WINDOWS.H>
 #include <COMMCTRL.H>
+#include <ASSERT.H>
 #pragma comment(lib, "comctl32.lib")
 
 class CListView  
 {
 public:
 	CListView();
+	CListView(HWND hwnd, UINT id);
 	virtual ~CListView();
     inline void set_new_process(WNDPROC process);
     inline WNDPROC old_process();

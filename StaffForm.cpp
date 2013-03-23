@@ -358,22 +358,22 @@ bool CStaffForm::CheckStaff(STAFFINFO * staff_info,std::string &error_info)
 	}
 	if (NULL == strchr(staff_info->email_address.c_str(), '@'))
 	{
-		error_info = "员工邮箱格式不正确，请仔细检查";
+		error_info = "员工邮箱格式不正确，请仔细检查！";
 		return false;
 	}
 	if (strlen(staff_info->email_address.c_str())>sizeof(m_mailbox_)-1)
 	{
-		error_info = "员工邮箱地址太长，正确输入";
+		error_info = "员工邮箱地址太长，正确输入！";
 		return false;
 	}
-	if (strlen(staff_info->phone.c_str())>sizeof(m_phone_num_)-1)
+	if (staff_info->phone.length() != 11)
 	{
-		error_info = "员工的电话号码太长，请适当减少输入";
+		error_info = "员工电话号码为11位，请修正！";
 		return false;
 	}
 	if (strlen(staff_info->address.c_str())>sizeof(m_address_)-1)
 	{
-		error_info = "员工地址长度太长，请适当减少输入";
+		error_info = "员工地址长度太长，请适当减少输入！";
 		return false;
 	}
 	return true;
@@ -429,4 +429,36 @@ bool CStaffForm::SetStaff(STAFFINFO * staff_info,std::string &error_info)
 		return false;
 	}
 	return true;
+}
+
+bool CStaffForm::GetStaffNo(std::string &err_info) {
+	m_sql_pro_ret = SQL_NTS;
+	m_sql_id_ = SQL_NTS;
+// 	if (!BindReturn()) {
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+// 		return false;
+// 	}
+	if (!ExecSQLProc("{call GetStaffNo}", err_info)) {
+		return false;
+	}
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_id_, sizeof(m_id_), &m_sql_id_);
+	return MoveFirst();
+}
+
+bool CStaffForm::GetStaffName(const char *no, std::string &err_info) {
+	m_sql_name_ = SQL_NTS;
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+		                              sizeof(m_id_) - 1, 0, m_id_, sizeof(m_id_), &m_sql_id_);
+	strcpy(m_id_, no);
+	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
+		if (ExecSQLProc("{call GetStaffName(?)}", err_info)) {
+			MoveFirst();
+			m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+		                              sizeof(m_name_) - 1, 0, m_name_, sizeof(m_name_), &m_sql_name_);
+			if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
+				return true;
+			}
+		}
+	}
+	return false;
 }

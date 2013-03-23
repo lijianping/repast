@@ -614,7 +614,6 @@ std::string GetQueryStatement(const HWND parent_hwnd)
 bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &error)
 {
 	CStaffForm staff;
-	staff.Connect("repast", "repast", "repast", error);
 	if (!staff.ExecuteSQL(sql_query, error))
 	{
 	//	MessageBox(hwnd,error.c_str(),"error",MB_ICONINFORMATION|MB_OK);
@@ -660,8 +659,6 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 			item++;
 		}
 	}
-	/* Disconnect from database */
-	staff.Disconnect();
 	return true;
 }
 

@@ -12,7 +12,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
 {
     HINSTANCE hinstance = (HINSTANCE)lParam;  /* The program handle */
-    long return_value = 0;
+  
     switch (message)
     {
     case WM_INITDIALOG:
@@ -44,7 +44,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
             switch (LOWORD(wParam))
             {
             case IDOK:
-                {
+                {  long return_value = 0;
                     TCHAR user_name[256];
                     TCHAR user_password[128];
                     memset(user_name, 0, sizeof(user_name));
@@ -66,6 +66,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
 						std::string error_information;
                         std::string name(user_name);
                         std::string password(user_password);
+						  
                         return_value = login.GetUserPermission(name, password,
                                                                     error_information);
                         if (0 == return_value)
@@ -76,6 +77,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                         }
 						g_login_name = name;
                     }
+
                     EndDialog(hwnd, return_value);
                     break;
                 }
