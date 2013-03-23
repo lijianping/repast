@@ -3,13 +3,16 @@
 
 #include "DBForm.h"
 
+// 登录用户信息 -- 用户管理 增加修改功能使用 
 struct LoginUser
 {
-	std::string user_name;
-	std::string user_old_name;
-	std::string user_passwd;
-	std::string user_permission_name;
-	UINT menu_id;
+	UINT menu_id;            // 选项按钮id
+	std::string staff_no;    // 员工编号
+	std::string login_name;  // 用户登录名
+	std::string new_login_name; // 修改后的用户登录名
+	std::string login_permission; // 用户登录权限
+	std::string password1;     // 用户密码
+	std::string password2;     // 用户确认密码
 };
 
 class CLoginForm : public CDBForm  
@@ -28,6 +31,7 @@ public:
                             std::string user_password,
                             std::string &information);
 	bool InsertInfo(LoginUser *login_user, std::string &error_info);
+	bool AddUser(LoginUser *login_user, std::string &err_info);
 	bool DeleteInfo(std::string user_name, std::string &error_info);
 	bool UpdateInfo(LoginUser *login_user, std::string &error_info);
 	bool ModifyPasswd(std::string user_name, std::string password);
@@ -40,19 +44,21 @@ protected:
 
 private:
 	char m_no_[9];                 /* 登录用户编号，与员工编号相同*/
+	char m_staff_no_[9];           /* 员工编号 */
 	char m_staff_name_[33];        /* 员工姓名*/
-    char m_name_[21];              /* staff's name in login form */
-    char m_password_[31];          /* staff's password */
-    short m_permission_;           /* staff's permission */
-	char m_permission_name_[33];       /* staff's permission name */
+    char m_name_[21];              /* 用户登录名 */
+    char m_password_[31];          /* 用户密码 */
+    short m_permission_;           /* 用户权限 */
+	char m_permission_name_[33];       /* 用户权限名称 */
 	char m_old_name_[21];
 
+	SQLINTEGER staff_no_len_;   // 对应员工编号
 	SQLINTEGER m_sql_no_;
 	SQLINTEGER m_sql_staff_name_;
-    SQLINTEGER m_sql_name_;        /* sql type staff's name */
-    SQLINTEGER m_sql_password_;    /* sql type staff's password */
+    SQLINTEGER name_len_;        // 对应用户登录名
+    SQLINTEGER password_len_;    // 对应用户密码
     SQLINTEGER m_sql_permission_;  /* sql type staff's permission */
-	SQLINTEGER m_sql_permission_name_; /* sql type staff's permission name */
+	SQLINTEGER permission_name_len_; // 对应用户权限名称
 	SQLINTEGER m_sql_old_name_;
 };
 

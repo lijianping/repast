@@ -445,6 +445,12 @@ bool CStaffForm::GetStaffNo(std::string &err_info) {
 	return MoveFirst();
 }
 
+/*
+ * @ brief: 获取员工姓名
+ * @ param: no [in] 员工编号指针
+ * @ param: err_info [out] 出错时的错误信息
+ * @ return: 执行成功返回ture，否则返回false
+ **/
 bool CStaffForm::GetStaffName(const char *no, std::string &err_info) {
 	m_sql_name_ = SQL_NTS;
 	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
@@ -452,9 +458,8 @@ bool CStaffForm::GetStaffName(const char *no, std::string &err_info) {
 	strcpy(m_id_, no);
 	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
 		if (ExecSQLProc("{call GetStaffName(?)}", err_info)) {
+			m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
 			MoveFirst();
-			m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
-		                              sizeof(m_name_) - 1, 0, m_name_, sizeof(m_name_), &m_sql_name_);
 			if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
 				return true;
 			}

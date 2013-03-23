@@ -145,3 +145,13 @@ void CEdit::EmptyUndoBuffer() {
 void CEdit::Empty() {
 	::SetWindowText(m_hwnd_, "");
 }
+
+/*
+ * @ brief: 设置编辑框为只读模式
+ * @ param: read_only [in] 若为true则表示为只读模式，否则为去掉只读模式
+ * @ return: 若成功返回true，否则返回false
+ **/
+bool CEdit::SetReadOnly(bool read_only /* = true */) {
+	int ret = ::SendMessage(m_hwnd_, EM_SETREADONLY, (WPARAM)&read_only, 0);
+	return (ret != 0);
+}

@@ -97,10 +97,12 @@
 #define ID_SERVICE_CHANGE               1064
 #define IDC_BASIC_INFO_MODIFY           1064
 #define IDC_QUERY_DETAIL                1064
+#define IDC_PERMISSION_ADD              1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
 #define IDC_BASIC_INFO_DELETE           1065
+#define IDC_PERMISSION_ADD2             1065
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
 #define IDC_BASIC_EDIT_CATEGORY         1066
@@ -147,9 +149,12 @@
 #define IDC_E_CANCEL                    1104
 #define IDC_E_USER_NAME                 1105
 #define IDC_E_STAFF_NAME1               1105
+#define IDC_E_PERMISSION_NAME           1105
+#define IDC_E_STAFF_NAME                1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
 #define IDC_E_USER_NAME2                1108
+#define IDC_E_LOGIN_NAME                1108
 #define IDC_LIST1                       1110
 #define IDC_EDIT1                       1111
 #define IDC_EDIT2                       1112
@@ -210,6 +215,10 @@
 #define IDC_E_START_TIME                1177
 #define IDC_E_USER_ID                   1178
 #define IDC_E_USER_PERMISSION           1179
+#define IDC_S_PERMISSION                1180
+#define IDC_S_PERMISSION_NO             1181
+#define IDC_S_PERMISSION_NAME           1182
+#define IDC_E_PERMISSION_NO             1183
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -220,7 +229,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        124
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1180
+#define _APS_NEXT_CONTROL_VALUE         1184
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
