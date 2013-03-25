@@ -15,6 +15,7 @@ public:
 	virtual ~ChildCateForm();
 	void Initialize();
 	bool GetChildCateName(const char *name, std::string &err_info);
+	inline char *cate_name();
 
 private:
 	short cate_no_;      // 商品子分类编号
@@ -27,4 +28,9 @@ private:
 	SQLINTEGER sql_main_cate_name_;// 对应main_cate_name_
 };
 
+char* ChildCateForm::cate_name()
+{
+	DeleteSpace(cate_name_, cate_name_);
+	return cate_name_;
+}
 #endif
