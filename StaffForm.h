@@ -6,7 +6,7 @@
 typedef struct StaffInfo
 {
 	UINT menu_id;
-	std::string old_id;/*保存原来的ID，在修改员工信息时使用*/
+	std::string old_id;/* 保存原来的ID，在修改员工信息时使用 */
     std::string id;
     std::string name;
     std::string sex;

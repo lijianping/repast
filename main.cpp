@@ -4,7 +4,7 @@
 #include "childwindowid.h"
 #include "basic_info.h"
 #include "manager.h"
-#include <SkinPPWTL.h>
+//#include <SkinPPWTL.h>
 
 
 bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect);
@@ -22,7 +22,7 @@ extern std::string g_login_name;
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nShowCmd)
 {
-	skinppLoadSkin(TEXT("skin/Royale.ssk"));  // ¼ÓÔØÆ¤·ô
+//	skinppLoadSkin(TEXT("skin/Royale.ssk"));  // ¼ÓÔØÆ¤·ô
 	g_hinstance = hInstance;
     std::string information;
 
@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	{
 		DialogBox(hInstance, MAKEINTRESOURCE(IDD_SYS_MANAGEMENT), NULL, (DLGPROC)ManagerProcesses);
 	}
-	skinppExitSkin();  // ÍË³ö
+//	skinppExitSkin();  // ÍË³ö
     return 0;
 }
 

@@ -181,12 +181,12 @@ BOOL CALLBACK ConsumeDetailProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static LoginUser *login_user;
+	static LoginUser login_user_info;  
 	switch (msg)
 	{
 	case WM_INITDIALOG:
 		{
-			login_user = (LoginUser *)lParam;
+			LoginUser *login_user = (LoginUser *)lParam;  // TODO: 传值
 			CButton button;
 			CPermission all_permission;
 			CComboBox permission_combo;
@@ -303,7 +303,7 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					user.user_name = std::string(name);
 					user.user_permission_name = permission_name;
 					user.user_passwd = p1;
-					user.user_old_name  = login_user->user_old_name;
+					user.user_old_name  = login_user->user_old_name;   // TODO: 有问题
 					if (false == login_form.UpdateInfo(&user, error))
 					{
 						MessageBox(hwnd, error.c_str(), TEXT("修改用户信息失败！"), MB_OK);

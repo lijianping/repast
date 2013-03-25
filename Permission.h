@@ -2,12 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_PERMISSION_H__E423BCD8_03A6_429D_852C_BA4C674D6EF5__INCLUDED_)
-#define AFX_PERMISSION_H__E423BCD8_03A6_429D_852C_BA4C674D6EF5__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef REPAST_PERMISSION_H_
+#define REPAST_PERMISSION_H_
 
 #include "DBForm.h"
 
@@ -36,4 +32,4 @@ char* CPermission::name()
 	return m_name_;
 }
 
-#endif // !defined(AFX_PERMISSION_H__E423BCD8_03A6_429D_852C_BA4C674D6EF5__INCLUDED_)
+#endif 
