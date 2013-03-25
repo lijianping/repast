@@ -85,15 +85,11 @@ bool CDBForm::SQLAllocHandleStmt(std::string &error_info)
 
 /*
  * 说明: 判断是否到了记录集的结尾
- * 返回值: 到了结尾返回true，否则返回false
+ * 返回值: 若没有数据返回true，有数据返回false
  */
 bool CDBForm::IsEOF()
 {
-    if (SQL_NO_DATA == m_return_code_)
-    {
-        return true;
-    }
-    return false;
+	return FetchData();
 }
 
 /*
@@ -758,8 +754,11 @@ bool CDBForm::BindReturn() {
 	return false;
 }
 
-void CDBForm::FetchData() {
-	SQLRETURN sql_ret = SQLFetch(m_hstmt_);
-	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO)
+bool CDBForm::FetchData() {
+	m_return_code_ = SQLFetch(m_hstmt_);
+	if (m_return_code_ == SQL_NO_DATA) {
+		return true;
+	}else if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
 		LTHROW(FETCH_ROWSET_ERROR)
+	return false;
 }

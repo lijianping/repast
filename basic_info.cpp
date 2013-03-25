@@ -29,30 +29,30 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
  				MessageBox(hwnd, error.c_str(), TEXT("获取商品主分类出错"), MB_OK);
  				return TRUE;
  			}
-			while(!comodity_main.IsEOF())
-			{
-				std::string main_name(comodity_main.name());
-				tree_parent = commodity_tree.InsertRootItem(main_name.c_str()); // 插入主分类节点
-				ChildCateForm comdity_child;//子商品分类
-				if (comdity_child.GetChildCateName(comodity_main.name(), error)) {       // 获取主分类对应的子分类名称
-					while(!comdity_child.IsEOF())
-					{
-						std::string child_name(comdity_child.cate_name());
-						commodity_tree.InsertChildItem(tree_parent, child_name.c_str());// 根据商品分类名称查询商品，再插入相应的根节点下
-						comdity_child.MoveNext();
-						CCommodity comdity;
-						bool is_ok = false;
-						try {
-							is_ok = comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
-						} catch(Err &err) {
-							MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
+			try {
+				while(!comodity_main.IsEOF())
+				{
+					std::string main_name(comodity_main.name());
+					tree_parent = commodity_tree.InsertRootItem(main_name.c_str()); // 插入主分类节点
+					ChildCateForm comdity_child;//子商品分类
+					if (comdity_child.GetChildCateName(comodity_main.name(), error)) {       // 获取主分类对应的子分类名称
+						while(!comdity_child.IsEOF())
+						{
+							std::string child_name(comdity_child.cate_name());
+							HTREEITEM child_node;
+							// 根据商品分类名称查询商品，再插入相应的根节点下
+							child_node = commodity_tree.InsertChildItem(tree_parent, child_name.c_str());
+							CCommodity comdity;
+							comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
+							while (!comdity.IsEOF()) {
+								commodity_tree.InsertChildItem(child_node, comdity.name());
+							}
 						}
-						std::string comdity_name(comdity.name());
 					}
-				}
- 				comodity_main.MoveNext();
-
-			}  
+				} 
+			} catch(Err &err) {
+				MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
+			}
 	//		InitCommodityTree(hwnd, IDC_TREE_COMMODITY);/*TODO:尚未定义*/
 //			InitBasicInfoList(hwnd, IDC_BASIC_INFO);
 //			ShowCommodity(hwnd);/*执行查询，显示查询结果*/

@@ -43,13 +43,10 @@ bool ChildCateForm::GetChildCateName(const char *name, std::string &err_info)
 	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
 		sizeof(main_cate_name_) - 1, 0, main_cate_name_, sizeof(main_cate_name_), &sql_main_cate_name_);
 	strcpy(main_cate_name_, name);
-// 	char sql[512];
-// 	memset(sql, 0, sizeof(sql));
-// 	sprintf(sql, "exec GetChildCateNameByMainCateName '%s'", name);
+
 	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
 		if (ExecSQLProc("{? = call GetChildCateNameByMainCateName(?)}"/* sql*/, err_info)) {
 			m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, cate_name_, sizeof(cate_name_), &sql_cate_name_);
-			SQLFetch(m_hstmt_);
 			if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
 				return true;
 			}

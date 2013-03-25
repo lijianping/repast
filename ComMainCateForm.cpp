@@ -38,8 +38,6 @@ bool ComMainCateForm::GetMainCateName() {
 	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-	sql_ret = SQLFetch(m_hstmt_);
-//	sql_ret = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
 	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) {
 		std::string err_info;
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
