@@ -53,7 +53,7 @@ public:
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
     bool IsSQLProcRetRight(std::string &error);
 	bool BindReturn();
-	void FetchData();
+	bool FetchData();
 
 
 protected:
