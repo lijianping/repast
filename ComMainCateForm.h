@@ -20,6 +20,11 @@ public:
 	inline char* name();
 	virtual bool BindingParameter();//绑定主商品分类的所有字段
 	bool GetMainCategoryName(std::string &error);//获取主商品分类名称
+	virtual bool BindingParameter(bool is_add, std::string &error_info);
+    bool InsertCategory(std::string id, std::string name,std::string &error);
+    bool UpdateCategory(std::string old_id, std::string id, std::string name,std::string &error);
+	bool DeleteCategory(std::string id,std::string &error);
+	bool CheckCategory(std::string id, std::string name, std::string &error);
 private: 
 	short m_no_;             //主商品分类编号
 	short m_old_no_;         //原来的主商品分类编号，用于修改主商品分类信息
