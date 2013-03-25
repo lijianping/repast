@@ -10,16 +10,7 @@
 
 CCommodity::CCommodity()
 {  
-	 m_sql_no_ = SQL_NTS;
-	 m_sql_name_ = SQL_NTS;
-	 m_sql_purchase_price_ = SQL_NTS;
-	 m_sql_sum_ = SQL_NTS;
-	 m_sql_category_ = SQL_NTS;
-	 m_sql_unit_ = SQL_NTS;
-	 m_sql_sale_price_ = SQL_NTS;
-	 m_sql_register_date_ = SQL_NTS;
-//	m_query_sql_ =  "select Commodity.Cno,Cname,Cprice,Cregisterdate,Csum from Commodity,	CommoditySum where Commodity.Cno=CommoditySum.Cno";
-    m_query_sql_ = "select Cno,Cname,Cpurchase_price,Cquantity,CCname,Cunit,Csale_price,Cregister_date from Commodity,CommodityCategory where Ccategory = CCno";
+	
 }
 
 CCommodity::~CCommodity()
@@ -27,48 +18,50 @@ CCommodity::~CCommodity()
 
 }
 
-bool CCommodity::BindingParameter()
+/*
+ * @ breif: 根据商品的主，次分类名称获取商品名称
+ * @ param: main_name [in] 主分类名
+ * @ param: child_name [in] 次分类名
+ * @ parem: err_info [out] 错误信息
+ * @ return: 若成功返回true，否则返回false
+ **/
+bool CCommodity::GetCommodityNameSet(const char* main_name,
+	                                 const char *child_name,
+	                                 std::string &err_info)
 {
-	/* 绑定列 */
-    SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_no_, sizeof(m_no_), &m_sql_no_);
-	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
-//	SQLBindCol(m_hstmt_, 3, SQL_C_DOUBLE, &m_price_,        sizeof(m_price_),        &m_sql_price_);/*TODO: 将不在使用了*/
-	SQLBindCol(m_hstmt_, 3, SQL_C_DOUBLE, &m_purchase_price_, sizeof(m_purchase_price_), &m_sql_purchase_price_);
-	SQLBindCol(m_hstmt_, 4, SQL_C_LONG, &m_sum_, sizeof(m_sum_), &m_sql_sum_);
-	SQLBindCol(m_hstmt_, 5, SQL_C_CHAR, m_category_, sizeof(m_category_), &m_sql_category_);
-	SQLBindCol(m_hstmt_, 6, SQL_C_CHAR, m_unit_, sizeof(m_unit_), &m_sql_unit_);
-	SQLBindCol(m_hstmt_, 7, SQL_C_DOUBLE, &m_sale_price_, sizeof(m_sale_price_),  &m_sql_sale_price_);
-	SQLBindCol(m_hstmt_, 8, SQL_C_CHAR, m_register_date_, sizeof(m_register_date_), &m_sql_register_date_);
-
-	return true;
-}
-
-bool CCommodity::InsertInfo(char no[9], char name[256], double price, char register_date[21], int sum)
-{
-//	char insert_sql[1024];
-	/*TODO: ADD INSERT*/
+	Initialize();
+	SQLRETURN sql_ret;   // sql 返回类型
+	// 绑定返回值
+	sql_ret = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_INTEGER,\
+		                       0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
+	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_RETURN_ERROR)
+	sql_ret = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR, sizeof(main_name_) - 1,\
+		                       0, main_name_, sizeof(main_name_), &sql_main_name_);
+	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	sql_ret = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR, sizeof(child_name_) - 1,\
+		                       0, child_name_, sizeof(child_name_), &sql_child_name_);
+	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	strcpy(main_name_, main_name);
+	strcpy(child_name_, child_name);
+	ExecSQLProc("{? = call GetCommodityName(?,?)}", err_info);
+	sql_ret = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, name_, sizeof(name_), &sql_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_RECODE_ERROR)
 	return true;
 }
 
 /*
- *说明：
- *     通过商品的分类名，查找对应的商品的记录集
- *参数：
- *    category_name    [in]  商品分类名称
- *返回值：
- *     成功返回对应商品的记录集
- *
+ * @ brief: 初始化数据
  **/
-bool CCommodity::SelectByName(char* name, std::string error)
-{
-	char query[256];
-	sprintf(query, "select Cno,Cname,Cpurchase_price,Cquantity,CCname,Cunit,Csale_price,Cregister_date \
-		from Commodity,CommodityCategory where Ccategory = CCno and (CCname ='%s' or Cname = '%s')", name, name);
-	if (false == ExecuteSQL(query, error))
-	{
-		return false;
-	}
-	BindingParameter();
-	MoveFirst();
-	return true;
+void CCommodity::Initialize() {
+	sql_name_ = SQL_NTS;
+	sql_main_name_ = SQL_NTS;
+	sql_child_name_ = SQL_NTS;
+	m_sql_pro_ret = SQL_NTS;
+	memset(name_, 0, sizeof(name_));
+	memset(main_name_, 0, sizeof(main_name_));
+	memset(child_name_, 0, sizeof(child_name_));
 }

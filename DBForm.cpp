@@ -701,15 +701,10 @@ bool CDBForm::RollBack()
   */
  bool CDBForm::ExecSQLProc(const char * sql_proc, std::string &error)
  {
-	/*执行存储过程*/
+	// 执行存储过程
 	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS);
-	if ((m_return_code_ != SQL_SUCCESS) &&
-		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
-	{
-		error = "执行存储过程出错!";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		return false;
-    }
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+	    LTHROW(EXEC_SQL_PROC_ERROR)
  	return true;
  }
 
@@ -761,4 +756,10 @@ bool CDBForm::BindReturn() {
 		return true;
 	}
 	return false;
+}
+
+void CDBForm::FetchData() {
+	SQLRETURN sql_ret = SQLFetch(m_hstmt_);
+	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO)
+		LTHROW(FETCH_ROWSET_ERROR)
 }

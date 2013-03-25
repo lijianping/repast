@@ -7,6 +7,7 @@
 #ifndef REPAST_DBFORM_H_
 #define REPAST_DBFORM_H_
 
+#include "Err.h"
 #include <WINDOWS.H>
 #include <SQLEXT.H>
 #include <SQLTYPES.H>
@@ -52,6 +53,7 @@ public:
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
     bool IsSQLProcRetRight(std::string &error);
 	bool BindReturn();
+	void FetchData();
 
 
 protected:

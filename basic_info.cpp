@@ -1,5 +1,5 @@
 #include "basic_info.h"
-
+#include "Commodity.h"
 
 
 BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -31,13 +31,23 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
  			}
 			while(!comodity_main.IsEOF())
 			{
-				tree_parent = commodity_tree.InsertRootItem(comodity_main.name()); // 插入主分类节点
+				std::string main_name(comodity_main.name());
+				tree_parent = commodity_tree.InsertRootItem(main_name.c_str()); // 插入主分类节点
 				ChildCateForm comdity_child;//子商品分类
 				if (comdity_child.GetChildCateName(comodity_main.name(), error)) {       // 获取主分类对应的子分类名称
 					while(!comdity_child.IsEOF())
 					{
-						commodity_tree.InsertChildItem(tree_parent, comdity_child.cate_name());// 根据商品分类名称查询商品，再插入相应的根节点下
+						std::string child_name(comdity_child.cate_name());
+						commodity_tree.InsertChildItem(tree_parent, child_name.c_str());// 根据商品分类名称查询商品，再插入相应的根节点下
 						comdity_child.MoveNext();
+						CCommodity comdity;
+						bool is_ok = false;
+						try {
+							is_ok = comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
+						} catch(Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
+						}
+						std::string comdity_name(comdity.name());
 					}
 				}
  				comodity_main.MoveNext();
@@ -372,43 +382,7 @@ bool InitBasicInfoList(HWND parent_hwnd, UINT id)
 
 bool ShowCommodity(HWND hwnd)
 {
-	CCommodity commodity;
-	commodity.GetRecordSet();
-	/* Move to the first of the record set */
-	commodity.MoveFirst();  
-	if (0 == strcmp("",commodity.no()))
-	{
-		CListView staff_list;
-		/* Initialization the list view object */
-		staff_list.Initialization(hwnd, IDC_BASIC_INFO);
-		/* Clean the list view */
-		staff_list.DeleteAllItems();
-	//	error = "无匹配结果！";
-		return false;
-	}
-	else
-	{
-		CListView staff_list;
-		/* Initialization the list view object */
-		staff_list.Initialization(hwnd, IDC_BASIC_INFO);
-		/* Clean the list view */
-		staff_list.DeleteAllItems();
-		int item = 0;
-		while (!commodity.IsEOF())
-		{
-			/* Insert item(s) into the list view */
-			staff_list.InsertItem(item, commodity.no());
-			staff_list.SetItem(item, 1, commodity.name());
-			staff_list.SetItem(item, 2, commodity.purchase_price());
-			staff_list.SetItem(item, 3, commodity.sum());
-			staff_list.SetItem(item, 4, commodity.unit());
-			staff_list.SetItem(item, 5, commodity.category());
-			staff_list.SetItem(item, 6, commodity.sale_price());
-			staff_list.SetItem(item, 7, commodity.register_date());
-			commodity.MoveNext();
-			item++;
-		}
-	}
+	
 	return true;
 }
 

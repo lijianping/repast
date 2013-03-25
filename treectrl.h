@@ -13,8 +13,8 @@ public:
 	TreeCtrl(HWND hwnd, UINT id);
 	~TreeCtrl();
 	bool Initialization(HWND hwnd, UINT id);
-	HTREEITEM InsertRootItem(char *text);
-	HTREEITEM InsertChildItem(HTREEITEM select, char *text);
+	HTREEITEM InsertRootItem(const char *text);
+	HTREEITEM InsertChildItem(HTREEITEM select, const char *text);
 	HTREEITEM GetSelectedItem();
 	bool DeleteItem(HTREEITEM item);
 	bool DeleteAllItems();
