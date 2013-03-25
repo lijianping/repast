@@ -8,6 +8,7 @@
 //#include <SkinPPWTL.h>
 
 
+
 bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect);
 BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

@@ -14,6 +14,7 @@
 #include "pagectrl.h"
 #include "CommodityCategoryForm.h"//TODO:½«±»É¾³ý
 #include "ComMainCateForm.h"
+#include "hildCateForm.h"
 
 BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

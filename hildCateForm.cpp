@@ -26,6 +26,7 @@ void ChildCateForm::Initialize()
 	this->sql_cate_no_ = SQL_NTS;
 	this->sql_main_cate_no_ = SQL_NTS;
 	this->sql_cate_name_ = SQL_NTS;
+	this->sql_main_cate_name_ = SQL_NTS;
 }
 
 
@@ -49,7 +50,7 @@ bool ChildCateForm::GetChildCateName(const char *name, std::string &err_info)
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
     {
-        err_info = "绑定员工编号失败!";
+        err_info = "绑定主分类名称失败!"; 
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
         return false;
     }

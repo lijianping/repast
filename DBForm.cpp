@@ -704,7 +704,7 @@ bool CDBForm::RollBack()
 	if ((m_return_code_ != SQL_SUCCESS) &&
 		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
 	{
-		error = "执行修改用户存储过程出错!";
+		error = "执行存储过程出错!";
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
 		return false;
     }
