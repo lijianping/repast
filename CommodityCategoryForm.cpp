@@ -14,7 +14,7 @@ CCommodityCategoryForm::CCommodityCategoryForm()
 	 m_sql_name_ = SQL_NTS;
 	 m_sql_old_no = SQL_NTS;
 	 m_query_sql_ = "select * from CommodityCategory";
-
+	 
 }
 
 CCommodityCategoryForm::~CCommodityCategoryForm()

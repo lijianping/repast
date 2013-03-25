@@ -34,7 +34,7 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 	{
 	case WM_INITDIALOG:
 		{
-//			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
+			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
 //			InitComboBox(hwnd, ID_SERVICE_COMBO);
 			std::string error_info;
 //			SetListInfo(hwnd, ID_SERVICE_LIST, "01", error_info);
@@ -207,7 +207,8 @@ bool InitListView(const HWND hwnd, UINT id)
 	if (-1 != table_list.InsertColumn(0, 80, "台号") &&
 		-1 != table_list.InsertColumn(1, 80, "状态") &&
 		-1 != table_list.InsertColumn(2, 150, "顾客编号") &&
-		-1 != table_list.InsertColumn(3, 150, "开台时间"))
+		-1 != table_list.InsertColumn(3, 100, "顾客人数")&&
+		-1 != table_list.InsertColumn(4, 150, "开台时间"))
 	{
 		return true;
 	}
