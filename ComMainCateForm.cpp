@@ -45,10 +45,15 @@ bool CComMainCateForm::BindingParameter()
  */
 bool CComMainCateForm:: GetMainCategoryName(std::string &error)
 {
+	m_sql_old_no_ = SQL_NTS;
 	m_sql_name_ = SQL_NTS;
 	m_sql_no_ = SQL_NTS;
 	m_sql_pro_ret = SQL_NTS;
-	if(false == ExecSQLProc("exec GetMainCategoryName", error))
+	if (false == BindReturn())
+	{
+		return false;
+	}
+	if(false == ExecSQLProc("{?=call GetMainCategoryName}", error))
 	{
 		return false;
 	} 
@@ -58,10 +63,21 @@ bool CComMainCateForm:: GetMainCategoryName(std::string &error)
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
 		return false;
 	}
-	if(false == MoveFirst())
+	m_return_code_ = SQLFetch(m_hstmt_);
+	if ((SQL_SUCCESS != m_return_code_) &&
+		(SQL_SUCCESS_WITH_INFO != m_return_code_))
 	{
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+		if (SQL_NO_DATA == m_return_code_)
+		{
+			error = "ÎÞÊý¾Ý!";
+		}
 		return false;
 	}
+// 	if(false == MoveFirst())
+// 	{
+// 		return false;
+// 	}
 	return true;
 }
 

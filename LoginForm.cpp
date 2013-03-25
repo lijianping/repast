@@ -47,6 +47,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
 	password_len_ = SQL_NTS;
 	m_sql_pro_ret = SQL_NTS;
 	m_sql_permission_ = SQL_NTS;
+
 	/*绑定存储过程返回值*/
 	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, \
 		SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
@@ -87,15 +88,11 @@ short CLoginForm::GetUserPermission(std::string user_name,
 
 //     short permission = 0;
 //     SQLINTEGER sql_permission=SQL_NTS;
-    SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &m_permission_, 0, &m_sql_permission_);
+    m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &m_permission_, 0, &m_sql_permission_);
 	m_return_code_ = SQLFetch(m_hstmt_);
     if ((SQL_SUCCESS != m_return_code_) &&
         (SQL_SUCCESS_WITH_INFO != m_return_code_))
     {
-        if (SQL_NO_DATA == m_return_code_)
-        {
-            information = "用户名或密码错误!";
-        }
 		return -1;
     }
 	if (false == IsSQLProcRetRight(information))

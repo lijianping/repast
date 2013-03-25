@@ -71,6 +71,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
 						 std::string pw = lo.Encrypt(password.c_str(), password.length()/2, password.length());
                         return_value = login.GetUserPermission(name, pw,
                                                                     error_information);
+                      // login.Disconnect();
                         if (-1 == return_value)
                         {
                             MessageBox(hwnd, error_information.c_str(),
@@ -78,6 +79,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                             return FALSE;
                         }
 						g_login_name = name;
+						
                     }
 
                     EndDialog(hwnd, return_value);

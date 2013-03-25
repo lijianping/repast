@@ -31,12 +31,12 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			while(!comodity_main.IsEOF())
 			{
 				tree_parent = commodity_tree.InsertRootItem(comodity_main.name());/*插入父节点*/
-				comdity_child.GetChildCateName(comodity_main.name(), error);
-				while(!comdity_child.IsEOF())
-				{
-					commodity_tree.InsertChildItem(tree_parent, comdity_child.cate_name());// 根据商品分类名称查询商品，再插入相应的根节点下
-					comdity_child.MoveNext();
-				}
+//				comdity_child.GetChildCateName(comodity_main.name(), error);
+// 				while(!comdity_child.IsEOF())
+// 				{
+// 					commodity_tree.InsertChildItem(tree_parent, comdity_child.cate_name());// 根据商品分类名称查询商品，再插入相应的根节点下
+// 					comdity_child.MoveNext();
+// 				}
  				comodity_main.MoveNext();
 
 			}  

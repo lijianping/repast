@@ -52,6 +52,8 @@ public:
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
     bool IsSQLProcRetRight(std::string &error);
 	bool BindReturn();
+	bool SetCursorDynamic(bool is_dynamic);
+
 
 protected:
 	inline bool is_connect();

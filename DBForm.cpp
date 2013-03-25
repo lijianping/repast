@@ -58,28 +58,28 @@ bool CDBForm::SQLAllocHandleStmt(std::string &error_info)
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
         return false;
     }
-
-	/* 设置游标属性：用行版本控制乐观并发设置动态游标类型 */
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
-		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
-		SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        error_info = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-        return false;
-	}
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
-		(SQLPOINTER)SQL_CONCUR_ROWVER, 
-		SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        error_info = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-        return false;
-    }
+	SetCursorDynamic(true);
+// 	/* 设置游标属性：用行版本控制乐观并发设置动态游标类型 */
+//     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
+// 		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
+// 		SQL_IS_INTEGER);
+//     if ((m_return_code_ != SQL_SUCCESS) &&
+//         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+//     {
+//         error_info = "设置数据库滚动游标失败！";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+//         return false;
+// 	}
+//     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
+// 		(SQLPOINTER)SQL_CONCUR_ROWVER, 
+// 		SQL_IS_INTEGER);
+//     if ((m_return_code_ != SQL_SUCCESS) &&
+//         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+//     {
+//         error_info = "设置数据库滚动游标失败！";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+//         return false;
+//     }
 	return true;
 }
 
@@ -103,6 +103,7 @@ bool CDBForm::IsEOF()
 bool CDBForm::MoveFirst()
 {
 	std::string error;
+	SetCursorDynamic(true);
 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
 	if ((m_return_code_ == SQL_ERROR) ||
         (m_return_code_ == SQL_INVALID_HANDLE))
@@ -275,7 +276,7 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 		error_info = TEXT("报告错误发生的原因是，分配sqlstate内存失败");
 		return false;
     }
-	sql_state = 0;
+
 	
 	/*获取错误*/
     SQLGetDiagRec(handle_type, hdbc, record_number, sql_state, &native_error,
@@ -397,6 +398,7 @@ void CDBForm::Disconnect()
      *      if has something wrong, you can check
      *      here.
      **/
+//	SetCursorDynamic(false);//TODO:just for test
 	if (NULL != m_hstmt_)
 	{
 		SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
@@ -759,4 +761,63 @@ bool CDBForm::BindReturn() {
 		return true;
 	}
 	return false;
+}
+
+
+bool CDBForm::SetCursorDynamic(bool is_dynamic)
+{
+	std::string error_info;
+	//默认的静态游标方式
+	if (false == is_dynamic)
+	{
+		m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE, (SQLPOINTER)SQL_CURSOR_FORWARD_ONLY, SQL_IS_INTEGER);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "1设置数据库静态游标失败！";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+		m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY, (SQLPOINTER)SQL_CONCUR_READ_ONLY, SQL_IS_INTEGER);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "2设置数据库静态游标失败！";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+		m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_ROW_ARRAY_SIZE,(SQLPOINTER) 1, SQL_IS_INTEGER);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "3设置数据库静态游标失败！";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+	}
+	else
+	{
+		/* 设置游标属性：用行版本控制乐观并发设置动态游标类型 */
+		m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
+			(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
+			SQL_IS_INTEGER);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "设置数据库滚动游标失败！";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+		m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
+			(SQLPOINTER)SQL_CONCUR_ROWVER, 
+			SQL_IS_INTEGER);
+		if ((m_return_code_ != SQL_SUCCESS) &&
+			(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+		{
+			error_info = "设置数据库滚动游标失败！";
+			ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+			return false;
+		}
+	}
+	return true;
 }
