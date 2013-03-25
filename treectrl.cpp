@@ -33,12 +33,12 @@ bool TreeCtrl::Initialization(HWND hwnd, UINT id) {
  * @ param: text [in] 文本
  * @ return: 若成功返回当前item的handle，否则返回NULL
  **/
-HTREEITEM TreeCtrl::InsertRootItem(char *text) {
+HTREEITEM TreeCtrl::InsertRootItem(const char *text) {
 	TVINSERTSTRUCT tree_insert;
 	tree_insert.hParent = NULL;
 	tree_insert.hInsertAfter = TVI_ROOT;
 	tree_insert.item.mask = TVIF_TEXT;
-	tree_insert.item.pszText = text;
+	tree_insert.item.pszText = (char *)text;
 	return TreeView_InsertItem(hwnd_, &tree_insert);
 }
 
@@ -48,14 +48,14 @@ HTREEITEM TreeCtrl::InsertRootItem(char *text) {
  * @ param: text [in] 文本
  * @ return: 若成功返回当前item的handle，否则返回NULL
  **/
-HTREEITEM TreeCtrl::InsertChildItem(HTREEITEM parent, char *text) {
+HTREEITEM TreeCtrl::InsertChildItem(HTREEITEM parent, const char *text) {
 	HTREEITEM item = NULL;
 	if (parent != NULL) {
 		TVINSERTSTRUCT tree_insert;
 		tree_insert.hParent = parent;
 		tree_insert.hInsertAfter = TVI_LAST;
 		tree_insert.item.mask = TVIF_TEXT;
-		tree_insert.item.pszText = text;
+		tree_insert.item.pszText = (char *)text;
 		item = TreeView_InsertItem(hwnd_, &tree_insert);
 	}
 	return item;

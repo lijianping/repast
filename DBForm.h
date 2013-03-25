@@ -7,6 +7,7 @@
 #ifndef REPAST_DBFORM_H_
 #define REPAST_DBFORM_H_
 
+#include "Err.h"
 #include <WINDOWS.H>
 #include <SQLEXT.H>
 #include <SQLTYPES.H>
@@ -43,7 +44,7 @@ public:
 	int GetSecond();
 	std::string GetSecondString();
 	bool Connect(const char *dsn, const char *id, 
-		const char *password, std::string &information);
+	             const char *password, std::string &information);
     void Disconnect();
 	void DeleteSpace(const char * src, char * des);
 	bool SetAutoCommit(bool is_auto_commit);
@@ -52,7 +53,7 @@ public:
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
     bool IsSQLProcRetRight(std::string &error);
 	bool BindReturn();
-	bool SetCursorDynamic(bool is_dynamic);
+	void FetchData();
 
 
 protected:

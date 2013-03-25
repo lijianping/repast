@@ -1,5 +1,5 @@
 #include "basic_info.h"
-
+#include "Commodity.h"
 
 
 BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -20,23 +20,36 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			CCommodity commodity;  //商品具体信息
 			std::string error;
 			commodity_tree.Initialization(hwnd, IDC_TREE_COMMODITY);
-			CComMainCateForm comodity_main;//主商品分类
-			ChildCateForm comdity_child;//子商品分类
+			ComMainCateForm comodity_main;//主商品分类
+			
 
- 			if(false == comodity_main.GetMainCategoryName(error))
+			// 获取主分类商品名称
+ 			if(false == comodity_main.GetMainCateName())
  			{
  				MessageBox(hwnd, error.c_str(), TEXT("获取商品主分类出错"), MB_OK);
  				return TRUE;
  			}
 			while(!comodity_main.IsEOF())
 			{
-				tree_parent = commodity_tree.InsertRootItem(comodity_main.name());/*插入父节点*/
-//				comdity_child.GetChildCateName(comodity_main.name(), error);
-// 				while(!comdity_child.IsEOF())
-// 				{
-// 					commodity_tree.InsertChildItem(tree_parent, comdity_child.cate_name());// 根据商品分类名称查询商品，再插入相应的根节点下
-// 					comdity_child.MoveNext();
-// 				}
+				std::string main_name(comodity_main.name());
+				tree_parent = commodity_tree.InsertRootItem(main_name.c_str()); // 插入主分类节点
+				ChildCateForm comdity_child;//子商品分类
+				if (comdity_child.GetChildCateName(comodity_main.name(), error)) {       // 获取主分类对应的子分类名称
+					while(!comdity_child.IsEOF())
+					{
+						std::string child_name(comdity_child.cate_name());
+						commodity_tree.InsertChildItem(tree_parent, child_name.c_str());// 根据商品分类名称查询商品，再插入相应的根节点下
+						comdity_child.MoveNext();
+						CCommodity comdity;
+						bool is_ok = false;
+						try {
+							is_ok = comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
+						} catch(Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
+						}
+						std::string comdity_name(comdity.name());
+					}
+				}
  				comodity_main.MoveNext();
 
 			}  
@@ -369,43 +382,7 @@ bool InitBasicInfoList(HWND parent_hwnd, UINT id)
 
 bool ShowCommodity(HWND hwnd)
 {
-	CCommodity commodity;
-	commodity.GetRecordSet();
-	/* Move to the first of the record set */
-	commodity.MoveFirst();  
-	if (0 == strcmp("",commodity.no()))
-	{
-		CListView staff_list;
-		/* Initialization the list view object */
-		staff_list.Initialization(hwnd, IDC_BASIC_INFO);
-		/* Clean the list view */
-		staff_list.DeleteAllItems();
-	//	error = "无匹配结果！";
-		return false;
-	}
-	else
-	{
-		CListView staff_list;
-		/* Initialization the list view object */
-		staff_list.Initialization(hwnd, IDC_BASIC_INFO);
-		/* Clean the list view */
-		staff_list.DeleteAllItems();
-		int item = 0;
-		while (!commodity.IsEOF())
-		{
-			/* Insert item(s) into the list view */
-			staff_list.InsertItem(item, commodity.no());
-			staff_list.SetItem(item, 1, commodity.name());
-			staff_list.SetItem(item, 2, commodity.purchase_price());
-			staff_list.SetItem(item, 3, commodity.sum());
-			staff_list.SetItem(item, 4, commodity.unit());
-			staff_list.SetItem(item, 5, commodity.category());
-			staff_list.SetItem(item, 6, commodity.sale_price());
-			staff_list.SetItem(item, 7, commodity.register_date());
-			commodity.MoveNext();
-			item++;
-		}
-	}
+	
 	return true;
 }
 

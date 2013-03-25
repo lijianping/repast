@@ -406,7 +406,7 @@ bool ShowLoginUser(HWND hwnd)
 	CLoginForm login_user;
 	login_user.SetSQLStatement("exec GetLoginUserInfo");
 	login_user.GetRecordSet();
-	login_user.MoveFirst();
+//	login_user.MoveFirst();
 	int i=0;
 	while(!login_user.IsEOF())
 	{

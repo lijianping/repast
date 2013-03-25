@@ -278,10 +278,10 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			while(!comodity_category.IsEOF())
 			{
 				tree_parent = tree.InsertRootItem(comodity_category.name());/*插入父节点*/
-				commodity.SelectByName(comodity_category.name(), error);
+
 				while(!commodity.IsEOF())
 				{
-					tree.InsertChildItem(tree_parent, commodity.name());/*根据商品分类名称查询商品，再插入相应的根节点下*/
+	
 					commodity.MoveNext();
 				}
 				comodity_category.MoveNext();
@@ -326,7 +326,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						{
 							std::string error;
 							CCommodity commodity; /*商品具体信息*/
-							commodity.SelectByName(text, error);/*通过商品名称或商品分类名称查找具体商品*/
+							
 							
 							CListView staff_list;
 							/* Initialization the list view object */
@@ -336,10 +336,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							int item = 0;
 							while (!commodity.IsEOF())
 							{
-								/* Insert item(s) into the list view */
-								staff_list.InsertItem(item, commodity.name());
-								staff_list.SetItem(item, 1, commodity.sale_price());
-								staff_list.SetItem(item, 2, commodity.unit());
+								
 								commodity.MoveNext();
 								item++;
 							}

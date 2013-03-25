@@ -7,41 +7,35 @@
 
 #include "DBForm.h"
 
-class CComMainCateForm  :public CDBForm
-{
+class ComMainCateForm : public CDBForm {
 public:
-	CComMainCateForm();
-	virtual ~CComMainCateForm();
-	inline short no();
+	ComMainCateForm();
+	~ComMainCateForm();
+	inline short no() const;
+	inline short old_no() const;
 	inline char* name();
-	virtual bool BindingParameter();//绑定主商品分类的所有字段
-	bool GetMainCategoryName(std::string &error);//获取主商品分类名称
-	virtual bool BindingParameter(bool is_add, std::string &error_info);
-    bool InsertCategory(std::string id, std::string name,std::string &error);
-    bool UpdateCategory(std::string old_id, std::string id, std::string name,std::string &error);
-	bool DeleteCategory(std::string id,std::string &error);
-	bool CheckCategory(std::string id, std::string name, std::string &error);
-	void Initialize(); 
-private: 
-	short m_no_;             //主商品分类编号
-	short m_old_no_;         //原来的主商品分类编号，用于修改主商品分类信息
-	char m_name_[33];        //主商品分类名称
+	bool GetMainCateName();
+	void Initialize();
 
-	SQLINTEGER m_sql_no_;
-	SQLINTEGER m_sql_old_no_;
-	SQLINTEGER m_sql_name_;
-
+private:
+	char name_[33];   // 主分类名称
+	short no_;        // 主分类编号
+	short old_no_;    // 主分类原编号
+	SQLINTEGER sql_name_;  // 对应主分类名称
+	SQLINTEGER sql_no_;    // 对应主分类编号
+	SQLINTEGER sql_old_no_;// 对应主分类原编号
 };
 
-
-short CComMainCateForm::no()
-{
-	return m_no_;
-}
-char* CComMainCateForm::name()
-{
-	this->DeleteSpace(m_name_, m_name_);
-	return m_name_;
+inline short ComMainCateForm::no() const {
+	return no_;
 }
 
+inline short ComMainCateForm::old_no() const {
+	return old_no_;
+}
+
+inline char* ComMainCateForm::name() {
+	DeleteSpace(name_, name_);   // 删除空格
+	return name_;
+}
 #endif 
