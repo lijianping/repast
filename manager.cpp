@@ -206,12 +206,10 @@ BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			permission_combo.Initialization(hwnd, IDC_E_USER_PERMISSION);
 			all_permission.SetSQLStatement("exec SelectPermissionAll");
 			all_permission.GetRecordSet();
-			all_permission.MoveFirst();
 			int index = 0;
 			while(!all_permission.IsEOF())     // 初始化权限按钮
 			{
 				permission_combo.AddString(all_permission.name());
-				all_permission.MoveNext();
 				index++;
 			}
 			CEdit staff_name(hwnd, IDC_E_STAFF_NAME);
@@ -406,7 +404,6 @@ bool ShowLoginUser(HWND hwnd)
 	CLoginForm login_user;
 	login_user.SetSQLStatement("exec GetLoginUserInfo");
 	login_user.GetRecordSet();
-//	login_user.MoveFirst();
 	int i=0;
 	while(!login_user.IsEOF())
 	{
@@ -414,7 +411,6 @@ bool ShowLoginUser(HWND hwnd)
 		user.SetItem(i, 1,login_user.staff_name());
 		user.SetItem(i, 2, login_user.name());
 		user.SetItem(i, 3, login_user.permission_name());
-		login_user.MoveNext();
 		i++;
 	}
 	return true;
@@ -455,7 +451,6 @@ bool InitStaffNo(HWND hwnd, UINT id) {
 	staff.GetStaffNo(err_info);
 	while (!staff.IsEOF()) {
 		staff_no.AddString(staff.id());
-		staff.MoveNext();
 	}
 	return true;
 }
@@ -487,10 +482,6 @@ bool ShowPermissionList(HWND hwnd)
 	{
 		return false;
 	}
-	if(!all_permission.MoveFirst())
-	{
-		return false;
-	}
 	int list_index=0;
 	while(!all_permission.IsEOF())
 	{
@@ -499,10 +490,6 @@ bool ShowPermissionList(HWND hwnd)
 			return false;
 		}
 		if(!permission_list.SetItem(list_index,1, all_permission.name()))
-		{
-			return false;
-		}
-		if(!all_permission.MoveNext())
 		{
 			return false;
 		}

@@ -282,8 +282,6 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 //	staff_info.Connect("repast", "repast", "repast", error_information);
 	/* Get the record set */
 	staff_info.GetRecordSet();
-	/* Move to the first record */
-	staff_info.MoveFirst();
 	int i = 0;
 	/* Get the record set data and insert into the list view */
 	while (!staff_info.IsEOF())
@@ -300,7 +298,6 @@ void SetListViewData(HWND parent_hwnd, UINT id)
 		staff_list.SetItem(i, 7, staff_info.phone_num());
 		staff_list.SetItem(i, 8, staff_info.address());
 		/* Move to the next record */	
-		staff_info.MoveNext();
 		i++;
 	}
 	/* Disconnect the link */
@@ -383,14 +380,12 @@ bool InitComboBox(HWND hwnd, int id)
 	hwnd_combo = GetDlgItem(hwnd, id);
 	cdept.SetSQLStatement("select * from Dept");
 	cdept.GetRecordSet();
-//	cdept.MoveFirst();
 	while (!cdept.IsEOF())
 	{
 		if (CB_ERR == SendMessage(hwnd_combo, CB_ADDSTRING, 0, (LPARAM)cdept.name()))
 		{
 			return false;
 		}
-		cdept.MoveNext();
 	}
 	SendMessage(hwnd_combo, CB_SETCURSEL, 0, 0);
     return true;
@@ -587,43 +582,33 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	staff.BindingParameter();  /* In this function, there no error judge. */
 	/* Move to the first of the record set */
 	
-	staff.MoveFirst();  
-	/*TODO:此处判断无匹配的结果有问题*/
-	if (0 == strcmp("",staff.id()))
+
+	CListView staff_list;
+	/* Initialization the list view object */
+	HWND list_hwnd = GetDlgItem(hwnd, id);
+	staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
+	/* Clean the list view */
+	staff_list.DeleteAllItems();
+	int item = 0;
+	bool is_in_loop = false;
+	while (!staff.IsEOF())
 	{
-		CListView staff_list;
-		/* Initialization the list view object */
-		HWND list_hwnd = GetDlgItem(hwnd, id);
-		staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
-		/* Clean the list view */
-		staff_list.DeleteAllItems();
+		is_in_loop = true;
+		/* Insert item(s) into the list view */
+		staff_list.InsertItem(item, staff.id());
+		staff_list.SetItem(item, 1, staff.name());
+		staff_list.SetItem(item, 2, staff.sex());
+		staff_list.SetItem(item, 3, staff.age());
+		staff_list.SetItem(item, 4, staff.salary());
+		staff_list.SetItem(item, 5, staff.dept_name());
+		staff_list.SetItem(item, 6, staff.mailbox());
+		staff_list.SetItem(item, 7, staff.phone_num());
+		staff_list.SetItem(item, 8, staff.address());
+		item++;
+	}
+	if (!is_in_loop) {
 		error = "无匹配结果！";
 		return false;
-	}
-	else
-	{
-		CListView staff_list;
-		/* Initialization the list view object */
-		HWND list_hwnd = GetDlgItem(hwnd, id);
-		staff_list.Initialization(hwnd, ID_PERSONNEL_INFO);
-		/* Clean the list view */
-		staff_list.DeleteAllItems();
-		int item = 0;
-		while (!staff.IsEOF())
-		{
-			/* Insert item(s) into the list view */
-			staff_list.InsertItem(item, staff.id());
-			staff_list.SetItem(item, 1, staff.name());
-			staff_list.SetItem(item, 2, staff.sex());
-			staff_list.SetItem(item, 3, staff.age());
-			staff_list.SetItem(item, 4, staff.salary());
-			staff_list.SetItem(item, 5, staff.dept_name());
-			staff_list.SetItem(item, 6, staff.mailbox());
-			staff_list.SetItem(item, 7, staff.phone_num());
-			staff_list.SetItem(item, 8, staff.address());
-			staff.MoveNext();
-			item++;
-		}
 	}
 	return true;
 }

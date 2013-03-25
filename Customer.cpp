@@ -54,6 +54,5 @@ bool CCustomer::GetCustomerByName(const char *customer_no, const char* table_no,
 		return false;
 	}
 	BindingParameter();
-	MoveFirst();
 	return true;
 }

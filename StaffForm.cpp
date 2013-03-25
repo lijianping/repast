@@ -321,7 +321,6 @@ int CStaffForm::GetStaffSum()
 		return staff_sum;
 	}
 	SQLBindCol(m_hstmt_, 1, SQL_C_SLONG, &staff_sum, sizeof(staff_sum), &sql_sum);
-	MoveFirst();
 	return staff_sum;
 }
 
@@ -446,7 +445,7 @@ bool CStaffForm::GetStaffNo(std::string &err_info) {
 		return false;
 	}
 	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_id_, sizeof(m_id_), &m_sql_id_);
-	return MoveFirst();
+	return true;
 }
 
 /*
@@ -463,7 +462,7 @@ bool CStaffForm::GetStaffName(const char *no, std::string &err_info) {
 	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
 		if (ExecSQLProc("{call GetStaffName(?)}", err_info)) {
 			m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
-			MoveFirst();
+			FetchData();  // 绑定数据 // TODO: 异常捕捉
 			if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
 				return true;
 			}

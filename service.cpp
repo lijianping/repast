@@ -271,7 +271,6 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			TreeCtrl tree(hwnd, IDC_MENU_TREE);
 			CCommodityCategoryForm comodity_category;/*商品分类*/
 			comodity_category.GetRecordSet();
-			comodity_category.MoveFirst();
 			HTREEITEM tree_parent;
 			std::string error;
 			CCommodity commodity;/*商品具体信息*/
@@ -282,9 +281,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				while(!commodity.IsEOF())
 				{
 	
-					commodity.MoveNext();
 				}
-				comodity_category.MoveNext();
 			}  // 结束树形控件初始化
 			CListView menu_list, custom_list;
 			menu_list.Initialization(hwnd, IDC_REPAST_MENU);
@@ -301,14 +298,12 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			CCustomerMenuForm order_info;
 			order_info.GetCustomerMenuSet(table->customer_no.c_str());
-			order_info.MoveFirst();
 			int i = 0;
 			while (!order_info.IsEOF()) {
 				custom_list.InsertItem(i, order_info.dish_name());
 				custom_list.SetItem(i, 1, order_info.dish_price());
 				custom_list.SetItem(i, 2, order_info.dish_quantity());
 				i++;
-				order_info.MoveNext();
 			}
 			return TRUE;
 		}
@@ -337,7 +332,6 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							while (!commodity.IsEOF())
 							{
 								
-								commodity.MoveNext();
 								item++;
 							}
 						}
@@ -543,7 +537,6 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			CCustomerMenuForm order_info;
 			order_info.GetCustomerMenuSet(table_info->customer_no.c_str());  // 设置顾客编号
-			order_info.MoveFirst();
 			int i = 0;
 			float totle_cash = 0;
 			while (!order_info.IsEOF()) {
@@ -552,7 +545,6 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				custom_list.SetItem(i, 2, order_info.dish_quantity());
 				totle_cash += order_info.dish_price() * order_info.dish_quantity();
 				i++;
-				order_info.MoveNext();
 			}
 			char temp[64] = "\0";
 			sprintf(temp, "%0.2f", totle_cash);
@@ -869,11 +861,6 @@ bool SetListInfo(const HWND hwnd, const UINT id,
 		error = "获取记录集失败！";
 		return false;
 	}
-	if (!customer.MoveFirst())
-	{
-		error = "移动到第一条记录集失败！";
-		return false;
-	}
 	CListView list;
 	if (!list.Initialization(hwnd, id))
 	{
@@ -894,11 +881,6 @@ bool SetListInfo(const HWND hwnd, const UINT id,
 		list.SetItem(i, 3, customer.founding_time()); 
 		/* TODO: Add data time at here. */
 		i++;
-		if (!customer.MoveNext())
-		{
-			error = "移动到下一条记录集失败！";
-			return false;
-		}
 	}
 	return true;
 }
@@ -910,7 +892,6 @@ bool InitAvailableTable(const HWND hwnd, int id)
 	table_list.Initialization(hwnd, id);
 	table_form.SetSQLStatement("select * from TableInfo");
 	table_form.GetRecordSet();
-	table_form.MoveFirst();
 	int i(0);
 	while (!table_form.IsEOF())
 	{
@@ -918,7 +899,6 @@ bool InitAvailableTable(const HWND hwnd, int id)
 		short num = table_form.payable_num();
 		table_list.InsertItem(i, temp);
 		table_list.SetItem(i, 1, num);
-		table_form.MoveNext();
 		i++;
 	}
 	return true;
@@ -947,7 +927,6 @@ void GetTableInfo(const HWND hwnd, const int id, const char *floor, int use) {
 	sprintf(sql, "select * from TableInfo where Tstatus = %d and Tno like '%s%c'", use, floor, '%');
 	table_form.SetSQLStatement(sql);
 	table_form.GetRecordSet();
-	table_form.MoveFirst();
 	int i(0);
 	while (!table_form.IsEOF())
 	{
@@ -955,7 +934,6 @@ void GetTableInfo(const HWND hwnd, const int id, const char *floor, int use) {
 		short num = table_form.payable_num();
 		table_list.InsertItem(i, temp);
 		table_list.SetItem(i, 1, num);
-		table_form.MoveNext();
 		i++;
 	}
 }

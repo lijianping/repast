@@ -30,6 +30,10 @@ private:
 };
 
 
+/*
+ * @ brief: 获取商品名称
+ * @ return: 指向商品名称的字符串指针
+ **/
 char* CCommodity::name() {
 	DeleteSpace(name_, name_);
 	return name_;
