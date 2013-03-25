@@ -92,82 +92,82 @@ bool CDBForm::IsEOF()
 	return FetchData();
 }
 
-/*
- * 说明: 移动到记录集的第一条数据
- * 返回值: 执行成功返回true,否则返回false。
- */
-bool CDBForm::MoveFirst()
-{
-	std::string error;
-	m_return_code_ = SQLFetch(m_hstmt_);
-	// m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
-	if ((m_return_code_ == SQL_ERROR) ||
-        (m_return_code_ == SQL_INVALID_HANDLE))
-    {
-		error = "获取第一条记录出错：";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-		return false;
-	}
-	return true;
-}
-
-/*
- * 说明: 移动到记录集的下一条数据
- * 返回值: 执行成功返回true,否则返回false。
- */
-bool CDBForm::MoveNext()
-{
-	std::string error;
-	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_NEXT,0);
-	if ((m_return_code_ == SQL_ERROR) ||
-        (m_return_code_ == SQL_INVALID_HANDLE))
-    {
-		error = "获取下一条记录出错：";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-		return false;
-	}
-	return true;
-}
-
-/*
- * 说明: 移动到记录集的上一条数据
- * 返回值: 执行成功返回true,否则返回false。
- */
-bool CDBForm::MovePrior()
-{
-	std::string error;
-    m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_PRIOR, 0);
-	if ((m_return_code_ == SQL_ERROR) ||
-        (m_return_code_ == SQL_INVALID_HANDLE))
-    {
-		error = "获取上一条记录出错：";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-		return false;
-	}
-	return true;
-}
-
-/*
- * 说明: 移动到记录集的最后一条数据
- * 返回值: 执行成功返回true,否则返回false。
- */
-bool CDBForm::MoveLast()
-{
-	std::string error;
-	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_LAST,0);
-	if ((m_return_code_ == SQL_ERROR) ||
-        (m_return_code_ == SQL_INVALID_HANDLE))
-    {
-		error = "获取最后一条记录出错：";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-    	MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-		return false;
-	}
-	return true;
-}
+// /*
+//  * 说明: 移动到记录集的第一条数据
+//  * 返回值: 执行成功返回true,否则返回false。
+//  */
+// bool CDBForm::MoveFirst()
+// {
+// 	std::string error;
+// 	m_return_code_ = SQLFetch(m_hstmt_);
+// 	// m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
+// 	if ((m_return_code_ == SQL_ERROR) ||
+//         (m_return_code_ == SQL_INVALID_HANDLE))
+//     {
+// 		error = "获取第一条记录出错：";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+// 		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+// 		return false;
+// 	}
+// 	return true;
+// }
+// 
+// /*
+//  * 说明: 移动到记录集的下一条数据
+//  * 返回值: 执行成功返回true,否则返回false。
+//  */
+// bool CDBForm::MoveNext()
+// {
+// 	std::string error;
+// 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_NEXT,0);
+// 	if ((m_return_code_ == SQL_ERROR) ||
+//         (m_return_code_ == SQL_INVALID_HANDLE))
+//     {
+// 		error = "获取下一条记录出错：";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+// 		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+// 		return false;
+// 	}
+// 	return true;
+// }
+// 
+// /*
+//  * 说明: 移动到记录集的上一条数据
+//  * 返回值: 执行成功返回true,否则返回false。
+//  */
+// bool CDBForm::MovePrior()
+// {
+// 	std::string error;
+//     m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_PRIOR, 0);
+// 	if ((m_return_code_ == SQL_ERROR) ||
+//         (m_return_code_ == SQL_INVALID_HANDLE))
+//     {
+// 		error = "获取上一条记录出错：";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+// 		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+// 		return false;
+// 	}
+// 	return true;
+// }
+// 
+// /*
+//  * 说明: 移动到记录集的最后一条数据
+//  * 返回值: 执行成功返回true,否则返回false。
+//  */
+// bool CDBForm::MoveLast()
+// {
+// 	std::string error;
+// 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_LAST,0);
+// 	if ((m_return_code_ == SQL_ERROR) ||
+//         (m_return_code_ == SQL_INVALID_HANDLE))
+//     {
+// 		error = "获取最后一条记录出错：";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
+//     	MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
+// 		return false;
+// 	}
+// 	return true;
+// }
 
 /*
  * 说明: 移动到记录集的最后一条数据
@@ -196,7 +196,6 @@ bool CDBForm::GetRecordSet()
 
     /* 绑定参数 */
     BindingParameter(); 
-	SQLFetch(m_hstmt_);
     return true;
 }
 
@@ -444,7 +443,6 @@ int CDBForm::GetDatePart(char *sql_selectdate)
 		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
 		return -1;
 	}
-	this->MoveFirst();
 	return m_datepart_;
 }
 
@@ -470,7 +468,6 @@ char *CDBForm::GetDatePartString(const char *datepart) {
 		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
 		return NULL;
 	}
-	this->MoveFirst();
 	return m_server_datatime;
 }
 

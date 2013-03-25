@@ -393,13 +393,11 @@ bool ShowCategoryList(HWND hwnd, UINT id)
 	category_list.DeleteAllItems();
 	CCommodityCategoryForm comodity_category;/*商品分类*/
 	comodity_category.GetRecordSet();
-	comodity_category.MoveFirst();
 	int item=0;
 	while(!comodity_category.IsEOF())
 	{
 		category_list.InsertItem(item, comodity_category.no());
 		category_list.SetItem(item, 1, comodity_category.name());
-		comodity_category.MoveNext();
 		item++;
 	}
 	return true;

@@ -21,10 +21,10 @@ public:
 	CDBForm(std::string dns, std::string name, std::string password);
 	virtual ~CDBForm();
     bool IsEOF();
-    bool MoveFirst();
-    bool MoveNext();
-    bool MovePrior(); 
-    bool MoveLast();
+//     bool MoveFirst();
+//     bool MoveNext();
+//     bool MovePrior(); 
+//     bool MoveLast();
     bool GetRecordSet();
     bool ExecuteSQL(const char *sql_statement, std::string &error_info);
     virtual bool BindingParameter();
