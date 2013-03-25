@@ -31,6 +31,7 @@ private:
 
 
 char* CCommodity::name() {
+	DeleteSpace(name_, name_);
 	return name_;
 }
 #endif 
