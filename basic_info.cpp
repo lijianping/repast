@@ -17,10 +17,11 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 //TODO:以下需要更改
 			HTREEITEM tree_parent;
-			CCommodity commodity;//商品具体信息
+			CCommodity commodity;  //商品具体信息
 			std::string error;
 			commodity_tree.Initialization(hwnd, IDC_TREE_COMMODITY);
 			CComMainCateForm comodity_main;//主商品分类
+
  			if(false == comodity_main.GetMainCategoryName(error))
  			{
  				MessageBox(hwnd, error.c_str(), TEXT("获取商品主分类出错"), MB_OK);
@@ -33,11 +34,11 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // 				commodity.SelectByName(comodity_category.name(), error);
 // 				while(!commodity.IsEOF())
 // 				{
-// 					commodity_tree.InsertChildItem(tree_parent, commodity.name());/*根据商品分类名称查询商品，再插入相应的根节点下*/
+// 					commodity_tree.InsertChildItem(tree_parent, commodity.name());// 根据商品分类名称查询商品，再插入相应的根节点下
 // 					commodity.MoveNext();
 // 				}
  				comodity_main.MoveNext();
-			}
+		}  
 	//		InitCommodityTree(hwnd, IDC_TREE_COMMODITY);/*TODO:尚未定义*/
 //			InitBasicInfoList(hwnd, IDC_BASIC_INFO);
 //			ShowCommodity(hwnd);/*执行查询，显示查询结果*/
@@ -89,6 +90,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // 					}
 //			}
 				return TRUE;
+
 		}
 
 	case WM_COMMAND:

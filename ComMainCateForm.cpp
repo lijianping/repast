@@ -31,8 +31,8 @@ CComMainCateForm::~CComMainCateForm()
  */
 bool CComMainCateForm::BindingParameter()
 {
-	SQLBindCol(m_hstmt_, 1, SQL_C_SHORT, &m_no_, sizeof(m_no_), &m_sql_no_);
-	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
+// 	SQLBindCol(m_hstmt_, 1, SQL_C_SHORT, &m_no_, sizeof(m_no_), &m_sql_no_);
+// 	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
 	return true;
 }
 
@@ -58,7 +58,6 @@ bool CComMainCateForm:: GetMainCategoryName(std::string &error)
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
 		return false;
 	}
-	
 	if(false == MoveFirst())
 	{
 		return false;
@@ -188,4 +187,14 @@ bool CComMainCateForm::CheckCategory(std::string id, std::string name, std::stri
 	m_no_=atoi(id.c_str());
 	strcpy(m_name_,name.c_str());
 	return true;
+}
+
+/*
+ * @ brief: 初始化sql类型数据
+ **/
+void CComMainCateForm::Initialize() 
+{
+	this->m_sql_name_ = SQL_NTS;
+	this->m_sql_no_ = SQL_NTS;
+	this->m_sql_old_no_ = SQL_NTS;
 }

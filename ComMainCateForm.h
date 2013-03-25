@@ -2,12 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_COMMAINCATEFORM_H__6D9BE542_105F_4C36_A967_C0B39FCCC376__INCLUDED_)
-#define AFX_COMMAINCATEFORM_H__6D9BE542_105F_4C36_A967_C0B39FCCC376__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef REPAST_COMMAINCATEFORM_H_
+#define REPAST_COMMAINCATEFORM_H_
 
 #include "DBForm.h"
 
@@ -25,6 +21,7 @@ public:
     bool UpdateCategory(std::string old_id, std::string id, std::string name,std::string &error);
 	bool DeleteCategory(std::string id,std::string &error);
 	bool CheckCategory(std::string id, std::string name, std::string &error);
+	void Initialize(); 
 private: 
 	short m_no_;             //主商品分类编号
 	short m_old_no_;         //原来的主商品分类编号，用于修改主商品分类信息
@@ -37,13 +34,14 @@ private:
 };
 
 
-short CComMainCateForm:: no()
+short CComMainCateForm::no()
 {
 	return m_no_;
 }
-char* CComMainCateForm:: name()
+char* CComMainCateForm::name()
 {
+	this->DeleteSpace(m_name_, m_name_);
 	return m_name_;
 }
 
-#endif // !defined(AFX_COMMAINCATEFORM_H__6D9BE542_105F_4C36_A967_C0B39FCCC376__INCLUDED_)
+#endif 

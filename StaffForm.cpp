@@ -430,15 +430,19 @@ bool CStaffForm::SetStaff(STAFFINFO * staff_info,std::string &error_info)
 	}
 	return true;
 }
-
+/*
+ * @ brief: 获取员工编号，该编号将拥有登录系统权限的人排除在外
+ * @ param: err_info [out] 错误信息
+ * @ return: 若成功返回true，否则返回false
+ **/
 bool CStaffForm::GetStaffNo(std::string &err_info) {
 	m_sql_pro_ret = SQL_NTS;
 	m_sql_id_ = SQL_NTS;
-// 	if (!BindReturn()) {
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
-// 		return false;
-// 	}
-	if (!ExecSQLProc("{call GetStaffNo}", err_info)) {
+	if (!BindReturn()) {
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
+		return false;
+	}
+	if (!ExecSQLProc("{? = call GetStaffNo}", err_info)) {
 		return false;
 	}
 	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_id_, sizeof(m_id_), &m_sql_id_);
