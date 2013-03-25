@@ -88,7 +88,7 @@ short CLoginForm::GetUserPermission(std::string user_name,
 //     short permission = 0;
 //     SQLINTEGER sql_permission=SQL_NTS;
     SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &m_permission_, 0, &m_sql_permission_);
-	    m_return_code_ = SQLFetch(m_hstmt_);
+	m_return_code_ = SQLFetch(m_hstmt_);
     if ((SQL_SUCCESS != m_return_code_) &&
         (SQL_SUCCESS_WITH_INFO != m_return_code_))
     {

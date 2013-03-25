@@ -17,29 +17,29 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 //TODO:以下需要更改
 			HTREEITEM tree_parent;
-			CCommodity commodity;//商品具体信息
+			CCommodity commodity;  //商品具体信息
 			std::string error;
 			commodity_tree.Initialization(hwnd, IDC_TREE_COMMODITY);
 			CComMainCateForm comodity_main;//主商品分类
-			comodity_main.SetSQLStatement("select * from MainCategory");
+//			comodity_main.SetSQLStatement("select * from MainCategory");
 //             comodity_main.GetRecordSet();
-// 			if(false == comodity_main.GetMainCategoryName(error))
-// 			{
-// 				MessageBox(hwnd, error.c_str(), TEXT("获取商品主分类出错"), MB_OK);
-// 				return TRUE;
-// 			}
-			comodity_main.MoveFirst();
+			if(false == comodity_main.GetMainCategoryName(error))
+			{
+				MessageBox(hwnd, error.c_str(), TEXT("获取商品主分类出错"), MB_OK);
+				return TRUE;
+			}
+//			comodity_main.MoveFirst();
 			while(!comodity_main.IsEOF())
 			{
-				tree_parent = commodity_tree.InsertRootItem(comodity_main.name());/*插入父节点*/
+				tree_parent = commodity_tree.InsertRootItem(comodity_main.name()); // 插入父节点
 // 				commodity.SelectByName(comodity_category.name(), error);
 // 				while(!commodity.IsEOF())
 // 				{
-// 					commodity_tree.InsertChildItem(tree_parent, commodity.name());/*根据商品分类名称查询商品，再插入相应的根节点下*/
+// 					commodity_tree.InsertChildItem(tree_parent, commodity.name());// 根据商品分类名称查询商品，再插入相应的根节点下
 // 					commodity.MoveNext();
 // 				}
  				comodity_main.MoveNext();
-			}
+		}  
 	//		InitCommodityTree(hwnd, IDC_TREE_COMMODITY);/*TODO:尚未定义*/
 //			InitBasicInfoList(hwnd, IDC_BASIC_INFO);
 //			ShowCommodity(hwnd);/*执行查询，显示查询结果*/
@@ -52,7 +52,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				case IDC_TREE_COMMODITY:
 					{
-						if (((LPNMHDR)lParam)->code == NM_DBLCLK) /*双击树形控件中的一项*/
+						if (((LPNMHDR)lParam)->code == NM_DBLCLK)  // 双击树形控件中的一项
 						{
 							HTREEITEM selection ;
 							selection = commodity_tree.GetSelectedItem();
@@ -61,8 +61,8 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							if (commodity_tree.GetItem(sizeof(text),text))
 							{
 								std::string error;
-								CCommodity commodity;/*商品具体信息*/
-								commodity.SelectByName(text, error);/*通过商品名称或商品分类名称查找具体商品*/
+								CCommodity commodity; // 商品具体信息*/
+								commodity.SelectByName(text, error); // 通过商品名称或商品分类名称查找具体商品
 							
 								CListView staff_list;
 								staff_list.Initialization(hwnd, IDC_BASIC_INFO);

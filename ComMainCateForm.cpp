@@ -27,8 +27,8 @@ CComMainCateForm::~CComMainCateForm()
  */
 bool CComMainCateForm::BindingParameter()
 {
-	SQLBindCol(m_hstmt_, 1, SQL_C_SHORT, &m_no_, sizeof(m_no_), &m_sql_no_);
-	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
+// 	SQLBindCol(m_hstmt_, 1, SQL_C_SHORT, &m_no_, sizeof(m_no_), &m_sql_no_);
+// 	SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
 	return true;
 }
 
@@ -41,33 +41,43 @@ bool CComMainCateForm::BindingParameter()
  */
 bool CComMainCateForm:: GetMainCategoryName(std::string &error)
 {
-	m_sql_name_ = SQL_NTS;
-	m_sql_no_ = SQL_NTS;
-	m_sql_pro_ret = SQL_NTS;
+	this->Initialize();
+
 // 	 if(false == BindReturn())
 // 	 {
 // 		 ReportError(m_hstmt_, SQL_HANDLE_STMT,error);
 // 		 return false;
 // 	 }   
 	//{? = call GetMainCategoryName}
+	
+	if(false == ExecSQLProc("{call GetMainCategoryName}", error))
+	{
+		return false;
+	}
 	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_name_, sizeof(m_name_), &m_sql_name_);
 	if ((m_return_code_ != SQL_SUCCESS) && (m_return_code_ != SQL_SUCCESS_WITH_INFO))
 	{
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
 		return false;
 	}
-	if(false == ExecSQLProc("exec GetMainCategoryName", error))
+
+	if(false == MoveFirst())
 	{
 		return false;
 	}
-
-// 	if(false == MoveFirst())
-// 	{
-// 		return false;
-// 	}
-//    if (false == IsSQLProcRetRight(error))
-//    {
-// 	return false;
+//     if (false == IsSQLProcRetRight(error))
+//     {
+//     	return false;
 // 	}
 	return true;
+}
+
+/*
+ * @ brief: 初始化sql类型数据
+ **/
+void CComMainCateForm::Initialize() 
+{
+	this->m_sql_name_ = SQL_NTS;
+	this->m_sql_no_ = SQL_NTS;
+	this->m_sql_old_no_ = SQL_NTS;
 }
