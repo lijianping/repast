@@ -191,3 +191,12 @@ bool CComboBox::SetCurSel(const int index)
 	}
 	return false;
 }
+
+/*
+ * @ brief: 查找指定的字符串
+ * @ param: text [in] 待查找的字符串
+ * @ return: 若成功返回字符串索引，否则返回-1
+ **/
+int CComboBox::FindString(const char *text) {
+	return SendMessage(m_hwnd_, CB_FINDSTRING, 0, (LPARAM)text);
+}

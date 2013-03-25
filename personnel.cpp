@@ -231,41 +231,6 @@ BOOL CALLBACK EditStaff(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
-/* 
- * @ Description: Create the staffs list view in personnel main window.
- * @ Parameters:
- *		parent_hwnd [in] Specifies the list view's parent window.
- * @ Return Value:
-		If it is success, the return value is true; otherwise, the return value is false.
- */
-bool CreateStaffListView(HWND parent_hwnd)
-{
-	CListView staff_list;
-	RECT window_rect, list_rect;
-	GetWindowRect(parent_hwnd, &window_rect); /* Get the window rect */
-	int width = window_rect.right - window_rect.left; /* Calculate the window width */
-	int height = window_rect.bottom - window_rect.top; /* Calculate the window height */
-	/* Set the staff list start point */
-	list_rect.left = 20;
-	list_rect.top = height / 4;
-	/* Set the staff list width and height */
-	list_rect.right = width - 40;
-	list_rect.bottom = height / 4 * 3 - 40;
-	DWORD style = LVS_REPORT | LVS_EDITLABELS; /* Set the list view's style */
-	/* Set the new list view process */
-//	staff_list.set_new_process(StaffListProc);
-	bool is_ok = staff_list.Create(style, list_rect, parent_hwnd,
-                                   ID_PERSONNEL_INFO);
-	/* When the list view create successfully and
-     * set the new list view process, save the old
-     * list view process. 
-	 */
-	if (is_ok && staff_list.is_set_process())
-	{
-		g_OldListProc = staff_list.old_process();
-	}
-	return is_ok;
-}
 
 /* 
  * @ Description: Create the staffs list view in personnel main window.
@@ -418,7 +383,7 @@ bool InitComboBox(HWND hwnd, int id)
 	hwnd_combo = GetDlgItem(hwnd, id);
 	cdept.SetSQLStatement("select * from Dept");
 	cdept.GetRecordSet();
-	cdept.MoveFirst();
+//	cdept.MoveFirst();
 	while (!cdept.IsEOF())
 	{
 		if (CB_ERR == SendMessage(hwnd_combo, CB_ADDSTRING, 0, (LPARAM)cdept.name()))
@@ -621,6 +586,7 @@ bool ExecQuery(const HWND hwnd, UINT id, const char *sql_query, std::string &err
 	}
 	staff.BindingParameter();  /* In this function, there no error judge. */
 	/* Move to the first of the record set */
+	
 	staff.MoveFirst();  
 	/*TODO:此处判断无匹配的结果有问题*/
 	if (0 == strcmp("",staff.id()))

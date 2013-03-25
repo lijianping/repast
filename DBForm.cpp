@@ -60,26 +60,26 @@ bool CDBForm::SQLAllocHandleStmt(std::string &error_info)
     }
 
 	/* 设置游标属性：用行版本控制乐观并发设置动态游标类型 */
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
-		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
-		SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        error_info = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-        return false;
-	}
-    m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
-		(SQLPOINTER)SQL_CONCUR_ROWVER, 
-		SQL_IS_INTEGER);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        error_info = "设置数据库滚动游标失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-        return false;
-    }
+//     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
+// 		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
+// 		SQL_IS_INTEGER);
+//     if ((m_return_code_ != SQL_SUCCESS) &&
+//         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+//     {
+//         error_info = "设置数据库滚动游标失败！";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+//         return false;
+// 	}
+//     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
+// 		(SQLPOINTER)SQL_CONCUR_ROWVER, 
+// 		SQL_IS_INTEGER);
+//     if ((m_return_code_ != SQL_SUCCESS) &&
+//         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+//     {
+//         error_info = "设置数据库滚动游标失败！";
+// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
+//         return false;
+//     }
 	return true;
 }
 
@@ -103,7 +103,8 @@ bool CDBForm::IsEOF()
 bool CDBForm::MoveFirst()
 {
 	std::string error;
-	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
+	m_return_code_ = SQLFetch(m_hstmt_);
+	// m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
 	if ((m_return_code_ == SQL_ERROR) ||
         (m_return_code_ == SQL_INVALID_HANDLE))
     {
@@ -199,6 +200,7 @@ bool CDBForm::GetRecordSet()
 
     /* 绑定参数 */
     BindingParameter(); 
+	SQLFetch(m_hstmt_);
     return true;
 }
 
@@ -275,7 +277,7 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 		error_info = TEXT("报告错误发生的原因是，分配sqlstate内存失败");
 		return false;
     }
-	sql_state = 0;
+/*	sql_state = 0;*/
 	
 	/*获取错误*/
     SQLGetDiagRec(handle_type, hdbc, record_number, sql_state, &native_error,
@@ -704,7 +706,7 @@ bool CDBForm::RollBack()
 	if ((m_return_code_ != SQL_SUCCESS) &&
 		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
 	{
-		error = "执行修改用户存储过程出错!";
+		error = "执行存储过程出错!";
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
 		return false;
     }
@@ -714,14 +716,15 @@ bool CDBForm::RollBack()
 
  /*
   * 说明：
-  *      获取执行存储过程的返回值,若是存储过程的返回值和其他数据记录集一起返回，
-  *      请先取数据记录集里的数据，再调用此函数获取存储过程的返回值
+  *      判断存储过程执行是否成功
+         若是存储过程的返回值和其他数据记录集一起返回，
+  *      请先取数据记录集里的数据，再调用此函数判断存储过程的执行是否成功
   * 参数：
   *      error    [out] 记录错误信息
   * 返回值：
   *       成功返回true, 否则返回false
   */
-bool CDBForm::GetSQLProcRet(std::string &error)
+bool CDBForm::IsSQLProcRetRight(std::string &error)
 {
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
 	{
@@ -732,7 +735,7 @@ bool CDBForm::GetSQLProcRet(std::string &error)
 	}
 	else if (2627 == m_pro_ret )
 	{
-		error="员工编号不能重复！";
+		error="字段重复！请更正为不同的值！";
 		return false;
 	}
 	else

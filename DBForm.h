@@ -43,15 +43,16 @@ public:
 	int GetSecond();
 	std::string GetSecondString();
 	bool Connect(const char *dsn, const char *id, 
-		const char *password, std::string &information);
+	             const char *password, std::string &information);
     void Disconnect();
 	void DeleteSpace(const char * src, char * des);
 	bool SetAutoCommit(bool is_auto_commit);
 	bool Commit();
 	bool RollBack();
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
-    bool GetSQLProcRet(std::string &error);
+    bool IsSQLProcRetRight(std::string &error);
 	bool BindReturn();
+
 
 protected:
 	inline bool is_connect();

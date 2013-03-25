@@ -96,11 +96,19 @@ SOURCE=.\basic_info.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\basic_manager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Button.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\ComboBox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ComMainCateForm.cpp
 # End Source File
 # Begin Source File
 
@@ -216,11 +224,19 @@ SOURCE=.\basic_info.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\basic_manager.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\childwindowid.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\ComboBox.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ComMainCateForm.h
 # End Source File
 # Begin Source File
 

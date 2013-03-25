@@ -33,7 +33,7 @@ bool TreeCtrl::Initialization(HWND hwnd, UINT id) {
  * @ param: text [in] 文本
  * @ return: 若成功返回当前item的handle，否则返回NULL
  **/
-HTREEITEM TreeCtrl::InsertRootItem(TCHAR *text) {
+HTREEITEM TreeCtrl::InsertRootItem(char *text) {
 	TVINSERTSTRUCT tree_insert;
 	tree_insert.hParent = NULL;
 	tree_insert.hInsertAfter = TVI_ROOT;
@@ -48,7 +48,7 @@ HTREEITEM TreeCtrl::InsertRootItem(TCHAR *text) {
  * @ param: text [in] 文本
  * @ return: 若成功返回当前item的handle，否则返回NULL
  **/
-HTREEITEM TreeCtrl::InsertChildItem(HTREEITEM parent, TCHAR *text) {
+HTREEITEM TreeCtrl::InsertChildItem(HTREEITEM parent, char *text) {
 	HTREEITEM item = NULL;
 	if (parent != NULL) {
 		TVINSERTSTRUCT tree_insert;
@@ -116,7 +116,7 @@ bool TreeCtrl::GetItem(HTREEITEM select, int len, char *text) {
 	memset(text, '0', len); // 清空缓冲区
 	TV_ITEM item;
 	item.mask = TVIF_TEXT;
-	item.pszText = (TCHAR *)text;
+	item.pszText = text;
 	item.cchTextMax = len;
 	item.hItem = select;
 	BOOL is_ok = SendDlgItemMessage(GetParent(hwnd_), id_, TVM_GETITEM, TVGN_CARET, (LPARAM)&item);
@@ -136,4 +136,50 @@ bool TreeCtrl::SelectDropTarget(HTREEITEM item) {
 bool TreeCtrl::EnsureVisible(HTREEITEM item) {
 	BOOL is_ok = TreeView_EnsureVisible(hwnd_, item);
 	return (is_ok == TRUE);
+}
+
+/*
+ * @ brief: 获取根节点
+ * @ return: 成功返回item句柄，否则返回NULL
+ **/
+HTREEITEM TreeCtrl::GetRoot() {
+	return TreeView_GetRoot(hwnd_);
+}
+
+HTREEITEM TreeCtrl::GetChild(HTREEITEM parent) {
+	return TreeView_GetChild(hwnd_, parent);
+}
+/*
+ * @ brief: 获取item节点的兄弟节点
+ * @ return: 成功返回item句柄，否则返回NULL
+ **/
+HTREEITEM TreeCtrl::GetNextSibling(HTREEITEM item) {
+	return TreeView_GetNextSibling(hwnd_, item);
+}
+
+HTREEITEM TreeCtrl::FindItem(HTREEITEM item, const char *text) {
+	HTREEITEM find_item = NULL;
+	if (item == NULL) {   // 如果根节点为空，直接返回
+		return find_item;
+	}
+	char item_text[512];
+	while (item != NULL) {
+		memset(item_text, 0, sizeof(item_text));
+		GetItem(item, 512, item_text); // 获取当前节点文本
+		if (strcmp(item_text, text) == 0) {  // 若相等，则返回
+			find_item = item;
+			return find_item;
+		} 
+		// 不相等，递归查询
+		HTREEITEM child = GetChild(item); // 获取子节点
+		if (child != NULL) { // 子节点不为空查找
+			find_item = FindItem(child, text); // 递归查找子节点
+			if (find_item != NULL) {  // 若不为空表示已查找到，返回
+				return find_item;
+			}
+		} else {  // 若子节点为空，查找兄弟节点
+			item = GetNextSibling(item);  // 查找兄弟节点
+		}
+	}
+	return find_item;
 }

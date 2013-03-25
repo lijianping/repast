@@ -22,6 +22,7 @@ public:
     bool EnableWindow(BOOL enable = TRUE);
     bool GetComboBoxText(std::string &text);
 	bool SetCurSel(const int index);
+	int FindString(const char *text);
 private:
     UINT m_id_;
     HWND m_hwnd_;

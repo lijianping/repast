@@ -53,6 +53,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                                                       user_name, 256);
                     UINT password_return = GetDlgItemText(hwnd, IDC_PASSWORD,
                                                           user_password, 128);
+					
                     if ((0 == name_return) || (0 == password_return))
                     {
                         MessageBox(hwnd, TEXT("用户名或密码为空！"),
@@ -66,10 +67,11 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
 						std::string error_information;
                         std::string name(user_name);
                         std::string password(user_password);
-						  
-                        return_value = login.GetUserPermission(name, password,
+						 CLoginForm lo;
+						 std::string pw = lo.Encrypt(password.c_str(), password.length()/2, password.length());
+                        return_value = login.GetUserPermission(name, pw,
                                                                     error_information);
-                        if (0 == return_value)
+                        if (-1 == return_value)
                         {
                             MessageBox(hwnd, error_information.c_str(),
                                        TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);

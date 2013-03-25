@@ -30,10 +30,14 @@
 #define IDD_CONSUMPTION_DETAIL          117
 #define IDD_TAB_PERSONNEL               118
 #define IDD_TAB_SERVER                  119
-#define IDD_TAB_BASIC_INFO              120
+#define IDD_BASIC_COMMODITY             120
 #define IDD_EDIT_COMMODITY              121
 #define IDD_EDIT_COMMODITY_CATEGORY     122
 #define IDD_EDIT_PERMISSION             123
+#define IDD_TAB_BASIC_INFO_             124
+#define IDD_TAB_BASIC_INFO              124
+#define IDD_BASIC_TABLE                 125
+#define IDD_BASIC_UNTENSIL              126
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -92,21 +96,32 @@
 #define ID_SERVICE_START                1063
 #define IDC_BASIC_INFO_ADD              1063
 #define IDC_COMMODITY_CANCEL            1063
+#define IDC_E_PERMISSION_ADD            1063
+#define IDC_B_FLOOR                     1063
+#define IDC_B_UTENSIL_ADD               1063
 #define IDC_BUTTON2                     1064
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
 #define IDC_BASIC_INFO_MODIFY           1064
 #define IDC_QUERY_DETAIL                1064
+#define IDC_E_PERMISSION_MODIFY         1064
 #define IDC_PERMISSION_ADD              1064
+#define IDC_B_ROOM                      1064
+#define IDC_B_UTENSIL_MODIFY            1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
 #define IDC_BASIC_INFO_DELETE           1065
-#define IDC_PERMISSION_ADD2             1065
+#define IDC_E_PERMISSION_DELETE         1065
+#define IDC_B_TABLE                     1065
+#define IDC_B_UTENSIL_DELETE            1065
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
 #define IDC_BASIC_EDIT_CATEGORY         1066
 #define IDC_DELETE_PERMISSION           1066
+#define IDC_E_PERMISSION_CANCEL         1066
+#define IDC_EDIT_PERMISSION             1066
+#define IDC_B_UTENSIL_SORT              1066
 #define ID_SERVICE_BOOK                 1067
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
@@ -121,6 +136,7 @@
 #define IDC_CONFIRM                     1079
 #define IDC_TAB1                        1079
 #define IDC_TAB_MAIN                    1079
+#define IDC_CHILD_TAB                   1079
 #define IDC_USER_LIST                   1080
 #define IDC_ADD_USER                    1081
 #define IDC_MODIFY_USER                 1082
@@ -149,10 +165,11 @@
 #define IDC_E_CANCEL                    1104
 #define IDC_E_USER_NAME                 1105
 #define IDC_E_STAFF_NAME1               1105
-#define IDC_E_PERMISSION_NAME           1105
+#define IDC_E_STAFF_NAME                1105
 #define IDC_E_USER_PASSWD               1106
 #define IDC_E_CONFROM_PASSWD            1107
 #define IDC_E_USER_NAME2                1108
+#define IDC_E_LOGIN_NAME                1108
 #define IDC_LIST1                       1110
 #define IDC_EDIT1                       1111
 #define IDC_EDIT2                       1112
@@ -217,6 +234,13 @@
 #define IDC_S_PERMISSION_NO             1181
 #define IDC_S_PERMISSION_NAME           1182
 #define IDC_E_PERMISSION_NO             1183
+#define IDC_E_PERMISSION_NAME           1184
+#define IDC_T_TABLE_INFO                1184
+#define IDC_S_TABLE_INFO                1185
+#define IDC_L_TABLE_INFO                1186
+#define IDC_T_UTENSIL                   1187
+#define IDC_S_UTENSIL                   1188
+#define IDC_L_UTENSIL                   1189
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -225,9 +249,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        124
+#define _APS_NEXT_RESOURCE_VALUE        127
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1184
+#define _APS_NEXT_CONTROL_VALUE         1190
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

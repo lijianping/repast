@@ -10,7 +10,11 @@
 #include "childwindowid.h"
 #include "resource.h"
 #include "Commodity.h"
-#include "CommodityCategoryForm.h"
+#include "tabctrl.h"
+#include "pagectrl.h"
+#include "CommodityCategoryForm.h"//TODO:½«±»É¾³ý
+#include "ComMainCateForm.h"
+#include "hildCateForm.h"
 
 BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

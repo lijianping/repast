@@ -22,6 +22,7 @@ public:
 	int CanUndo();
 	void EmptyUndoBuffer();
 	void Empty();
+	bool SetReadOnly(bool read_only = true);
 
 private:
     UINT m_id_;

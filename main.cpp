@@ -4,7 +4,9 @@
 #include "childwindowid.h"
 #include "basic_info.h"
 #include "manager.h"
+#include "basic_manager.h"
 //#include <SkinPPWTL.h>
+
 
 
 bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect);
@@ -124,7 +126,7 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect)
 {
 	h_server.CreatePage(g_hinstance, tab_hwnd, IDD_TAB_SERVER, (DLGPROC)ServiceProcesses);
-	h_basic_info.CreatePage(g_hinstance, tab_hwnd, IDD_TAB_BASIC_INFO, (DLGPROC)BasicInfoProc);
+	h_basic_info.CreatePage(g_hinstance, tab_hwnd, IDD_TAB_BASIC_INFO, (DLGPROC)BasicManagerProc);
 	h_personnel.CreatePage(g_hinstance, tab_hwnd, IDD_TAB_PERSONNEL, (DLGPROC)PersonnelProc);
 	h_finance.CreatePage(g_hinstance, tab_hwnd, IDD_TAB_FINANCE, (DLGPROC)FinanceProc);
 	h_user.CreatePage(g_hinstance, tab_hwnd, IDD_TAB_USER, (DLGPROC)UserManagementProc);
@@ -204,12 +206,14 @@ BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 					GetDlgItemText(hwnd, IDC_OLD_PASSWD, old_passwd, 64);
 					std::string password(old_passwd), error;
 					CLoginForm modify_passwd;
+					std::string pw = modify_passwd.Encrypt(password.c_str(), password.length() / 2, password.length());
+					std::string pw1 = modify_passwd.Encrypt(password1.c_str(), password1.length() / 2, password1.length());
 					// 判断用户密码是否正确
-					if (0 == modify_passwd.GetUserPermission(g_login_name, password, error)) {
+					if (-1 == modify_passwd.GetUserPermission(g_login_name, pw, error)) {
 						MessageBox(hwnd, TEXT("用户密码错误！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
 						return FALSE;
 					}
-					if (!modify_passwd.ModifyPasswd(g_login_name, password1))
+					if (!modify_passwd.ModifyPasswd(g_login_name, pw1))
 					{
 						MessageBox(hwnd, TEXT("修改用户密码失败！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
 						break;
