@@ -105,7 +105,7 @@ bool TreeCtrl::GetItem(int len, char *text) {
 	item.pszText = (TCHAR *)text;
 	item.cchTextMax = len;
 	item.hItem = select;
-	BOOL is_ok = SendDlgItemMessage(GetParent(hwnd_), id_, TVM_GETITEM, TVGN_CARET, (LPARAM)&item);
+	BOOL is_ok = SendDlgItemMessage(::GetParent(hwnd_), id_, TVM_GETITEM, TVGN_CARET, (LPARAM)&item);
 	return (is_ok == TRUE);
 }
 
@@ -119,7 +119,7 @@ bool TreeCtrl::GetItem(HTREEITEM select, int len, char *text) {
 	item.pszText = text;
 	item.cchTextMax = len;
 	item.hItem = select;
-	BOOL is_ok = SendDlgItemMessage(GetParent(hwnd_), id_, TVM_GETITEM, TVGN_CARET, (LPARAM)&item);
+	BOOL is_ok = SendDlgItemMessage(::GetParent(hwnd_), id_, TVM_GETITEM, TVGN_CARET, (LPARAM)&item);
 	return (is_ok == TRUE);
 }
 
@@ -146,6 +146,13 @@ HTREEITEM TreeCtrl::GetRoot() {
 	return TreeView_GetRoot(hwnd_);
 }
 
+/*
+ * @ brief: 获取父节点信息
+ * @ return 成功返回父节点句柄，否则返回NULL
+ **/
+HTREEITEM TreeCtrl::GetParent(HTREEITEM item) {
+	return TreeView_GetParent(hwnd_, item);
+}
 HTREEITEM TreeCtrl::GetChild(HTREEITEM parent) {
 	return TreeView_GetChild(hwnd_, parent);
 }
@@ -157,6 +164,12 @@ HTREEITEM TreeCtrl::GetNextSibling(HTREEITEM item) {
 	return TreeView_GetNextSibling(hwnd_, item);
 }
 
+/*
+ * @ brief: 查找指定内容的节点
+ * @ param: item [in] 开始查找的节点句柄
+ * @ param: text [in] 查找的内容
+ * @ return: 若查找成功返回节点句柄，否则返回NULL
+ **/
 HTREEITEM TreeCtrl::FindItem(HTREEITEM item, const char *text) {
 	HTREEITEM find_item = NULL;
 	if (item == NULL) {   // 如果根节点为空，直接返回

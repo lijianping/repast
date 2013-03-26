@@ -2,27 +2,27 @@
 #define REPAST_TABLEINFO_H_
 #include "DBForm.h"
 
+static const char *TableStatus[] = {
+	"未开台",
+	"已开台",
+	"已预定"
+};
+
 class CTableInfo : public CDBForm
 {
 public:
 	CTableInfo();
 	virtual ~CTableInfo();
-	enum TableStatus {
-		kFounding = 0,       // 未开台 
-		kNotFounding = 1,    // 已开台 
-		kBooked = 2          // 已预定 
-	};
-	inline char* table_no();
-	inline short payable_num();
-	inline short real_num();
-	inline short table_status();
-	inline char* datetime();
+	
 	bool UpdateForm(std::string sql, std::string &error);
 	virtual bool BindingParameter();
 
 	bool GetTableInfoSet(const char *floor_name);
 	bool GetTableInfoSet(const char *floor_name, const char *room_name);
 	void Initialize();
+	inline char* table_no();
+	inline short status();
+	inline short payable();
 
 private:
 	char m_table_no_[7];			 // 编号 
@@ -46,33 +46,28 @@ private:
 };
 
 /*
- * 说明: 获取台号
- * 返回值: 台号字符串
+ * @ brief: 获取台号
+ * @ return: 台号字符串指针
  **/
-char* CTableInfo::table_no()
-{
-	return m_table_no_;
+char* CTableInfo::table_no() {
+	DeleteSpace(table_no_, table_no_);
+	return table_no_;
 }
 
 /*
- * 说明: 获取台号状态
- * 返回值: 	0, 已开台 
- *          1, 未开台 
- *          2, 已预定 
+ * @ brief: 获取台号状态
+ * @ return: 台号的状态信息 0 -- 未开台 1 -- 开台 2 -- 预订
  **/
-short CTableInfo::table_status()
-{
-	return m_table_status_;
+short CTableInfo::status() {
+	return status_;
 }
 
 /*
- * 说明: 获取应容人数
- * 返回值: 应容人数
-**/
-short CTableInfo::payable_num()
-{
-	return m_payable_num_;
+ * @ brief: 获取台号可容纳的人数
+ * @ return: 可容纳的人数
+ **/
+short CTableInfo::payable() {
+	return payable_;
 }
-
 
 #endif 
