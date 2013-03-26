@@ -15,6 +15,7 @@
 #include "treectrl.h"
 #include "Commodity.h"
 #include "CommodityCategoryForm.h"
+#include "floorinfo.h"
 #include <MATH.H>
 #include <TIME.H>
 
@@ -24,20 +25,29 @@ WNDPROC g_checkout_edit_proc;
 WNDPROC g_change_table_list;
 extern std::string g_login_name;
 
-char* status[3] = {"未开台", "已开台", "已预订"};
-
 BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
 {
-	static HINSTANCE hinstance = (HINSTANCE)lParam;
+	static HINSTANCE hinstance;
 	switch (message)
 	{
 	case WM_INITDIALOG:
 		{
-			InitListView(hwnd, ID_SERVICE_LIST); /* Insert the list view's title */
-//			InitComboBox(hwnd, ID_SERVICE_COMBO);
+			hinstance = (HINSTANCE)lParam;
+			InitListView(hwnd, ID_SERVICE_LIST); // Insert the list view's title
 			std::string error_info;
-//			SetListInfo(hwnd, ID_SERVICE_LIST, "01", error_info);
+			CComboBox combo(hwnd, ID_SERVICE_COMBO);   // 初始化楼层Combo box
+			try {
+				FloorInfo floor_name;
+				floor_name.GetFloorName();
+				while (!floor_name.IsEOF()) {
+					combo.AddString(floor_name.floor_name());
+				}
+			} catch (Err &err) {
+				MessageBox(hwnd, err.what(), TEXT("SERVICE"), MB_ICONERROR);
+				return FALSE;
+			}
+			combo.SetCurSel(0);
 			return TRUE;
 		}
     case WM_SETFOCUS:
@@ -113,7 +123,7 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					break;
 				}
 				std::string current_status = table_list.GetItem(select_row, 1);
-				if (std::string(status[0]) == current_status)
+				if (std::string(TableStatus[0]) == current_status)
 				{
 					MessageBox(hwnd, TEXT("该台尚未开台或预订， 不可进行换台！"), 
 							   TEXT("服务管理"), MB_ICONINFORMATION);
@@ -138,7 +148,7 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 						break;
 					}
 					std::string current_status = table_list.GetItem(select_row, 1);
-					if (std::string(status[0]) == current_status)
+					if (std::string(TableStatus[0]) == current_status)
 					{
 						MessageBox(hwnd, TEXT("该台尚未开台！"), TEXT("服务管理"), MB_ICONINFORMATION);
 						break;
@@ -163,7 +173,7 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 						break;
 					}
 					std::string current_status = table_list.GetItem(select_row, 1);
-					if (std::string(status[0]) == current_status)
+					if (std::string(TableStatus[0]) == current_status)
 					{
 						MessageBox(hwnd, TEXT("该台尚未开台！"), TEXT("服务管理"), MB_ICONINFORMATION);
 						break;
@@ -226,16 +236,12 @@ bool InitListView(const HWND hwnd, UINT id)
  */
 bool InitComboBox(const HWND hwnd, int id)
 {
-	HWND combo;
-	combo = GetDlgItem(hwnd, id);
-	if (CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"一楼") ||
-		CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"二楼") ||
-		CB_ERR == SendMessage(combo, CB_ADDSTRING, 0, (LPARAM)"三楼"))
-	{
-		return false;
+	CComboBox combo(hwnd, id);
+	FloorInfo floor_name;
+	floor_name.GetFloorName();
+	while (!floor_name.IsEOF()) {
+		combo.AddString(floor_name.floor_name());
 	}
-	/* Set the first item into edit box of the combo box */
-	SendMessage(combo, CB_SETCURSEL, 0, 0);
 	return true;
 }
 
@@ -876,7 +882,7 @@ bool SetListInfo(const HWND hwnd, const UINT id,
 	while (!customer.IsEOF()) 
 	{
 		list.InsertItem(i, customer.table_no());
-		list.SetItem(i, 1, status[customer.table_state()]);
+		list.SetItem(i, 1, TableStatus[customer.table_state()]);
 		list.SetItem(i, 2, customer.customer_no());
 		list.SetItem(i, 3, customer.founding_time()); 
 		/* TODO: Add data time at here. */

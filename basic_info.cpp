@@ -38,11 +38,6 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							HTREEITEM child_node;
 							// 根据商品分类名称查询商品，再插入相应的根节点下
 							child_node = category_tree.InsertChildItem(tree_parent, child_name.c_str());
-// 							CCommodity comdity;
-// 							comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
-// 							while (!comdity.IsEOF()) {
-// 								commodity_tree.InsertChildItem(child_node, comdity.name());
-// 							}
 						}
 					}
 				} 
@@ -60,83 +55,65 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				case IDC_TREE_COMMODITY:
 					{
-						if (((LPNMHDR)lParam)->code == NM_DBLCLK) /*双击树形控件中的一项*/
-						{
-							char main_category[33];
-							char child_category[33];
-							TreeCtrl category_tree;
-							category_tree.Initialization(hwnd, IDC_TREE_COMMODITY);;
-							HTREEITEM selection;
-							selection = category_tree.GetSelectedItem();
-							category_tree.GetItem(selection,sizeof(main_category),main_category);
-							MessageBox(hwnd,main_category,"fdfd",0);
-							category_tree.EnsureVisible(selection);
-							if (category_tree.GetParent(selection) == NULL)//是根结点
-							{
-								MessageBox(hwnd,"无父结点", "tree",0);
-								if (category_tree.GetItem(selection,sizeof(main_category),main_category))
-								{
-									//TODO:根据父结点名称查询
-								
+						if (((LPNMHDR)lParam)->code == NM_DBLCLK)  { // 双击树形控件中的一项
+							TreeCtrl basic_info(hwnd, IDC_TREE_COMMODITY);
+							HTREEITEM select = basic_info.GetSelectedItem();
+							if (!select) {   // 为空，退出
+								break;
+							}
+							char current_item_text[512];
+							basic_info.GetItem(select, 512, current_item_text);
+							HTREEITEM parent_node = basic_info.GetParent(select);
+							if (parent_node) {
+								char parent_item_text[512];
+								basic_info.GetItem(parent_node, 512, parent_item_text);
+								try {
+									CCommodity commodity_info;
+									commodity_info.GetCommodityNameSet(parent_item_text, current_item_text);
+									CListView basic_list(hwnd, IDC_BASIC_INFO);
+									basic_list.DeleteAllItems();
+									int i = 0;
+									while (!commodity_info.IsEOF()) {
+										basic_list.InsertItem(i, commodity_info.no());
+										basic_list.SetItem(i, 1, commodity_info.name());
+										basic_list.SetItem(i, 2, commodity_info.purchase_price());
+										basic_list.SetItem(i, 3, commodity_info.quantity());
+										basic_list.SetItem(i, 4, commodity_info.unit());
+										basic_list.SetItem(i, 5, commodity_info.sale_price());
+										basic_list.SetItem(i, 6, commodity_info.register_date());
+										i++;
+									}
+								} catch (Err &err) {
+									MessageBox(hwnd, err.what(), TEXT("TABLE INFOR"), MB_ICONINFORMATION);
+									return FALSE;
 								}
-							}
-							else//有父节点
-							{
-									MessageBox(hwnd,"有父结点", "tree",0);
-								 if (category_tree.GetItem(selection,sizeof(child_category),child_category))
-								 {
-									 //TODO:根据父结点，子节点名称查询
-									
-								 }
-							}
-							
-						}
+							} else {
+								try {
+									CCommodity commodity_info;
+									commodity_info.GetCommodityNameSet(current_item_text);
+									CListView basic_list(hwnd, IDC_BASIC_INFO);
+									basic_list.DeleteAllItems();
+									int i = 0;
+									while (!commodity_info.IsEOF()) {
+										basic_list.InsertItem(i, commodity_info.no());
+										basic_list.SetItem(i, 1, commodity_info.name());
+										basic_list.SetItem(i, 2, commodity_info.purchase_price());
+										basic_list.SetItem(i, 3, commodity_info.quantity());
+										basic_list.SetItem(i, 4, commodity_info.unit());
+										basic_list.SetItem(i, 5, commodity_info.sale_price());
+										basic_list.SetItem(i, 6, commodity_info.register_date());
+										i++;
+									}
+								} catch (Err &err) {
+									MessageBox(hwnd, err.what(), TEXT("TABLE INFOR"), MB_ICONINFORMATION);
+									return FALSE;
+								}
+							} // end else
+						}  // end first if
 						break;
 					}
-			}
-// 			switch(LOWORD(wParam))
-// 			{
-// 				case IDC_TREE_COMMODITY:
-// 					{
-// 						if (((LPNMHDR)lParam)->code == NM_DBLCLK) /*双击树形控件中的一项*/
-// 						{
-// 							HTREEITEM selection ;
-// 							selection = commodity_tree.GetSelectedItem();
-// 							commodity_tree.EnsureVisible(selection);
-// 							char text[256];
-// 							if (commodity_tree.GetItem(sizeof(text),text))
-// 							{
-// 								std::string error;
-// 								CCommodity commodity;/*商品具体信息*/
-// 								commodity.SelectByName(text, error);/*通过商品名称或商品分类名称查找具体商品*/
-// 							
-// 								CListView staff_list;
-// 								staff_list.Initialization(hwnd, IDC_BASIC_INFO);
-// 								staff_list.DeleteAllItems();
-// 								int item = 0;
-// 								while (!commodity.IsEOF())
-// 								{
-// 									staff_list.InsertItem(item, commodity.no());
-// 									staff_list.SetItem(item, 1, commodity.name());
-// 									staff_list.SetItem(item, 2, commodity.purchase_price());
-// 									staff_list.SetItem(item, 3, commodity.sum());
-// 									staff_list.SetItem(item, 4, commodity.unit());
-// 									staff_list.SetItem(item, 5, commodity.category());
-// 									staff_list.SetItem(item, 6, commodity.sale_price());
-// 									staff_list.SetItem(item, 7, commodity.register_date());
-// 									commodity.MoveNext();
-// 									item++;
-// 								}
-// 							}
-// 							else
-// 							{
-// 								MessageBox(hwnd, TEXT("Something Error!"), TEXT("HIT"), MB_ICONINFORMATION);
-// 							}	
-// 						}
-// 						break;
-// 					}
-// 			}
-				return TRUE;
+			}  // end case IDC_TREE_COMMODITY
+			return TRUE;
 
 		}
 

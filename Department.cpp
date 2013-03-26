@@ -41,5 +41,6 @@ int CDepartment:: GetDeptSum()
 		MessageBox(NULL, error.c_str(), TEXT("获取部门总数出错"), MB_OK);
 	}
 	SQLBindCol(m_hstmt_, 1, SQL_C_SLONG, &dept_sum, sizeof(dept_sum), &sql_depat_sum);
+	FetchData();
 	return dept_sum;
 }

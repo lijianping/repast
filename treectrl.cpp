@@ -153,6 +153,11 @@ HTREEITEM TreeCtrl::GetRoot() {
 HTREEITEM TreeCtrl::GetParent(HTREEITEM item) {
 	return TreeView_GetParent(hwnd_, item);
 }
+
+/*
+ * @ brief: 获取子节点信息
+ * @ return 成功返回父节点句柄，否则返回NULL
+ **/
 HTREEITEM TreeCtrl::GetChild(HTREEITEM parent) {
 	return TreeView_GetChild(hwnd_, parent);
 }

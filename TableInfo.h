@@ -25,14 +25,6 @@ public:
 	inline short payable();
 
 private:
-	char m_table_no_[7];			 // 编号 
-	short m_table_status_;			 // 状态 
-	short m_payable_num_;			 // 应纳人数 
-	SQLINTEGER m_sql_table_no_;    
-	SQLINTEGER m_sql_table_status_;
-	SQLINTEGER m_sql_payable_num_;
-
-	// 新建,用于取代
 	char table_no_[5];             // 台号
 	char room_name_[33];              // 房间编号
 	char floor_name_[33];             // 楼层编号

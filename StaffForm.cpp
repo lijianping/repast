@@ -321,6 +321,7 @@ int CStaffForm::GetStaffSum()
 		return staff_sum;
 	}
 	SQLBindCol(m_hstmt_, 1, SQL_C_SLONG, &staff_sum, sizeof(staff_sum), &sql_sum);
+	FetchData();
 	return staff_sum;
 }
 
