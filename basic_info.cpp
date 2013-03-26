@@ -5,24 +5,20 @@
 BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static RECT tab_rect;
-	static TreeCtrl commodity_tree;
+	
 	static PageCtrl p_Commodiy;
 	static HINSTANCE hInstance;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
 		{
+		    TreeCtrl category_tree;
 			hInstance = (HINSTANCE)lParam;
-		
-
-//TODO:以下需要更改
 			HTREEITEM tree_parent;
 			CCommodity commodity;  //商品具体信息
 			std::string error;
-			commodity_tree.Initialization(hwnd, IDC_TREE_COMMODITY);
+			category_tree.Initialization(hwnd, IDC_TREE_COMMODITY);
 			ComMainCateForm comodity_main;//主商品分类
-			
-
 			// 获取主分类商品名称
  			if(false == comodity_main.GetMainCateName())
  			{
@@ -33,7 +29,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				while(!comodity_main.IsEOF())
 				{
 					std::string main_name(comodity_main.name());
-					tree_parent = commodity_tree.InsertRootItem(main_name.c_str()); // 插入主分类节点
+					tree_parent = category_tree.InsertRootItem(main_name.c_str()); // 插入主分类节点
 					ChildCateForm comdity_child;//子商品分类
 					if (comdity_child.GetChildCateName(comodity_main.name(), error)) {       // 获取主分类对应的子分类名称
 						while(!comdity_child.IsEOF())
@@ -41,28 +37,61 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							std::string child_name(comdity_child.cate_name());
 							HTREEITEM child_node;
 							// 根据商品分类名称查询商品，再插入相应的根节点下
-							child_node = commodity_tree.InsertChildItem(tree_parent, child_name.c_str());
-							CCommodity comdity;
-							comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
-							while (!comdity.IsEOF()) {
-								commodity_tree.InsertChildItem(child_node, comdity.name());
-							}
+							child_node = category_tree.InsertChildItem(tree_parent, child_name.c_str());
+// 							CCommodity comdity;
+// 							comdity.GetCommodityNameSet(main_name.c_str(), child_name.c_str(), error);
+// 							while (!comdity.IsEOF()) {
+// 								commodity_tree.InsertChildItem(child_node, comdity.name());
+// 							}
 						}
 					}
 				} 
 			} catch(Err &err) {
 				MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
 			}
-	//		InitCommodityTree(hwnd, IDC_TREE_COMMODITY);/*TODO:尚未定义*/
-//			InitBasicInfoList(hwnd, IDC_BASIC_INFO);
-//			ShowCommodity(hwnd);/*执行查询，显示查询结果*/
-		
+	//		InitCommodityTree(hwnd, IDC_TREE_COMMODITY);//TODO:尚未定义,即以上代码
+			InitBasicInfoList(hwnd, IDC_BASIC_INFO);
+//			ShowCommodity(hwnd);//执行查询，显示查询结果
 		return TRUE;
 		}
 	case WM_NOTIFY:
 		{
-//			switch(LOWORD(wParam))
-//			{
+			switch(LOWORD(wParam))
+			{
+				case IDC_TREE_COMMODITY:
+					{
+						if (((LPNMHDR)lParam)->code == NM_DBLCLK) /*双击树形控件中的一项*/
+						{
+							char main_category[33];
+							char child_category[33];
+							TreeCtrl category_tree;
+							HTREEITEM selection ;
+							selection = category_tree.GetSelectedItem();
+							category_tree.EnsureVisible(selection);
+							if ((NULL == category_tree.GetParent(selection))
+								&&(category_tree.GetChild(selection)))//是根结点,但是有子节点
+							{
+								if (category_tree.GetItem(sizeof(main_category),main_category))
+								{
+									//TODO:根据父结点名称查询
+									MessageBox(hwnd,"无父结点", "tree",0);
+								}
+							}
+							else//有父节点
+							{
+								 if (category_tree.GetItem(sizeof(child_category),child_category))
+								 {
+									 //TODO:根据父结点，子节点名称查询
+									 MessageBox(hwnd,"无父结点", "tree",0);
+								 }
+							}
+							
+						}
+						break;
+					}
+			}
+// 			switch(LOWORD(wParam))
+// 			{
 // 				case IDC_TREE_COMMODITY:
 // 					{
 // 						if (((LPNMHDR)lParam)->code == NM_DBLCLK) /*双击树形控件中的一项*/
@@ -102,7 +131,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // 						}
 // 						break;
 // 					}
-//			}
+// 			}
 				return TRUE;
 
 		}

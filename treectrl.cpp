@@ -45,7 +45,7 @@ HTREEITEM TreeCtrl::InsertRootItem(const char *text) {
 /*
  * @ brief: 插入子节点
  * @ param: parent [in] 父节点handle
- * @ param: text [in] 文本
+ * @ param: text [in] 文本t
  * @ return: 若成功返回当前item的handle，否则返回NULL
  **/
 HTREEITEM TreeCtrl::InsertChildItem(HTREEITEM parent, const char *text) {
