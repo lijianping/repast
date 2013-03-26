@@ -896,7 +896,7 @@ bool InitAvailableTable(const HWND hwnd, int id)
 	while (!table_form.IsEOF())
 	{
 		std::string temp = table_form.table_no();
-		short num = table_form.payable_num();
+		short num = table_form.payable();
 		table_list.InsertItem(i, temp);
 		table_list.SetItem(i, 1, num);
 		i++;
@@ -931,7 +931,7 @@ void GetTableInfo(const HWND hwnd, const int id, const char *floor, int use) {
 	while (!table_form.IsEOF())
 	{
 		std::string temp = table_form.table_no();
-		short num = table_form.payable_num();
+		short num = table_form.payable();
 		table_list.InsertItem(i, temp);
 		table_list.SetItem(i, 1, num);
 		i++;

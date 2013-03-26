@@ -25,6 +25,7 @@ public:
 	HTREEITEM GetRoot();
 	HTREEITEM GetParent(HTREEITEM item);
 	HTREEITEM GetChild(HTREEITEM parent);
+	HTREEITEM GetParent(HTREEITEM item);
 	HTREEITEM GetNextSibling(HTREEITEM item);
 	HTREEITEM FindItem(HTREEITEM item, const char *text);
 
