@@ -63,18 +63,20 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                     else
                     {
                         /* get permission from database */
-                        CLoginForm login; 
 						std::string error_information;
-                        std::string name(user_name);
-                        std::string password(user_password);
-						 CLoginForm lo;
-						 std::string pw = lo.Encrypt(password.c_str(), password.length()/2, password.length());
-                        return_value = login.GetUserPermission(name, pw,
-                                                                    error_information);
-                        if (-1 == return_value)
-                        {
-                            MessageBox(hwnd, error_information.c_str(),
-                                       TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
+						std::string name(user_name);
+						std::string password(user_password);
+						try {
+							CLoginForm login; 
+							CLoginForm lo;
+							std::string pw = lo.Encrypt(password.c_str(), password.length()/2, password.length());
+							return_value = login.GetUserPermission(name, pw,error_information);
+						} catch (Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("LOGIN ERROR"), MB_ICONERROR);
+							return FALSE;
+						}
+                        if (-1 == return_value) {
+                            MessageBox(hwnd, error_information.c_str(), TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
                             return FALSE;
                         }
 						g_login_name = name;

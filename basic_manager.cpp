@@ -1,10 +1,11 @@
 
 #include "basic_manager.h"
+#include "table_info.h"
 
 BOOL CALLBACK BasicManagerProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static RECT tab_rect;
-	static PageCtrl p_commodity, p_utensil, p_desk;//p_utensil:餐具管理
+	static PageCtrl p_commodity, p_utensil, p_desk; // p_utensil:餐具管理
 	static HINSTANCE hInstance;
 	switch(msg)
 	{
@@ -24,7 +25,7 @@ BOOL CALLBACK BasicManagerProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		tab_rect.left += 1;
 		tab_rect.right -= 2;
 		p_commodity.CreatePage(hInstance, tab_hwnd, IDD_BASIC_COMMODITY,(DLGPROC)BasicInfoProc);
-		p_desk.CreatePage(hInstance, tab_hwnd, IDD_BASIC_TABLE,NULL);
+		p_desk.CreatePage(hInstance, tab_hwnd, IDD_BASIC_TABLE,(DLGPROC)TableInfoProc);
         p_utensil.CreatePage(hInstance, tab_hwnd, IDD_BASIC_UNTENSIL, NULL);
 		p_commodity.MoveWindow(tab_rect);
 		p_desk.MoveWindow(tab_rect);

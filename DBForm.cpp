@@ -28,7 +28,7 @@ CDBForm::CDBForm(std::string dns, std::string name, std::string password)
 	  m_return_code_(NULL)
 {
 	std::string error;
-	assert(true == this->Connect(dns.c_str(), name.c_str(), password.c_str(), error));
+	this->Connect(dns.c_str(), name.c_str(), password.c_str(), error);
 }
 
 CDBForm::~CDBForm()
@@ -43,43 +43,15 @@ CDBForm::~CDBForm()
 bool CDBForm::SQLAllocHandleStmt(std::string &error_info)
 {
 	std::string error;
-	if (NULL != m_hstmt_)
-	{
+	if (NULL != m_hstmt_) {
 		SQLFreeStmt(m_hstmt_, SQL_UNBIND);/*释放绑定*/
 		SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
 		m_hstmt_ = NULL;
 	}
 	/* 分配语句句柄 */
     m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        error_info = "分配数据库语句句柄失败！";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-        return false;
-    }
-
-	/* 设置游标属性：用行版本控制乐观并发设置动态游标类型 */
-//     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CURSOR_TYPE,
-// 		(SQLPOINTER)SQL_CURSOR_DYNAMIC, 
-// 		SQL_IS_INTEGER);
-//     if ((m_return_code_ != SQL_SUCCESS) &&
-//         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-//     {
-//         error_info = "设置数据库滚动游标失败！";
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-//         return false;
-// 	}
-//     m_return_code_ = SQLSetStmtAttr(m_hstmt_, SQL_ATTR_CONCURRENCY,
-// 		(SQLPOINTER)SQL_CONCUR_ROWVER, 
-// 		SQL_IS_INTEGER);
-//     if ((m_return_code_ != SQL_SUCCESS) &&
-//         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-//     {
-//         error_info = "设置数据库滚动游标失败！";
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error_info);
-//         return false;
-//     }
+    if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(ALLOCATE_DB_HANDLE_ERROR)
 	return true;
 }
 
@@ -91,83 +63,6 @@ bool CDBForm::IsEOF()
 {
 	return FetchData();
 }
-
-// /*
-//  * 说明: 移动到记录集的第一条数据
-//  * 返回值: 执行成功返回true,否则返回false。
-//  */
-// bool CDBForm::MoveFirst()
-// {
-// 	std::string error;
-// 	m_return_code_ = SQLFetch(m_hstmt_);
-// 	// m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_FIRST, 0);
-// 	if ((m_return_code_ == SQL_ERROR) ||
-//         (m_return_code_ == SQL_INVALID_HANDLE))
-//     {
-// 		error = "获取第一条记录出错：";
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-// 		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-// 		return false;
-// 	}
-// 	return true;
-// }
-// 
-// /*
-//  * 说明: 移动到记录集的下一条数据
-//  * 返回值: 执行成功返回true,否则返回false。
-//  */
-// bool CDBForm::MoveNext()
-// {
-// 	std::string error;
-// 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_NEXT,0);
-// 	if ((m_return_code_ == SQL_ERROR) ||
-//         (m_return_code_ == SQL_INVALID_HANDLE))
-//     {
-// 		error = "获取下一条记录出错：";
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-// 		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-// 		return false;
-// 	}
-// 	return true;
-// }
-// 
-// /*
-//  * 说明: 移动到记录集的上一条数据
-//  * 返回值: 执行成功返回true,否则返回false。
-//  */
-// bool CDBForm::MovePrior()
-// {
-// 	std::string error;
-//     m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_PRIOR, 0);
-// 	if ((m_return_code_ == SQL_ERROR) ||
-//         (m_return_code_ == SQL_INVALID_HANDLE))
-//     {
-// 		error = "获取上一条记录出错：";
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-// 		MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-// 		return false;
-// 	}
-// 	return true;
-// }
-// 
-// /*
-//  * 说明: 移动到记录集的最后一条数据
-//  * 返回值: 执行成功返回true,否则返回false。
-//  */
-// bool CDBForm::MoveLast()
-// {
-// 	std::string error;
-// 	m_return_code_ = SQLFetchScroll(m_hstmt_, SQL_FETCH_LAST,0);
-// 	if ((m_return_code_ == SQL_ERROR) ||
-//         (m_return_code_ == SQL_INVALID_HANDLE))
-//     {
-// 		error = "获取最后一条记录出错：";
-// 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
-//     	MessageBox(NULL, error.c_str(), TEXT("错误"), MB_OK|MB_ICONERROR);
-// 		return false;
-// 	}
-// 	return true;
-// }
 
 /*
  * 说明: 移动到记录集的最后一条数据
@@ -320,30 +215,17 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 {
 	/* 分配环境句柄 */
     m_return_code_ = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &m_henv_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "分配环境句柄失败!";
-        return false;
-    }
+    if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(ALLOCATE_HANDLE_ERROR)
 
     /* 设置ODBC版本的环境属性 */
-    m_return_code_ = SQLSetEnvAttr(m_henv_, SQL_ATTR_ODBC_VERSION,
-        (void *)SQL_OV_ODBC3, 0);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "设置ODBC版本的环境属性失败!";
-        return false;
-    }
+    m_return_code_ = SQLSetEnvAttr(m_henv_, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+    if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(SET_ODBC_VERSION_ERROR)
     /* 分配连接句柄 */
     m_return_code_ = SQLAllocHandle(SQL_HANDLE_DBC, m_henv_, &m_hdbc_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-		information = "分配连接句柄失败!";
-        return false;
-    }
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(ALLOCATE_CONNECT_HANDLE_ERROR)
     /* 设置数据库事务提交方式，默认为自动提交方式*/
 	m_return_code_ = SQLSetConnectAttr(m_hdbc_, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)m_auto_commit_, SQL_IS_POINTER);
     if ((m_return_code_ != SQL_SUCCESS) &&
@@ -363,15 +245,11 @@ bool CDBForm::Connect(const char *dsn, const char *id,
     }
     /* 连接数据源 */
     m_return_code_ = SQLConnect(m_hdbc_, (SQLCHAR *)dsn, 
-        SQL_NTS,(SQLCHAR *)id, SQL_NTS,
-        (SQLCHAR *)password, SQL_NTS);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "连接数据源失败!";
-		ReportError(m_hdbc_, SQL_HANDLE_DBC, information);
-        return false;
-    }
+                                SQL_NTS,(SQLCHAR *)id, SQL_NTS,
+                                (SQLCHAR *)password, SQL_NTS);
+    if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(CONNECT_ERROR)
+    
 	/*分配语句句柄*/
     if (false == SQLAllocHandleStmt(information))
 	{
@@ -745,10 +623,9 @@ bool CDBForm::IsSQLProcRetRight(std::string &error)
 bool CDBForm::BindReturn() {
 	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SHORT,\
 		                              SQL_INTEGER, 0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
-	if (m_return_code_ == SQL_SUCCESS || m_return_code_ == SQL_SUCCESS_WITH_INFO) {
-		return true;
-	}
-	return false;
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_RETURN_ERROR)
+	return true;
 }
 
 bool CDBForm::FetchData() {
