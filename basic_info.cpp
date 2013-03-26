@@ -65,24 +65,28 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							char main_category[33];
 							char child_category[33];
 							TreeCtrl category_tree;
-							HTREEITEM selection ;
+							category_tree.Initialization(hwnd, IDC_TREE_COMMODITY);;
+							HTREEITEM selection;
 							selection = category_tree.GetSelectedItem();
+							category_tree.GetItem(selection,sizeof(main_category),main_category);
+							MessageBox(hwnd,main_category,"fdfd",0);
 							category_tree.EnsureVisible(selection);
-							if ((NULL == category_tree.GetParent(selection))
-								&&(category_tree.GetChild(selection)))//是根结点,但是有子节点
+							if (category_tree.GetParent(selection) == NULL)//是根结点
 							{
-								if (category_tree.GetItem(sizeof(main_category),main_category))
+								MessageBox(hwnd,"无父结点", "tree",0);
+								if (category_tree.GetItem(selection,sizeof(main_category),main_category))
 								{
 									//TODO:根据父结点名称查询
-									MessageBox(hwnd,"无父结点", "tree",0);
+								
 								}
 							}
 							else//有父节点
 							{
-								 if (category_tree.GetItem(sizeof(child_category),child_category))
+									MessageBox(hwnd,"有父结点", "tree",0);
+								 if (category_tree.GetItem(selection,sizeof(child_category),child_category))
 								 {
 									 //TODO:根据父结点，子节点名称查询
-									 MessageBox(hwnd,"无父结点", "tree",0);
+									
 								 }
 							}
 							
