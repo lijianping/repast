@@ -30,19 +30,16 @@ bool CLoginForm::BindingParameter()
 }
 
 /*
- *  说明: 获取用户权限
- *  参数:
- *        name [in] 用户姓名
- *        password [in] 用户密码
- *        information [out] 错误信息
- *  返回值: 若失败返回-1，否则返回用户权限
+ * @ brief: 获取用户权限
+ * @ param: name [in] 用户名
+ * @ param: password [in] 用户密码,外部加密
+ * @ param: information [out] 错误信息
+ * @ return: 若失败返回-1，否则返回用户权限
  **/
 short CLoginForm::GetUserPermission(std::string user_name, 
                                     std::string user_password,
                                     std::string &information)
 {
-//	std::string password = Encrypt(user_password.c_str(), user_password.length() / 2, user_password.length());
-
 	name_len_ = SQL_NTS;
 	password_len_ = SQL_NTS;
 	m_sql_pro_ret = SQL_NTS;
@@ -50,33 +47,20 @@ short CLoginForm::GetUserPermission(std::string user_name,
 
 	/*绑定存储过程返回值*/
 	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, \
-		SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
-	if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "绑定返回值失败!";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return -1;
-    }
+		                              SQL_INTEGER,0, 0,&m_pro_ret, 0, &m_sql_pro_ret);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_RETURN_ERROR)
 	// 绑定列参数
     m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, \
-		SQL_CHAR, sizeof(m_name_)-1, 0, m_name_, sizeof(m_name_), &name_len_);
-	if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "绑定参数1失败!";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return -1;
-    }
+		                              SQL_CHAR, sizeof(m_name_)-1, 0, m_name_,\
+									  sizeof(m_name_), &name_len_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_PARAM_ERROR)
 	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, \
-		SQL_CHAR, sizeof(m_password_)-1, 0, m_password_, sizeof(m_password_), &password_len_);
-   	if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
-        information = "绑定参数2失败!";
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, information);
-        return -1;
-    }
+		                              SQL_CHAR, sizeof(m_password_)-1, 0, m_password_,\
+									  sizeof(m_password_), &password_len_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_PARAM_ERROR)
 	//TODO: 添加检查用户信息长度
 	strcpy(m_name_, user_name.c_str());
 	strcpy(m_password_, user_password.c_str());
@@ -85,18 +69,15 @@ short CLoginForm::GetUserPermission(std::string user_name,
 	{
 		return -1;
 	}
-
-//     short permission = 0;
-//     SQLINTEGER sql_permission=SQL_NTS;
-    m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &m_permission_, 0, &m_sql_permission_);
+    SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &m_permission_, 0, &m_sql_permission_);
 	m_return_code_ = SQLFetch(m_hstmt_);
-    if ((SQL_SUCCESS != m_return_code_) &&
-        (SQL_SUCCESS_WITH_INFO != m_return_code_))
-    {
+    if (SQL_SUCCESS != m_return_code_ && SQL_SUCCESS_WITH_INFO != m_return_code_) {
+        if (SQL_NO_DATA == m_return_code_) {
+            information = "用户名或密码错误!";
+        }
 		return -1;
     }
-	if (false == IsSQLProcRetRight(information))
-	{
+	if (false == IsSQLProcRetRight(information)) {
 		return -1;
 	}
     return m_permission_;

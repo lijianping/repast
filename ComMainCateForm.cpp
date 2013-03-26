@@ -27,7 +27,6 @@ bool ComMainCateForm::GetMainCateName() {
 	}
 	// 执行存储过程
 	sql_ret = SQLExecDirect(m_hstmt_, (SQLCHAR *)"{? = call GetMainCategoryName}", SQL_NTS);
-	m_return_code_ = sql_ret;
 	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) {
 		std::string err_info;
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
@@ -35,9 +34,6 @@ bool ComMainCateForm::GetMainCateName() {
 	}
 	// 绑定记录集
 	sql_ret = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, name_, sizeof(name_), &sql_name_);
-	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
 	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) {
 		std::string err_info;
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);
