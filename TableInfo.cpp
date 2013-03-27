@@ -60,7 +60,7 @@ bool CTableInfo::GetTableInfoSet(const char *floor_name) {
 	this->Initialize();
 	BindReturn();
 	// 绑定输入参数
-	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
 		                              sizeof(floor_name_) - 1, 0, floor_name_,\
 		                              sizeof(floor_name_), &sql_floor_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
@@ -79,12 +79,12 @@ bool CTableInfo::GetTableInfoSet(const char *floor_name, const char *room_name) 
 	this->Initialize();
 	BindReturn();
 	// 绑定输入参数
-	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
 		sizeof(floor_name_) - 1, 0, floor_name_,\
 		sizeof(floor_name_), &sql_floor_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
 		LTHROW(BIND_PARAM_ERROR)
-	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
 	                              	  sizeof(room_name_) - 1, 0, room_name_,\
 		                              sizeof(room_name_), &sql_room_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
@@ -100,6 +100,40 @@ bool CTableInfo::GetTableInfoSet(const char *floor_name, const char *room_name) 
 	return true;
 }
 
+
+/*
+ * @ brief: 根据楼层名获取指定状态的房间台号
+ * @ param: floor_name [in] 楼层名称
+ * @ param: status [in] 状态
+ * @ return: 若成功返回true,可获取台号,房间名及可容纳人数
+ **/
+bool CTableInfo::GetStartTableSet(const char *floor_name, short status) {
+	Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		                              sizeof(floor_name_) - 1, 0, floor_name_,\
+		                              sizeof(floor_name_), &sql_floor_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
+	                                  0, 0, &status_, 0, &sql_status_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	strcpy(floor_name_, floor_name);
+	status_ = status;
+	std::string err_info;
+	ExecSQLProc("{? = call GetStartTableInfo(?,?)}", err_info);
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, table_no_, sizeof(table_no_), &sql_table_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_RECODE_ERROR)
+	m_return_code_ = SQLBindCol(m_hstmt_, 2, SQL_C_CHAR, room_name_, sizeof(room_name_), &sql_room_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_RECODE_ERROR)
+	m_return_code_ = SQLBindCol(m_hstmt_, 3, SQL_C_SSHORT, &payable_, 0, &sql_payable_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_RECODE_ERROR)
+	return true;
+}
 /*
  * @ brief: 初始化相关数据
  **/
@@ -113,3 +147,4 @@ void CTableInfo::Initialize() {
 	memset(floor_name_, 0, sizeof(floor_name_));
 	memset(room_name_, 0, sizeof(room_name_));
 }
+

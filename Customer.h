@@ -19,6 +19,10 @@ public:
 	inline short table_state() const;
 	inline short payablenum() const;
 	bool GetCustomerByName(const char *customer_no, const char* table_no, std::string &error);
+	bool AddCustomer(const char *customer_no);
+	void Initialize();
+	bool AddCustomerTable(const char *customer_no, const char *floor_name,
+		                  const char *room_name, const char *table_no, int real_num, int status);
 
 protected:
 	virtual bool BindingParameter();
@@ -35,6 +39,9 @@ private:
 	char m_table_no_[7];            /* 台号 */
 	short m_table_state_;           /* 台号状态 */
 
+	char m_floor_name_[33];          // 楼层名称
+	char m_room_name_[33];           // 房间名称
+
 	SQLINTEGER m_customer_no_len_;
 	SQLINTEGER m_customer_num_len_;
 	SQLINTEGER m_founding_time_len_;
@@ -45,6 +52,8 @@ private:
 	
 	SQLINTEGER m_table_no_len_;
 	SQLINTEGER m_table_state_len_;
+	SQLINTEGER m_floor_name_len_;
+	SQLINTEGER m_room_name_len_;
 };
 
 char* CCustomer::customer_no() 

@@ -40,6 +40,7 @@ public:
 	WNDPROC SetListProc(const WNDPROC proc);
 	void SetExtendStyle(DWORD style);
 	int FindItem(std::string item);
+	int FindItem(int index, std::string item);
 
 private:
     UINT m_id_;

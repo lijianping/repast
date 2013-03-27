@@ -19,10 +19,12 @@ public:
 
 	bool GetTableInfoSet(const char *floor_name);
 	bool GetTableInfoSet(const char *floor_name, const char *room_name);
+	bool GetStartTableSet(const char *floor_name, short status);
 	void Initialize();
 	inline char* table_no();
 	inline short status();
 	inline short payable();
+	inline char* room_name();
 
 private:
 	char table_no_[5];             // 台号
@@ -62,4 +64,12 @@ short CTableInfo::payable() {
 	return payable_;
 }
 
+/*
+ * @ brief: 获取房间名称
+ * @ return: 房间名称字符指针
+ **/
+char* CTableInfo::room_name() {
+	DeleteSpace(room_name_, room_name_);
+	return room_name_;
+}
 #endif 

@@ -145,6 +145,14 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 						MessageBox(hwnd, TEXT("时间输入不合法"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
 						break;
 					}
+					// NOTE: 测试数据库备份
+					try {
+						CDBForm db_back("restore", "frank", "frank1234");
+						db_back.Restore("D:\\repast");
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("MANAGER"), MB_ICONERROR);
+						return FALSE;
+					}
 					// TODO: 查询数据库，显示时间段的消费者
 					break;
 				}
