@@ -176,6 +176,7 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 	{
 	case 2627:
 		{
+			LTHROW(INPUT_EXIST_ERROR)
 			error_info +=  TEXT("不能输入重复的编号");
 	    	break;
 		}
@@ -196,6 +197,44 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
     delete [] sql_state;
     sql_state = NULL;
     return true;
+}
+
+/*
+ * 说明: 报告错误信息(抛出异常方式)
+ **/
+bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type)
+{
+	char message[500] = "\0";
+	short message_length(0);
+	SQLINTEGER native_error = 0;
+	SQLSMALLINT record_number = 1;
+	unsigned char *sql_state = new unsigned char[6];
+	if (NULL == sql_state)
+	{
+		return false;
+	}
+	/*	sql_state = 0;*/
+
+	/*获取错误*/
+	SQLGetDiagRec(handle_type, hdbc, record_number, sql_state, &native_error,
+		(unsigned char *)message, 500, &message_length);
+	switch(native_error)
+	{
+	case 2627:
+		{
+			LTHROW(INPUT_EXIST_ERROR)
+			break;
+		}
+		/*TODO: Add other error information*/
+	default:
+		{
+			LTHROW(EXEC_SQL_PROC_ERROR)
+			break;
+		}
+	}
+	delete [] sql_state;
+	sql_state = NULL;
+	return true;
 }
 
 /*
@@ -579,6 +618,20 @@ bool CDBForm::RollBack()
  	return true;
  }
 
+ bool CDBForm::ExecSQLProc(const char * sql_proc)
+ {
+	 // 执行存储过程
+	 std::string error;
+	 m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS); 
+	
+	
+	 if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+     {
+		 ReportError(m_hstmt_,SQL_HANDLE_STMT,error);
+	 }
+//		 LTHROW(EXEC_SQL_PROC_ERROR)
+		 return true;
+ }
 
  /*
   * 说明：
@@ -611,6 +664,36 @@ bool CDBForm::IsSQLProcRetRight(std::string &error)
 		error="未处理错误：存储过程返回值->";
 		error+=ret;
 		return false;
+	}
+	return true;
+}
+
+ /*
+  * 说明：（换为抛出异常）
+  *      判断存储过程执行是否成功
+         若是存储过程的返回值和其他数据记录集一起返回，
+  *      请先取数据记录集里的数据，再调用此函数判断存储过程的执行是否成功
+  * 参数：
+  *      error    [out] 记录错误信息
+  * 返回值：
+  *       成功返回true, 否则返回false
+  */
+bool CDBForm::IsSQLProcRetRight()
+{
+	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
+	{
+	}
+	if (0 == m_pro_ret)
+	{
+		return true;
+	}
+	else if (2627 == m_pro_ret )
+	{
+		LTHROW(INPUT_EXIST_ERROR)
+	}
+	else
+	{
+		LTHROW(EXEC_SQL_PROC_ERROR)
 	}
 	return true;
 }

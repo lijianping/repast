@@ -23,7 +23,6 @@ public:
 	bool SelectDropTarget(HTREEITEM item);
 	bool EnsureVisible(HTREEITEM item);
 	HTREEITEM GetRoot();
-	HTREEITEM GetParent(HTREEITEM item);
 	HTREEITEM GetChild(HTREEITEM parent);
 	HTREEITEM GetParent(HTREEITEM item);
 	HTREEITEM GetNextSibling(HTREEITEM item);

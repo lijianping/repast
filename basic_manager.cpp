@@ -1,7 +1,7 @@
 
 #include "basic_manager.h"
 #include "table_info.h"
-
+extern HINSTANCE g_hinstance;
 BOOL CALLBACK BasicManagerProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static RECT tab_rect;
@@ -11,7 +11,7 @@ BOOL CALLBACK BasicManagerProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	{
 	case WM_INITDIALOG:
 		{
-		hInstance = (HINSTANCE)lParam;
+		hInstance = g_hinstance;
 		InitCommonControls();
 		TabCtrl tab(hwnd, IDC_CHILD_TAB);
 	    tab.InsertItem(0,"商品信息");

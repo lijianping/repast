@@ -8,6 +8,10 @@
 //#include <SkinPPWTL.h>
 
 
+HINSTANCE g_hinstance;
+static int g_user_permission = 0;  /* The user permission flag */
+static PageCtrl h_server ,h_personnel, h_finance,  h_passwd, h_user, h_basic_info, h_help;
+extern std::string g_login_name;
 
 bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect);
 BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -16,10 +20,7 @@ BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                                 WPARAM wParam, LPARAM lParam);
 
-static HINSTANCE g_hinstance;
-static int g_user_permission = 0;  /* The user permission flag */
-static PageCtrl h_server ,h_personnel, h_finance,  h_passwd, h_user, h_basic_info, h_help;
-extern std::string g_login_name;
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nShowCmd)

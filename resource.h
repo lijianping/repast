@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by resource.rc
 //
 #define PERMISSION_SERVICE              1
@@ -38,6 +38,8 @@
 #define IDD_TAB_BASIC_INFO              124
 #define IDD_BASIC_TABLE                 125
 #define IDD_BASIC_UNTENSIL              126
+#define IDD_FLOOR_MANAGEMENT            127
+#define IDD_EDIT_FLOOR                  127
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -99,6 +101,7 @@
 #define IDC_E_PERMISSION_ADD            1063
 #define IDC_B_FLOOR                     1063
 #define IDC_B_UTENSIL_ADD               1063
+#define IDC_B_FLOOR_ADD                 1063
 #define IDC_BUTTON2                     1064
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
@@ -108,6 +111,7 @@
 #define IDC_PERMISSION_ADD              1064
 #define IDC_B_ROOM                      1064
 #define IDC_B_UTENSIL_MODIFY            1064
+#define IDC_B_FLOOR_MODIFY              1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
@@ -115,6 +119,7 @@
 #define IDC_E_PERMISSION_DELETE         1065
 #define IDC_B_TABLE                     1065
 #define IDC_B_UTENSIL_DELETE            1065
+#define IDC_B_FLOOR_DELETE              1065
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
 #define IDC_BASIC_EDIT_CATEGORY         1066
@@ -122,6 +127,7 @@
 #define IDC_E_PERMISSION_CANCEL         1066
 #define IDC_EDIT_PERMISSION             1066
 #define IDC_B_UTENSIL_SORT              1066
+#define IDC_B_FLOOR_CANCEL              1066
 #define ID_SERVICE_BOOK                 1067
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
@@ -241,6 +247,12 @@
 #define IDC_T_UTENSIL                   1187
 #define IDC_S_UTENSIL                   1188
 #define IDC_L_UTENSIL                   1189
+#define IDC_S_FLOOR                     1190
+#define IDC_S_FLOOR_ID                  1191
+#define IDC_S_FLOOR_NAME                1192
+#define IDC_E_FLOOR_ID                  1193
+#define IDC_E_FLOOR_NAME                1194
+#define IDC_L_FLOOR_INFO                1195
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -249,9 +261,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        127
+#define _APS_NEXT_RESOURCE_VALUE        128
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1190
+#define _APS_NEXT_CONTROL_VALUE         1196
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -49,7 +49,7 @@ private:
  * @ return: 指向商品名称的字符串指针
  **/
 char* CCommodity::name() {
-	DeleteSpace(name_, name_);
-	return name_;
+	DeleteSpace(m_name_, m_name_);
+	return m_name_;
 }
 #endif 

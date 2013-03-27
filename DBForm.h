@@ -26,6 +26,7 @@ public:
     virtual bool BindingParameter();
 	virtual bool BindingParameter(bool is_out, std::string error);
     bool ReportError(SQLHANDLE &hdbc, int handle_type, std::string &error_info);
+	bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type);
 	virtual void SetSQLStatement(const std::string statement);
 	int GetYear();
 	std::string GetYearString();
@@ -47,7 +48,9 @@ public:
 	bool Commit();
 	bool RollBack();
 	bool ExecSQLProc(const char * sql_proc, std::string &error);
+	bool ExecSQLProc(const char * sql_proc);
     bool IsSQLProcRetRight(std::string &error);
+	bool IsSQLProcRetRight();
 	bool BindReturn();
 	bool FetchData();
 

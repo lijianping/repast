@@ -22,7 +22,13 @@ enum RepastErr {
 
 	CONNECT_ERROR,                   // 连接数据源失败
 
-	ALLOCATE_DB_HANDLE_ERROR        // 分配数据库语句句柄失败
+	ALLOCATE_DB_HANDLE_ERROR,        // 分配数据库语句句柄失败
+
+	INPUT_NULL_ERROR,                // 输入为空
+	
+	INPUT_TOO_LONG_ERROR,           // 输入过长
+
+	INPUT_EXIST_ERROR               //输入的值已存在
 };
 class Err : public std::exception {
 public:

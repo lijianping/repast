@@ -199,12 +199,12 @@ BOOL CALLBACK EditCategoryProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				EndDialog(hwnd,HIWORD(wParam));	
 				return TRUE;
 			}
-			if (false == ShowCategoryList(hwnd,IDC_E_COMMODITY_CATEGORY))
+/*			if (false == ShowCategoryList(hwnd,IDC_E_COMMODITY_CATEGORY))
 			{
 				MessageBox(hwnd, TEXT("显示商品类别列表失败！"), TEXT("错误"), MB_OK);
 				EndDialog(hwnd,HIWORD(wParam));	
 				return TRUE;
-			}
+			}*/
 		}
 	case  WM_NOTIFY:
 		{

@@ -77,7 +77,6 @@ BOOL CALLBACK PersonnelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					}
 					break;
 				}
-			
 			}
         	return TRUE;
 		}
