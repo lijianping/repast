@@ -513,21 +513,23 @@ std::string CDBForm::GetSecondString() {
 }
 
 /*
- * 说明：
- *      删除字符串中的空格
- * 参数：
- *      src    [in]  需要删除空格的字符串
- *      des    [out]  删除空格后的字符串
- * 返回值：
- *       void
+ * @ brief: 删除字符串末尾空格
+ * @ param: src [in] 源字符串
+ * @ param: des [out] 返回的目标字符串
  */
 void CDBForm::DeleteSpace(const char * src, char * des)
 {
-	while(*src!=' ')
-	{
-		*des++=*src++;
+	int i = 0;
+	int len = strlen(src);
+	char* buffer = new char[len];
+	strncpy(buffer, src, len);
+	memset(des, 0, len);
+	char *temp = (buffer + len - 1);
+	while (*temp-- == ' ') {
+		i++;
 	}
-	*des='\0';
+	strncpy(des, buffer, len - i);
+	delete [] buffer;
 }
 
 

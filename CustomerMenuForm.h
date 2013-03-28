@@ -8,54 +8,59 @@ class CCustomerMenuForm : public CDBForm
 public:
 	CCustomerMenuForm();
 	virtual ~CCustomerMenuForm();
-	inline char* dish_name();
-	inline float dish_price() const;
-	inline int dish_quantity() const;
-	void GetCustomerMenuSet(const char *customer_no);
-	bool DeleteDish(const char *customer_no, const char *dish_name);
-	bool DeleteAll(const char *customer_no);
+	inline char* commodity_name();
+	inline short quantity() const;
+	inline float commodity_price() const;
+	
+	bool GetCustomerMenuSet(const char *customer_no);
+	bool DeleteCustomerMenu(const char *customer_no);
+	bool AddCustomerMenu(const char *customer_no, 
+		                 const char *commodity_name,
+						 int quantity);
 
 protected:
+	void Initialize();
 	virtual bool BindingParameter();
 
 private:
-	char m_customer_no_[16];
 	char m_dish_no_[4];
-	char m_dish_name_[20];
-	float m_dish_price_;
-	int m_dish_quantity_;
-	SQLINTEGER m_customer_no_len_;
 	SQLINTEGER m_dish_no_len_;
-	SQLINTEGER m_dish_name_len_;
-	SQLINTEGER m_dish_price_len_;
-	SQLINTEGER m_dish_quantity_len_;
+
+	char customer_no_[16];          // 顾客编号
+	char commodity_name_[64];       // 商品名称
+	short quantity_;                // 商品数量
+	float commodity_price_;         // 商品单价
+	SQLINTEGER sql_customer_no_;    // 对应顾客编号
+	SQLINTEGER sql_commodity_name_; // 对应商品名称
+	SQLINTEGER sql_quantity_;       // 对应商品数量
+	SQLINTEGER sql_commodity_price_;// 对应商品单价
 };
 
 /*
- * @ 说明: 获取菜名
- * @ 返回值:
- *           菜名
+ * @ brief: 获取菜名
+ * @ return: 菜名
  **/
-char* CCustomerMenuForm::dish_name() {
-	return m_dish_name_;
+char* CCustomerMenuForm::commodity_name() {
+	DeleteSpace(commodity_name_, commodity_name_);
+	return commodity_name_;
 }
 
 /*
- * @ 说明: 获取单价
- * @ 返回值:
- *           单价--每个菜的单价
+ * @ brief: 获取数量
+ * @ return: 数量--用户点菜列表中的菜的份数(单个菜)
  **/
-float CCustomerMenuForm::dish_price() const {
-	return m_dish_price_;
+short CCustomerMenuForm::quantity() const {
+	return quantity_;
 }
 
 /*
- * @ 说明: 获取数量
- * @ 返回值:
- *           数量--用户点菜列表中的菜的份数(单个菜)
+ * @ brief: 获取单价
+ * @ return: 单价--每个菜的单价
  **/
-int CCustomerMenuForm::dish_quantity() const {
-	return m_dish_quantity_;
+float CCustomerMenuForm::commodity_price() const {
+	return commodity_price_;
 }
+
+
 
 #endif 
