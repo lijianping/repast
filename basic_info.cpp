@@ -15,17 +15,11 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		    TreeCtrl category_tree;
 			hInstance = (HINSTANCE)lParam;
 			HTREEITEM tree_parent;
-			CCommodity commodity;  //商品具体信息
 			std::string error;
 			category_tree.Initialization(hwnd, IDC_TREE_COMMODITY);
-			ComMainCateForm comodity_main;//主商品分类
-			// 获取主分类商品名称
- 			if(false == comodity_main.GetMainCateName())
- 			{
- 				MessageBox(hwnd, error.c_str(), TEXT("获取商品主分类出错"), MB_OK);
- 				return TRUE;
- 			}
 			try {
+				ComMainCateForm comodity_main;//主商品分类
+				comodity_main.GetMainCateName();
 				while(!comodity_main.IsEOF())
 				{
 					std::string main_name(comodity_main.name());
@@ -43,8 +37,8 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				} 
 			} catch(Err &err) {
 				MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
+				return FALSE;
 			}
-	//		InitCommodityTree(hwnd, IDC_TREE_COMMODITY);//TODO:尚未定义,即以上代码
 			InitBasicInfoList(hwnd, IDC_BASIC_INFO);
 //			ShowCommodity(hwnd);//执行查询，显示查询结果
 		return TRUE;
@@ -64,7 +58,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							char current_item_text[512];
 							basic_info.GetItem(select, 512, current_item_text);
 							HTREEITEM parent_node = basic_info.GetParent(select);
-							if (parent_node) {
+							if (parent_node) {  // 显示次分类下商品信息
 								char parent_item_text[512];
 								basic_info.GetItem(parent_node, 512, parent_item_text);
 								try {
@@ -87,7 +81,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									MessageBox(hwnd, err.what(), TEXT("TABLE INFOR"), MB_ICONINFORMATION);
 									return FALSE;
 								}
-							} else {
+							} else {   // 显示主分类下商品信息
 								try {
 									CCommodity commodity_info;
 									commodity_info.GetCommodityNameSet(current_item_text);
@@ -114,9 +108,7 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					}
 			}  // end case IDC_TREE_COMMODITY
 			return TRUE;
-
 		}
-
 	case WM_COMMAND:
 		{
 			switch(LOWORD(wParam))
@@ -379,7 +371,6 @@ bool InitBasicInfoList(HWND parent_hwnd, UINT id)
 		-1 != staff_list.InsertColumn(2, 100, "商品进价") &&
 		-1 != staff_list.InsertColumn(3, 100, "商品数量") &&
 		-1 != staff_list.InsertColumn(4, 100, "商品单位") &&
-    	-1 != staff_list.InsertColumn(5, 100, "商品类别") &&
 		-1 != staff_list.InsertColumn(6, 100, "商品卖价") &&
 		-1 != staff_list.InsertColumn(7, 100, "登记日期"))
 	{

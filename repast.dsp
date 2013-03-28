@@ -140,6 +140,10 @@ SOURCE=.\Edit.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\hildCateForm.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ListView.cpp
 # End Source File
 # Begin Source File
@@ -265,6 +269,10 @@ SOURCE=.\Department.h
 # Begin Source File
 
 SOURCE=.\Edit.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\hildCateForm.h
 # End Source File
 # Begin Source File
 

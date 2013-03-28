@@ -129,6 +129,8 @@
 #define IDC_B_UTENSIL_SORT              1066
 #define IDC_B_FLOOR_CANCEL              1066
 #define ID_SERVICE_BOOK                 1067
+#define IDC_EDIT_PERMISSION2            1067
+#define IDC_DATA_BACKUP                 1067
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_START_TABLE                 1071
