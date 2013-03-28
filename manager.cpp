@@ -2,7 +2,9 @@
 #include "Button.h"
 
 
-
+/*
+ * @ brief: 系统管理tab页面处理过程
+ **/
 BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hinstance = (HINSTANCE)GetWindowLong(GetParent(hwnd), GWL_HINSTANCE);
 	switch (msg) {
@@ -82,7 +84,21 @@ BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 					DialogBox(hinstance, MAKEINTRESOURCE(IDD_EDIT_PERMISSION), hwnd, (DLGPROC)EditPermissionProc);
 					break;
 				}
+			case IDC_DATA_BACKUP:   // 数据库备份
+				{
+					try {
+						CDBForm db_back;
+						db_back.BackUp("not_use");
+						MessageBox(hwnd, TEXT("数据备份成功！\n备份文件保存在SQL服务器安装目录的BACKUP目录下"),\
+							TEXT("数据备份"), MB_ICONINFORMATION);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("MANAGER"), MB_ICONERROR);
+						return FALSE;
+					}
+					break;
+				}
 			}
+			return TRUE;
 		}
 	}
 	return FALSE;
@@ -145,14 +161,7 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 						MessageBox(hwnd, TEXT("时间输入不合法"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
 						break;
 					}
-					// NOTE: 测试数据库备份
-					try {
-						CDBForm db_back("restore", "frank", "frank1234");
-						db_back.Restore("D:\\repast");
-					} catch (Err &err) {
-						MessageBox(hwnd, err.what(), TEXT("MANAGER"), MB_ICONERROR);
-						return FALSE;
-					}
+					
 					// TODO: 查询数据库，显示时间段的消费者
 					break;
 				}

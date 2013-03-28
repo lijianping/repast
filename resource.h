@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by resource.rc
 //
 #define PERMISSION_SERVICE              1
@@ -123,6 +123,8 @@
 #define IDC_EDIT_PERMISSION             1066
 #define IDC_B_UTENSIL_SORT              1066
 #define ID_SERVICE_BOOK                 1067
+#define IDC_EDIT_PERMISSION2            1067
+#define IDC_DATA_BACKUP                 1067
 #define IDC_TABLE_AVAILABLE             1070
 #define IDC_LIST3                       1071
 #define IDC_START_TABLE                 1071

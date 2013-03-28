@@ -27,6 +27,10 @@ bool CCustomerMenuForm::BindingParameter()
 	return true;
 }
 
+/*
+ * @ brief: 根据顾客编号获取顾客点菜信息
+ * @ param: customer_no [in] 顾客编号
+ **/
 void CCustomerMenuForm::GetCustomerMenuSet(const char *customer_no) {
 	char sql_statement[256] = {0};
 	sprintf(sql_statement, "execute SelectCustomerMenu '%s'", customer_no);
@@ -35,7 +39,10 @@ void CCustomerMenuForm::GetCustomerMenuSet(const char *customer_no) {
 }
 
 /*
- * @ 
+ * @ brief: 删除顾客点菜信息
+ * @ param: customer_no [in] 顾客编号
+ * @ param: dish_name [in] 商品名称
+ * @ return: 成功返回true
  **/
 bool CCustomerMenuForm::DeleteDish(const char *customer_no, 
 								   const char *dish_name) {

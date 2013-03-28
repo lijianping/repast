@@ -12,12 +12,12 @@
 bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect);
 BOOL CALLBACK ChangePasswdProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-/* 登陆对话框处理过程函数 */
+// 登陆对话框处理过程函数 
 BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                                 WPARAM wParam, LPARAM lParam);
 
 static HINSTANCE g_hinstance;
-static int g_user_permission = 0;  /* The user permission flag */
+static int g_user_permission = 0;  // 用户权限标志
 static PageCtrl h_server ,h_personnel, h_finance,  h_passwd, h_user, h_basic_info, h_help;
 extern std::string g_login_name;
 
@@ -90,12 +90,8 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 						h_personnel.ShowWindow(SW_NORMAL);
 					} else if (0 == strcmp(tab_title, "财政管理")) {
 						h_finance.ShowWindow(SW_NORMAL);
-					} else if (0 == strcmp(tab_title, "用户管理")) {
+					} else if (0 == strcmp(tab_title, "系统管理")) {
 						h_user.ShowWindow(SW_NORMAL);
-					} else if (0 == strcmp(tab_title, "数据库备份")) {
-						MessageBox(hwnd, TEXT("尚未添加，敬请期待！"), TEXT("提示"), MB_ICONINFORMATION);
-					} else if (0 == strcmp(tab_title, "数据库还原")) {
-						MessageBox(hwnd, TEXT("尚未添加，敬请期待！"), TEXT("提示"), MB_ICONINFORMATION);
 					} else if (0 == strcmp(tab_title, "使用帮助")) {
 						MessageBox(hwnd, TEXT("尚未添加，敬请期待！"), TEXT("提示"), MB_ICONINFORMATION);
 					} else if (0 == strcmp(tab_title, "密码管理")) {
@@ -165,10 +161,8 @@ bool CreateSysManagement(TabCtrl *tab, HWND tab_hwnd, RECT tab_rect)
 		tab->InsertItem(1, "基础信息管理");
 		tab->InsertItem(2, "人事管理");
 		tab->InsertItem(3, "财政管理");
-		tab->InsertItem(4, "用户管理");
-		tab->InsertItem(5, "数据库备份");
-		tab->InsertItem(6, "数据库还原");
-		tab->InsertItem(7, "使用帮助");
+		tab->InsertItem(4, "系统管理");
+		tab->InsertItem(5, "使用帮助");
 		h_server.ShowWindow(SW_NORMAL);
 	} 
 	tab->SetCurSel(0);

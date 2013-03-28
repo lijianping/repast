@@ -653,19 +653,32 @@ bool CDBForm::FreeStatemetHandle() {
 
 /*
  * @ brief: 数据库备份
- * @ param: file_path [in] 备份文件名称，在sql服务器上
+ * @ param: file_path [in] 备份文件名称，在sql服务器上,
+ *          现固定备份时间为备份文件名，保存在SQL服务器安装目录的BACKUP目录下
  * @ return: 成功返回true
  **/
 bool CDBForm::BackUp(const char *file_path) {
+	std::string file_name;
+	file_name += GetYearString();
+	file_name += GetMonthString();
+	file_name += GetDayString();
+	file_name += GetHourString();
+	file_name += GetMinuteString();
+	file_name += GetSecondString();
 	char backup_statement[1024];
 	memset(backup_statement, 0, sizeof(backup_statement));
-	sprintf(backup_statement, "backup database repaset to disk = '%s'", file_path);
+	sprintf(backup_statement, "backup database repaset to disk = '%s'", file_name.c_str()/*file_path*/);
 	std::string err_info;
 	if (!ExecuteSQL(backup_statement, err_info))
 		LTHROW(BACKUP_DATABASE_ERROR)
 	return true;
 }
 
+/*
+ * @ brief: 数据库恢复
+ * @ param: file_path [in] 文件名称
+ * @ return: 若成功返回true
+ **/
 bool CDBForm::Restore(const char *file_path) {
 	char restore_statement[1024];
 	memset(restore_statement, 0, sizeof(restore_statement));

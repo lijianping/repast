@@ -13,7 +13,7 @@ LRESULT CALLBACK ListProcesses(HWND hwnd, UINT message,
                                WPARAM wParam, LPARAM lParam);
 
 bool ShowConsumerTableInfo(const HWND hwnd, const UINT id, const char *floor_name);
-bool InitComboBox(const HWND hwnd, int id);
+bool InitFloorName(const HWND hwnd, int id);
 
 
 BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -21,7 +21,7 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-BOOL CALLBACK ChangeProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK ChangeTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK StartTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -42,11 +42,14 @@ LRESULT CALLBACK ChangeTableListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 /* struct define */
 
 /* Ã®∫≈–≈œ¢ */
-struct CustomerTable {
+typedef struct CustomerTable {
 	UINT menu_id;
-	std::string table_no;
-	std::string table_state;
 	std::string customer_no;
-	std::string founding_time;
-};
+	std::string table_no;
+	std::string room_name;
+	std::string table_state;
+	std::string customer_num;
+	std::string start_time;
+	std::string floor_name;
+}CUSTOMERTABLE, *PCUSTOMERTABLE;
 #endif  
