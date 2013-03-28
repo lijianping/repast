@@ -317,34 +317,56 @@ bool CLoginForm::CheckLoginUser(LoginUser * login_user, std::string &error_info)
 	unsigned int length=0;
 	length = login_user->staff_no.length();
 	if (0 == length) {  // 检查员工编号
-		error_info = "员工编号不能为空";
+		LTHROW(INPUT_NULL_ERROR)
 		return false;
 	}
 	length = login_user->new_login_name.length();
 	if (length == 0) {  // 检查用户名
-		error_info = "用户名不能为空";
+	LTHROW(INPUT_TOO_LONG_ERROR)
 		return false;
 	}
 	if (length > sizeof(m_name_)-1)
 	{
-		error_info = "用户名太长，请适当减小后再试！";
+		LTHROW(INPUT_TOO_LONG_ERROR)
 		return false;
 	}
 	length = login_user->password1.length();
 	if ( 0 == length)  // 检查密码
 	{
-		error_info = "用户密码不能为空";
+		LTHROW(INPUT_NULL_ERROR)
 		return false;
 	}
 	if (length > sizeof(m_password_)-1)
 	{
-		error_info = "用户密码太长，请适当减小后再试！";
+		LTHROW(INPUT_TOO_LONG_ERROR)
 		return false;
 	}
 	length = login_user->login_permission.length();
 	if (0 == length)  // 检查权限
 	{
-		error_info = "请设置用户权限！";
+		LTHROW(INPUT_NULL_ERROR)
+		return false;
+	}
+	return true;
+}
+
+/*
+ * 说明：
+ *     检查登录时输入是否正确
+ * 参数：
+ *     name   [in] 输入的名称
+ *     passwd [in] 输入的密码
+ * 返回值：
+ *     输入正确返回true,否则返回false 
+ */
+bool CLoginForm::CheckInputRight(char* name,char* passwd)
+{
+	if (strlen(name) > sizeof(m_name_)-1){  // 检查用户名
+	LTHROW(INPUT_TOO_LONG_ERROR)
+		return false;
+	}
+	if (strlen(passwd) > sizeof(m_password_)-1){  // 检查密码
+	LTHROW(INPUT_TOO_LONG_ERROR)
 		return false;
 	}
 	return true;

@@ -373,12 +373,10 @@ void CListView::SetExtendStyle(DWORD style) {
 }
 
 /*
- * @ 说明: find the item
- * @ 参数:
- *         item [in] The item you will find.
- * @ 返回值:
- *           The index of the item indicates success.
- *           -1 indicates failure. 
+ * @ brief: find the item
+ * @ param: index [in] 查找的列，第一列可忽略
+ * @ param: item [in] 查找的item项
+ * @ return: 返回查找项的行号，失败返回-1
  **/
 int CListView::FindItem(std::string item) {
 	LVFINDINFO find_info;
@@ -386,4 +384,15 @@ int CListView::FindItem(std::string item) {
 	find_info.psz = item.c_str();
 	// ListView_FindItem(m_hwnd_, -1, &find_info);
 	return SendMessage(m_hwnd_, LVM_FINDITEM, -1, (LPARAM)&find_info);
+}
+
+int CListView::FindItem(int index, std::string item) {
+	int row = GetItemCount();
+	for (int i = 0; i < row; ++i) {
+		std::string text = GetItem(i, index);
+		if (item == text) {
+			return i;
+		}
+	}
+	return -1;
 }

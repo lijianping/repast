@@ -35,6 +35,7 @@ public:
 	bool DeleteInfo(std::string user_name, std::string &error_info);
 	bool ModifyPasswd(std::string user_name, std::string password);
 	std::string Encrypt(const char *src, int shift, int len);
+	bool CheckInputRight(char* name,char* passwd);
 protected:
 	void Initialization();
     virtual	bool BindingParameter(bool is_add, std::string &error_info);

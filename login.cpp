@@ -44,7 +44,8 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
             switch (LOWORD(wParam))
             {
             case IDOK:
-                {  long return_value = 0;
+                {  
+					long return_value = 0;
                     TCHAR user_name[256];
                     TCHAR user_password[128];
                     memset(user_name, 0, sizeof(user_name));
@@ -60,6 +61,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                                    TEXT("µÇÂ¼"), MB_OK | MB_ICONINFORMATION);
                         return FALSE;
 				    }
+				
                     else
                     {
                         /* get permission from database */
@@ -68,9 +70,10 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
 						std::string password(user_password);
 						try {
 							CLoginForm login; 
-							CLoginForm lo;
-							std::string pw = lo.Encrypt(password.c_str(), password.length()/2, password.length());
+							login.CheckInputRight(user_name,user_password);
+							std::string pw = login.Encrypt(password.c_str(), password.length()/2, password.length());
 							return_value = login.GetUserPermission(name, pw,error_information);
+							login.Disconnect();
 						} catch (Err &err) {
 							MessageBox(hwnd, err.what(), TEXT("LOGIN ERROR"), MB_ICONERROR);
 							return FALSE;
@@ -79,10 +82,8 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                             MessageBox(hwnd, error_information.c_str(), TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
                             return FALSE;
                         }
-						g_login_name = name;
-						
+						g_login_name = name;	
                     }
-
                     EndDialog(hwnd, return_value);
                     break;
                 }

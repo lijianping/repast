@@ -19,7 +19,7 @@ CDBForm::CDBForm()
 {
 	m_auto_commit_ = SQL_AUTOCOMMIT_ON;
 	std::string error;
-	assert(true == this->Connect("repast", "repast", "repast", error));
+	this->Connect("repast", "repast", "repast", error);
 }
 
 CDBForm::CDBForm(std::string dns, std::string name, std::string password)
@@ -28,6 +28,7 @@ CDBForm::CDBForm(std::string dns, std::string name, std::string password)
 	  m_return_code_(NULL)
 {
 	std::string error;
+	m_auto_commit_ = SQL_AUTOCOMMIT_ON;
 	this->Connect(dns.c_str(), name.c_str(), password.c_str(), error);
 }
 
@@ -40,18 +41,17 @@ CDBForm::~CDBForm()
  * 说明：分配语句句柄
  * 返回值：分配成功返回true,否则返回false
  **/
-bool CDBForm::SQLAllocHandleStmt(std::string &error_info)
+bool CDBForm::AllocHandleStmt()
 {
 	std::string error;
 	if (NULL != m_hstmt_) {
 		SQLFreeStmt(m_hstmt_, SQL_UNBIND);/*释放绑定*/
-		SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
-		m_hstmt_ = NULL;
+		FreeStatemetHandle();
 	}
 	/* 分配语句句柄 */
     m_return_code_ = SQLAllocHandle(SQL_HANDLE_STMT, m_hdbc_, &m_hstmt_);
     if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
-		LTHROW(ALLOCATE_DB_HANDLE_ERROR)
+		LTHROW(ALLOCATE_STATEMENT_HANDLE_ERROR)
 	return true;
 }
 
@@ -72,7 +72,7 @@ bool CDBForm::GetRecordSet()
 {
 	std::string error_info;
 	/*分配语句句柄*/
-    if (false == SQLAllocHandleStmt(error_info))
+    if (false == AllocHandleStmt())
 	{
 		return false;
 	}
@@ -134,7 +134,7 @@ bool CDBForm::BindingParameter(bool is_out, std::string error)
 bool CDBForm::ExecuteSQL(const char *sql_statement, std::string &error_info )
 {
 	/*分配语句句柄*/
-    if (false == SQLAllocHandleStmt(error_info))
+    if (false == AllocHandleStmt())
 	{
 		return false;
 	}
@@ -290,7 +290,7 @@ bool CDBForm::Connect(const char *dsn, const char *id,
 		LTHROW(CONNECT_ERROR)
     
 	/*分配语句句柄*/
-    if (false == SQLAllocHandleStmt(information))
+    if (false == AllocHandleStmt())
 	{
 		return false;
 	}
@@ -342,7 +342,7 @@ int CDBForm::GetDatePart(char *sql_selectdate)
 {
 	std::string error;
 	/*分配语句句柄*/
-    if (false == SQLAllocHandleStmt(error))
+    if (false == AllocHandleStmt())
 	{
 		return -1;
 	}
@@ -360,13 +360,14 @@ int CDBForm::GetDatePart(char *sql_selectdate)
 		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
 		return -1;
 	}
+	FetchData();
 	return m_datepart_;
 }
 
 char *CDBForm::GetDatePartString(const char *datepart) {
 	std::string error;
 	/*分配语句句柄*/
-    if (false == SQLAllocHandleStmt(error))
+    if (false == AllocHandleStmt())
 	{
 		return NULL;
 	}
@@ -385,6 +386,7 @@ char *CDBForm::GetDatePartString(const char *datepart) {
 		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
 		return NULL;
 	}
+	FetchData();
 	return m_server_datatime;
 }
 
@@ -613,8 +615,10 @@ bool CDBForm::RollBack()
  {
 	// 执行存储过程
 	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS);
-	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);   // TODO: 调试用，完成后
 	    LTHROW(EXEC_SQL_PROC_ERROR)
+	}
  	return true;
  }
 
@@ -718,4 +722,39 @@ bool CDBForm::FetchData() {
 	}else if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
 		LTHROW(FETCH_ROWSET_ERROR)
 	return false;
+}
+
+bool CDBForm::FreeStatemetHandle() {
+	if (NULL != m_hstmt_) {
+		SQLRETURN sql_ret = SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt_);
+		if (SQL_SUCCESS != sql_ret && SQL_SUCCESS_WITH_INFO != sql_ret)
+			LTHROW(FREE_STATEMENT_HANDLE_ERROR)
+		m_hstmt_ = NULL;
+	}
+	return true;
+}
+
+/*
+ * @ brief: 数据库备份
+ * @ param: file_path [in] 备份文件名称，在sql服务器上
+ * @ return: 成功返回true
+ **/
+bool CDBForm::BackUp(const char *file_path) {
+	char backup_statement[1024];
+	memset(backup_statement, 0, sizeof(backup_statement));
+	sprintf(backup_statement, "backup database repaset to disk = '%s'", file_path);
+	std::string err_info;
+	if (!ExecuteSQL(backup_statement, err_info))
+		LTHROW(BACKUP_DATABASE_ERROR)
+	return true;
+}
+
+bool CDBForm::Restore(const char *file_path) {
+	char restore_statement[1024];
+	memset(restore_statement, 0, sizeof(restore_statement));
+	sprintf(restore_statement, "restore database repaset from disk = '%s'", file_path);
+	std::string err_info;
+	if (!ExecuteSQL(restore_statement, err_info))
+		LTHROW(RESTORE_DATABASE_ERROR)
+	return true;
 }

@@ -26,7 +26,7 @@ bool RoomInfo::GetRoomName(const char *floor_name) {
 	Initialize();  // 初始化
 	BindReturn();  // 绑定返回值
 	// 绑定输入参数
-	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
 		                              sizeof(floor_name_) - 1, 0, floor_name_,\
 									  sizeof(floor_name_), &sql_floor_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
