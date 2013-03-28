@@ -430,27 +430,29 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						std::string customer_no;  // 顾客编号
 						cus_no.GetEditText(customer_no);   // 获取顾客编号
 						
-						bool is_ok = true;     // 保存是否成功
+						bool is_ok = false;     // 保存是否成功
 						try {
 							CCustomerMenuForm customer_info;
-							customer_info.SetAutoCommit(false);
-	//						customer_info.DeleteCustomerMenu(customer_no.c_str());
+							customer_info.DeleteCustomerMenu(customer_no.c_str());
+							std::string before_error;
 							for (int i = 0; i < count; ++i) {
+								CCustomerMenuForm test;
 								std::string commodity_name = customer_list.GetItem(i, 0);  // 获取商品名称
 								std::string quantity_str = customer_list.GetItem(i, 2);    // 获取商品数量
 								int quantity = atoi(quantity_str.c_str());
-								is_ok = customer_info.AddCustomerMenu(customer_no.c_str(), commodity_name.c_str(), quantity);
+								is_ok = test.AddCustomerMenu(customer_no.c_str(), commodity_name.c_str(), quantity);
 								if (!is_ok) {
-									customer_info.RollBack();   // 出错回滚
-									MessageBox(hwnd, TEXT("点菜失败！\n回复到初始状态!"), TEXT("前台管理"), MB_ICONINFORMATION);
+									before_error = customer_list.GetItem(i-1,0);
 									break;
-								}	
+								}
 							}
 							if (is_ok) {
-								customer_info.Commit();   // 提交更改
 								MessageBox(hwnd, TEXT("点菜成功！"), TEXT("前台管理"), MB_ICONINFORMATION);
+							} else {
+							    char temp[512];
+								sprintf(temp, "%s 之前的商品已成功添加！\n之后的尚未添加！",before_error.c_str());
+								MessageBox(hwnd, temp, TEXT("前台管理"), MB_ICONINFORMATION);
 							}
-//							customer_info.SetAutoCommit(true);
 						} catch (Err &err) {
 							MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
 							return FALSE;
@@ -1019,7 +1021,7 @@ bool ShowConsumerTableInfo(const HWND hwnd, const UINT id, const char *floor_nam
 	CListView consumer_table(hwnd, id);
 	consumer_table.DeleteAllItems();
 	try {
-/*		ConsumerTable consumer;
+		ConsumerTable consumer;
 		consumer.GetConsumerTable(floor_name);
 		int i = 0;
 		while (!consumer.IsEOF()) {
@@ -1030,7 +1032,7 @@ bool ShowConsumerTableInfo(const HWND hwnd, const UINT id, const char *floor_nam
 			consumer_table.SetItem(i, 4, consumer.consumer_num());
 			consumer_table.SetItem(i, 5, consumer.start_time());
 			i++;
-		}*/
+		}
 	} catch (Err &err) {
 		MessageBox(hwnd, err.what(), TEXT("SERVICE"), MB_ICONERROR);
 		return false;

@@ -81,8 +81,8 @@ bool CCustomerMenuForm::AddCustomerMenu(const char *customer_no,
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
 		LTHROW(BIND_PARAM_ERROR)
     m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
-		                              sizeof(customer_no_) - 1, 0, customer_no_,\
-		                              sizeof(customer_no_), &sql_customer_no_);
+		                              sizeof(commodity_name_) - 1, 0, commodity_name_,\
+		                              sizeof(commodity_name_), &sql_commodity_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
 		LTHROW(BIND_PARAM_ERROR)
 	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
@@ -96,6 +96,24 @@ bool CCustomerMenuForm::AddCustomerMenu(const char *customer_no,
 	// 执行存储过程
 	// TODO: 添加获取用户菜单存储过程
 	ExecSQLProc("{? = call AddConsumerMenu(?,?,?)}", err_info);
+	return true;
+}
+
+/*
+ * @ brief: 创建临时表
+ * @ return: 成功返回true
+ */
+bool CCustomerMenuForm::CreateTempTable() {
+	ExecSQLProc("{exec CreateTempTable}");
+	return true;
+}
+
+/*
+ * @ brief: 删除临时表
+ * @ return: 成功返回true
+ */
+bool CCustomerMenuForm::DropTempTable() {
+	ExecSQLProc("{exec DropTempTable}");
 	return true;
 }
 /*

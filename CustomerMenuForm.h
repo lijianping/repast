@@ -17,6 +17,8 @@ public:
 	bool AddCustomerMenu(const char *customer_no, 
 		                 const char *commodity_name,
 						 int quantity);
+	bool CreateTempTable();
+	bool DropTempTable();
 
 protected:
 	void Initialize();
