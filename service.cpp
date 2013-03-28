@@ -239,7 +239,7 @@ bool InitFloorName(const HWND hwnd, int id)
 BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static PCUSTOMERTABLE table;
-    static bool is_change = false;
+    static bool is_change = false;   // 顾客菜单是否编号，若为true，表示菜单已变化
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -294,6 +294,15 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 					}
 				} 
+				CCustomerMenuForm consumer_menu;
+				consumer_menu.GetCustomerMenuSet(table->customer_no.c_str());
+				int i = 0;
+				while (!consumer_menu.IsEOF()) {
+					custom_list.InsertItem(i, consumer_menu.commodity_name());
+					custom_list.SetItem(i, 1, consumer_menu.commodity_price());
+					custom_list.SetItem(i, 2, consumer_menu.quantity());
+					i++;
+				}
 			} catch(Err &err) {
 				MessageBox(hwnd, err.what(), TEXT("商品管理"), MB_ICONERROR);
 				return FALSE;
@@ -409,34 +418,51 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 			case IDC_SAVE_MENU:  // 保存更改
 				{
-					CCustomer customer;
-					CListView customer_list;
-					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
-					int count = customer_list.GetItemCount();
-					if(0 == count) {
-						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
+					CListView customer_list(hwnd, IDC_CUSTOM_MENU);
+					int count = customer_list.GetItemCount();  // 商品种类数
+					if (!is_change) {
+						MessageBox(hwnd, TEXT("您未做出任何修改！"), TEXT("点菜提示"), MB_OK);
 						break;
 					}
-					char customer_no[16] = {0};
-					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
-					CCustomerMenuForm customer_menu_info;
-					bool is_ok = false;
-					// TODO: 顾客菜单修改数据库操作，事务处理
-					for (int i = 0; i < count; ++i) {
-						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
-						is_ok = customer.InsertCustomerMenu(customer_no,
-							                        customer_list.GetItem(i, 0).c_str(), 
-													quantity);
-						if (!is_ok) {
-							customer_menu_info.DeleteAll(customer_no);
-							break;
+					
+					if(count) {
+						CEdit cus_no(hwnd, IDC_CUSTOM_NUM);
+						std::string customer_no;  // 顾客编号
+						cus_no.GetEditText(customer_no);   // 获取顾客编号
+						
+						bool is_ok = true;     // 保存是否成功
+						try {
+							CCustomerMenuForm customer_info;
+							customer_info.SetAutoCommit(false);
+	//						customer_info.DeleteCustomerMenu(customer_no.c_str());
+							for (int i = 0; i < count; ++i) {
+								std::string commodity_name = customer_list.GetItem(i, 0);  // 获取商品名称
+								std::string quantity_str = customer_list.GetItem(i, 2);    // 获取商品数量
+								int quantity = atoi(quantity_str.c_str());
+								is_ok = customer_info.AddCustomerMenu(customer_no.c_str(), commodity_name.c_str(), quantity);
+								if (!is_ok) {
+									customer_info.RollBack();   // 出错回滚
+									MessageBox(hwnd, TEXT("点菜失败！\n回复到初始状态!"), TEXT("前台管理"), MB_ICONINFORMATION);
+									break;
+								}	
+							}
+							if (is_ok) {
+								customer_info.Commit();   // 提交更改
+								MessageBox(hwnd, TEXT("点菜成功！"), TEXT("前台管理"), MB_ICONINFORMATION);
+							}
+//							customer_info.SetAutoCommit(true);
+						} catch (Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
+							return FALSE;
 						}
-					}
-					if (is_ok) {
-						MessageBox(hwnd, TEXT("添加菜单成功！"), TEXT("提示"), MB_ICONINFORMATION);
 					} else {
-						MessageBox(hwnd, TEXT("添加菜单失败！"), TEXT("提示"), MB_ICONINFORMATION);
+
 					}
+// 					if (is_ok) {
+// 						MessageBox(hwnd, TEXT("添加菜单成功！"), TEXT("提示"), MB_ICONINFORMATION);
+// 					} else {
+// 						MessageBox(hwnd, TEXT("添加菜单失败！"), TEXT("提示"), MB_ICONINFORMATION);
+// 					}
 					is_change = false; // 重置
 					break;
 				}
@@ -451,28 +477,33 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		{
 			if (true == is_change) {
-				int ret = MessageBox(hwnd, TEXT("Save the change!"), 
-					                 TEXT("ORDER"), MB_YESNOCANCEL);
+				int ret = MessageBox(hwnd, TEXT("Save the change!"), TEXT("ORDER"), MB_YESNOCANCEL);
 				if (IDYES == ret) {
-					CCustomerMenuForm customer_menu_info;
-					customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
-					CCustomer customer;
-					CListView customer_list;
-					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
-					int count = customer_list.GetItemCount();
-					if(0==count)
-					{
-						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
-						break;
+					CListView consumer_menu(hwnd, IDC_CUSTOM_MENU);
+					int count = consumer_menu.GetItemCount();
+					if (is_change) {
+
 					}
-					char customer_no[16] = {0};
-					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
-					for (int i = 0; i < count; ++i) {
-						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
-						customer.InsertCustomerMenu(customer_no,
-													customer_list.GetItem(i, 0).c_str(), 
-													quantity);
-					}
+// 					CCustomerMenuForm customer_menu_info;
+// 	//				customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
+// 					CCustomer customer;
+// 					CListView customer_list;
+// 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
+// 					int count = customer_list.GetItemCount();
+// 					if(0==count)
+// 					{
+// 						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
+// 						break;
+// 					}
+// 					char customer_no[16] = {0};
+// 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
+// 
+// 					for (int i = 0; i < count; ++i) {
+// 						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
+// 						customer.InsertCustomerMenu(customer_no,
+// 													customer_list.GetItem(i, 0).c_str(), 
+// 													quantity);
+// 					}
 					is_change = false;
 
 				} else if (IDCANCEL == ret) {

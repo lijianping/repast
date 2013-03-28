@@ -18,43 +18,114 @@ CCustomerMenuForm::~CCustomerMenuForm()
 
 }
 
-bool CCustomerMenuForm::BindingParameter()
-{
-	/* 菜名--单价--数量 */
-	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_dish_name_, sizeof(m_dish_name_), &m_dish_name_len_);
-	SQLBindCol(m_hstmt_, 2, SQL_C_FLOAT, &m_dish_price_, 0, &m_dish_quantity_len_);
-	SQLBindCol(m_hstmt_, 3, SQL_C_LONG, &m_dish_quantity_, 0, &m_dish_quantity_len_);
-	return true;
-}
+
 
 /*
  * @ brief: 根据顾客编号获取顾客点菜信息
  * @ param: customer_no [in] 顾客编号
  **/
-void CCustomerMenuForm::GetCustomerMenuSet(const char *customer_no) {
-	char sql_statement[256] = {0};
-	sprintf(sql_statement, "execute SelectCustomerMenu '%s'", customer_no);
-	this->m_query_sql_ = std::string(sql_statement);
-	this->GetRecordSet();	
+bool CCustomerMenuForm::GetCustomerMenuSet(const char *customer_no) {
+	Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		                              sizeof(customer_no_) - 1, 0, customer_no_,\
+		                              sizeof(customer_no_), &sql_customer_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	strcpy(customer_no_, customer_no);
+	std::string err_info;	
+	// 执行存储过程
+	// TODO: 添加获取用户菜单存储过程
+	ExecSQLProc("{? = call GetConsumerMenuSet(?)}", err_info);
+	BindingParameter();   // 绑定返回记录集
+	return true;
+}
+
+
+/*
+ * @ brief: 删除顾客所有商品信息
+ * @ param: customer_no [in] 顾客编号
+ * @ return: 若成功返回true
+ **/
+bool CCustomerMenuForm::DeleteCustomerMenu(const char *customer_no) {
+	Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		sizeof(customer_no_) - 1, 0, customer_no_,\
+		sizeof(customer_no_), &sql_customer_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	strcpy(customer_no_, customer_no);
+	std::string err_info;	
+	// 执行存储过程
+	// TODO: 添加获取用户菜单存储过程
+	ExecSQLProc("{? = call DeleteCustomerMenuAll(?)}", err_info);
+	return true;
 }
 
 /*
- * @ brief: 删除顾客点菜信息
- * @ param: customer_no [in] 顾客编号
- * @ param: dish_name [in] 商品名称
+ * @ brief: 增加顾客商品信息
+ * @ param: consumer_no [in] 顾客编号
+ * @ param: commodity_name [in] 商品名称
+ * @ param: quantity [in] 商品数量
  * @ return: 成功返回true
  **/
-bool CCustomerMenuForm::DeleteDish(const char *customer_no, 
-								   const char *dish_name) {
-	char sql_delete[128] = {0};
-	sprintf(sql_delete, "execute DeleteCustomerMenu '%s', '%s'", customer_no, dish_name);
-	std::string error;
-	return this->ExecuteSQL(sql_delete, error);
+bool CCustomerMenuForm::AddCustomerMenu(const char *customer_no,
+	                                    const char *commodity_name,
+										int quantity) {
+    Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		                              sizeof(customer_no_) - 1, 0, customer_no_,\
+		                              sizeof(customer_no_), &sql_customer_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+    m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		                              sizeof(customer_no_) - 1, 0, customer_no_,\
+		                              sizeof(customer_no_), &sql_customer_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
+		                              0, 0, &quantity_, 0, &sql_quantity_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	strcpy(customer_no_, customer_no);
+	strcpy(commodity_name_, commodity_name);
+	quantity_ = quantity;
+	std::string err_info;	
+	// 执行存储过程
+	// TODO: 添加获取用户菜单存储过程
+	ExecSQLProc("{? = call AddConsumerMenu(?,?,?)}", err_info);
+	return true;
+}
+/*
+ * @ brief: 初始化相关数据
+ **/
+void CCustomerMenuForm::Initialize() {
+	memset(customer_no_, 0, sizeof(customer_no_));
+	memset(commodity_name_, 0, sizeof(commodity_name_));
+	quantity_ = 0;
+	commodity_price_ = 0;
+	sql_customer_no_ = SQL_NTS;
+	sql_commodity_name_ = SQL_NTS;
+	sql_quantity_ = SQL_NTS;
+	sql_commodity_price_ = SQL_NTS;
 }
 
-bool CCustomerMenuForm::DeleteAll(const char *customer_no) {
-	char sql_delete[128] = {0};
-	sprintf(sql_delete, "execute DeleteCustomerMenuAll '%s'", customer_no);
-	std::string error;
-	return this->ExecuteSQL(sql_delete, error);
+bool CCustomerMenuForm::BindingParameter()
+{
+	/* 菜名--单价--数量 */
+	// 绑定商品名称
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, commodity_name_, sizeof(commodity_name_), &sql_commodity_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_RECODE_ERROR)
+	// 绑定商品售价
+	m_return_code_ = SQLBindCol(m_hstmt_, 2, SQL_C_FLOAT, &commodity_price_, 0, &sql_commodity_price_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_RECODE_ERROR)
+	// 绑定商品数量
+	m_return_code_ = SQLBindCol(m_hstmt_, 3, SQL_C_LONG, &quantity_, 0, &sql_quantity_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(BIND_RECODE_ERROR)
+	return true;
 }

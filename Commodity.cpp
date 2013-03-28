@@ -19,7 +19,7 @@ CCommodity::~CCommodity()
 }
 
 /*
- * @ breif: 根据商品的主，次分类名称获取商品名称
+ * @ breif: 根据商品的主，次分类名称获取商品信息
  * @ param: main_name [in] 主分类名
  * @ param: child_name [in] 次分类名
  * @ return: 若成功返回true，否则返回false

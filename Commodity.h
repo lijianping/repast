@@ -15,7 +15,7 @@ public:
 	virtual ~CCommodity();
 	bool GetCommodityNameSet(const char* main_name, const char *child_name);
 	bool GetCommodityNameSet(const char* main_name);
-	void Initialize();
+	
 	
 	inline char* no();
 	inline char* name();
@@ -26,6 +26,7 @@ public:
 	inline char* register_date();
 
 protected:
+	void Initialize();
 	virtual bool BindingParameter();
 
 private:
