@@ -115,7 +115,9 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_BASIC_INFO_ADD:
 				{
-                    DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY),hwnd,EditCommodityProc);
+					CommodityInfo commodity_info;
+					commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
+                    DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY),hwnd,EditCommodityProc, (long)&commodity_info);
 					break;
 				}
 			case IDC_BASIC_INFO_MODIFY:
@@ -325,14 +327,14 @@ BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		{
 			CommodityInfo *info = (CommodityInfo *)lParam;
 			commodity_info.menu_id = info->menu_id;
-			commodity_info.commodity_no = info->commodity_no;
-			commodity_info.commodity_name = info->commodity_name;
-			commodity_info.commodity_category = info->commodity_category;
-			commodity_info.commodity_purchase = info->commodity_purchase;
-			commodity_info.commodity_sale = info->commodity_sale;
-			commodity_info.commodity_sum = info->commodity_sum;
-			commodity_info.commodity_unit = info->commodity_unit;
 			if (info->menu_id == IDC_BASIC_INFO_MODIFY) {
+				commodity_info.commodity_no = info->commodity_no;
+				commodity_info.commodity_name = info->commodity_name;
+				commodity_info.commodity_category = info->commodity_category;
+				commodity_info.commodity_purchase = info->commodity_purchase;
+				commodity_info.commodity_sale = info->commodity_sale;
+				commodity_info.commodity_sum = info->commodity_sum;
+				commodity_info.commodity_unit = info->commodity_unit;
 				SetDlgItemText(hwnd, IDC_E_COMMODITY_ID, info->commodity_no.c_str());
 				SetDlgItemText(hwnd, IDC_E_COMMODITY_NAME, info->commodity_name.c_str());
 				SetDlgItemText(hwnd, IDC_E_COMMODITY_PURCHASE, info->commodity_purchase.c_str());
