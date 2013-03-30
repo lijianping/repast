@@ -15,6 +15,7 @@ public:
 	inline short old_no() const;
 	inline char* name();
 	bool GetMainCateName();
+	bool GetMainCateByName(const char* name);
 	void Initialize();
 
 private:

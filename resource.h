@@ -234,8 +234,11 @@
 #define IDC_E_CATEGORY_NAME             1174
 #define IDC_CATEGORY_MODIFY             1175
 #define IDC_START_DATE                  1176
+#define IDC_S_CATEGORY_CATE             1176
 #define IDC_END_DATE                    1177
 #define IDC_E_START_TIME                1177
+#define IDC_E_CATEGORY_                 1177
+#define IDC_E_CATEGORY_CATE             1177
 #define IDC_E_USER_ID                   1178
 #define IDC_E_USER_PERMISSION           1179
 #define IDC_S_PERMISSION                1180
@@ -265,7 +268,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        128
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1196
+#define _APS_NEXT_CONTROL_VALUE         1197
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

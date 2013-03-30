@@ -14,6 +14,7 @@ void ComMainCateForm::Initialize() {
 	sql_old_no_ = SQL_NTS;
 	sql_no_ = SQL_NTS;
 	sql_name_ = SQL_NTS;
+	m_sql_pro_ret = SQL_NTS;
 }
 
 bool ComMainCateForm::GetMainCateName() {
@@ -35,5 +36,33 @@ bool ComMainCateForm::GetMainCateName() {
 	sql_ret = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, name_, sizeof(name_), &sql_name_);
 	if (sql_ret != SQL_SUCCESS && sql_ret != SQL_SUCCESS_WITH_INFO) 
 		LTHROW(BIND_RECODE_ERROR)
+	return true;
+}
+
+/*
+ * 说明：
+ *     通过主分类的名称获取主分类的具体信息
+ * 参数：
+ *     name [in] 主分类名称
+ * 返回值：
+ *     成功返回true, 否则返回false;
+ *
+ */
+bool ComMainCateForm::GetMainCateByName(const char* name)
+{
+    Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+	       sizeof(name_)-1,0, name_, sizeof(name_), &sql_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_RETURN_ERROR)
+	}
+	strcpy(name_,name);
+	ExecSQLProc("{?=call GetMainCateByname(?)}");
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &no_, 0, &sql_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_RECODE_ERROR)
+	}
+	this->IsEOF();
 	return true;
 }

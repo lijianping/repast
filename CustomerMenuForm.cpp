@@ -92,7 +92,8 @@ bool CCustomerMenuForm::AddCustomerMenu(const char *customer_no,
 	strcpy(customer_no_, customer_no);
 	strcpy(commodity_name_, commodity_name);
 	quantity_ = quantity;
-	std::string err_info;	
+	std::string err_info;
+	
 	// 执行存储过程
 	// TODO: 添加获取用户菜单存储过程
 	ExecSQLProc("{? = call AddConsumerMenu(?,?,?)}", err_info);

@@ -24,8 +24,14 @@ BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 bool InitBasicInfoList(HWND parent_hwnd, UINT id);
 bool InitCommodityTree(HWND parent_hwnd, UINT id);
+bool ShowCommodityTree(HWND paren_hwnd, UINT id);
 bool ShowCommodity(HWND hwnd);
 bool ShowCategoryList(HWND hwnd, UINT id);
+bool RespondTreeDBClick(HWND hwnd);
+bool AddComCategory(HWND hwnd);
+bool UpdateComCategory(HWND hwnd);
+bool DeleteComCategory(HWND hwnd);
+
 
 /* 商品信息 */
 struct CommodityInfo {
