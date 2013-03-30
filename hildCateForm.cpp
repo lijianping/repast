@@ -59,6 +59,11 @@ bool ChildCateForm::GetChildCateName(const char *name, std::string &err_info)
 /*
  * 说明:
  *     根据主分类名称和子分类名称获取子分类的编号
+ * 参数：
+ *     main_name [in] 主分类名称
+ *     child_name [in] 子分类名称
+ * 返回值：
+ *     成功返回true, 失败返回false
  */
 bool ChildCateForm::GetChildCateByDname(const char *main_name, const char *child_name)
 {
@@ -85,5 +90,87 @@ bool ChildCateForm::GetChildCateByDname(const char *main_name, const char *child
 		return false;
 	}
 	this->IsEOF();
+	return true;
+}
+
+
+/*
+ * 说明:
+ *     检查子分类信息是否正确
+ * 参数：
+ *     child_cate  [in]指向子分类结构体的指针
+ * 返回值：
+ *     成功返回true, 失败返回false
+ */
+bool ChildCateForm::CheckChildCate(COMCHILDCATE *child_cate)
+{
+	return true;
+}
+
+
+/*
+ * 说明:
+ *     子分类信息赋值
+ * 参数：
+ *     child_cate  [in]指向子分类结构体的指针
+ * 返回值：
+ *    无
+ */
+void ChildCateForm::SetChildCate(COMCHILDCATE *child_cate)
+{
+
+}
+
+/*
+ * 说明:
+ *     绑定子分类输入参数
+ * 参数：
+ *     bind_type  [in]绑定类型，可以是ADDCHILDCATE,UPDATECHILDCATE,DELETECHILDCATE
+ * 返回值：
+ *     成功返回true, 失败返回false
+ */
+bool ChildCateForm::Bind(int bind_type)
+{
+	return true;
+}
+
+
+/*
+ * 说明:
+ *     添加子分类信息
+ * 参数：
+ *     child_cate  [in]指向子分类结构体的指针
+ * 返回值：
+ *     成功返回true, 失败返回false
+ */
+bool ChildCateForm::AddChildCate(COMCHILDCATE *child_cate)
+{
+	return true;
+}
+
+
+/*
+ * 说明:
+ *     更新子分类信息是否正确
+ * 参数：
+ *     child_cate  [in]指向子分类结构体的指针
+ * 返回值：
+ *     成功返回true, 失败返回false
+ */
+bool ChildCateForm::UpdateChildCate(COMCHILDCATE *child_cate)
+{
+	return true;
+}
+
+/*
+ * 说明:
+ *     删除子分类信息是否正确
+ * 参数：
+ *     child_cate  [in]指向子分类结构体的指针
+ * 返回值：
+ *     成功返回true, 失败返回false
+ */
+bool ChildCateForm::DeleteChildCate(const char *child_no)
+{
 	return true;
 }
