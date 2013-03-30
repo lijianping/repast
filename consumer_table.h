@@ -27,7 +27,7 @@ private:
 	char room_name_[33];               // 房间名称
 	short table_status_;               // 台号状态
 	short consumer_num_;               // 顾客人数
-	char start_time_[33];              // 开台时间
+	char start_time_[20];              // 开台时间
 	char floor_name_[17];              // 楼层名称
 	SQLINTEGER sql_consumer_no_;
 	SQLINTEGER sql_table_no_;

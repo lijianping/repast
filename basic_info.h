@@ -7,7 +7,6 @@
 #include "ComboBox.h"
 #include "Edit.h"
 #include "treectrl.h"
-#include "childwindowid.h"
 #include "resource.h"
 #include "Commodity.h"
 #include "tabctrl.h"

@@ -1,11 +1,9 @@
 #include "Wind.h"
 #include "resource.h"
 #include "service.h"
-#include "childwindowid.h"
 #include "basic_info.h"
 #include "manager.h"
 #include "basic_manager.h"
-//#include <SkinPPWTL.h>
 
 
 HINSTANCE g_hinstance;
@@ -24,7 +22,6 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nShowCmd)
 {
-//	skinppLoadSkin(TEXT("skin/Royale.ssk"));  // ¼ÓÔØÆ¤·ô
 	g_hinstance = hInstance;
     std::string information;
 
@@ -35,7 +32,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	{
 		DialogBox(hInstance, MAKEINTRESOURCE(IDD_SYS_MANAGEMENT), NULL, (DLGPROC)ManagerProcesses);
 	}
-//	skinppExitSkin();  // ÍË³ö
     return 0;
 }
 

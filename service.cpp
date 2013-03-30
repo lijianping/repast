@@ -424,17 +424,14 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						MessageBox(hwnd, TEXT("您未做出任何修改！"), TEXT("点菜提示"), MB_OK);
 						break;
 					}
-					
+					CEdit cus_no(hwnd, IDC_CUSTOM_NUM);
+					std::string customer_no;  // 顾客编号
+					cus_no.GetEditText(customer_no);   // 获取顾客编号
 					if(count) {
-						CEdit cus_no(hwnd, IDC_CUSTOM_NUM);
-						std::string customer_no;  // 顾客编号
-						cus_no.GetEditText(customer_no);   // 获取顾客编号
-						
 						bool is_ok = false;     // 保存是否成功
 						try {
 							CCustomerMenuForm customer_info;
-							customer_info.DeleteCustomerMenu(customer_no.c_str());
-							std::string before_error;
+							customer_info.DeleteCustomerMenu(customer_no.c_str());   // 删除用户菜单
 							for (int i = 0; i < count; ++i) {
 								CCustomerMenuForm test;
 								std::string commodity_name = customer_list.GetItem(i, 0);  // 获取商品名称
@@ -442,30 +439,30 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								int quantity = atoi(quantity_str.c_str());
 								is_ok = test.AddCustomerMenu(customer_no.c_str(), commodity_name.c_str(), quantity);
 								if (!is_ok) {
-									before_error = customer_list.GetItem(i-1,0);
 									break;
 								}
 							}
 							if (is_ok) {
 								MessageBox(hwnd, TEXT("点菜成功！"), TEXT("前台管理"), MB_ICONINFORMATION);
 							} else {
-							    char temp[512];
-								sprintf(temp, "%s 之前的商品已成功添加！\n之后的尚未添加！",before_error.c_str());
-								MessageBox(hwnd, temp, TEXT("前台管理"), MB_ICONINFORMATION);
+								MessageBox(hwnd, TEXT("菜单更新失败！"), TEXT("前台管理"), MB_ICONINFORMATION);
 							}
 						} catch (Err &err) {
 							MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
 							return FALSE;
-						}
+						}  
 					} else {
-
+						try {
+						CCustomerMenuForm customer_info;
+						customer_info.DeleteCustomerMenu(customer_no.c_str());   // 删除用户菜单
+						} catch (Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
+							return FALSE;
+						}
+						MessageBox(hwnd, TEXT("保存成功！"), TEXT("前台管理"), MB_ICONINFORMATION);
 					}
-// 					if (is_ok) {
-// 						MessageBox(hwnd, TEXT("添加菜单成功！"), TEXT("提示"), MB_ICONINFORMATION);
-// 					} else {
-// 						MessageBox(hwnd, TEXT("添加菜单失败！"), TEXT("提示"), MB_ICONINFORMATION);
-// 					}
 					is_change = false; // 重置
+					
 					break;
 				}
 			case IDC_CANCEL_MENU:  // 取消更改
@@ -479,38 +476,8 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		{
 			if (true == is_change) {
-				int ret = MessageBox(hwnd, TEXT("Save the change!"), TEXT("ORDER"), MB_YESNOCANCEL);
-				if (IDYES == ret) {
-					CListView consumer_menu(hwnd, IDC_CUSTOM_MENU);
-					int count = consumer_menu.GetItemCount();
-					if (is_change) {
-
-					}
-// 					CCustomerMenuForm customer_menu_info;
-// 	//				customer_menu_info.DeleteAll(table->customer_no.c_str());/*删除顾客点菜*/
-// 					CCustomer customer;
-// 					CListView customer_list;
-// 					customer_list.Initialization(hwnd, IDC_CUSTOM_MENU);
-// 					int count = customer_list.GetItemCount();
-// 					if(0==count)
-// 					{
-// 						MessageBox(hwnd, TEXT("您还没有点菜，请您点菜"), TEXT("点菜提示"), MB_OK);
-// 						break;
-// 					}
-// 					char customer_no[16] = {0};
-// 					GetDlgItemText(hwnd, IDC_CUSTOM_NUM, customer_no, 16);
-// 
-// 					for (int i = 0; i < count; ++i) {
-// 						int quantity = atoi((customer_list.GetItem(i, 2)).c_str());
-// 						customer.InsertCustomerMenu(customer_no,
-// 													customer_list.GetItem(i, 0).c_str(), 
-// 													quantity);
-// 					}
-					is_change = false;
-
-				} else if (IDCANCEL == ret) {
-					break;
-				}
+				MessageBox(hwnd, TEXT("请先保存数据!"), TEXT("前台管理"), MB_ICONINFORMATION);
+				return FALSE;
 			}
 			EndDialog(hwnd, HIWORD(wParam));
 			return TRUE;
@@ -552,7 +519,7 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
  **/
 BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static PCUSTOMERTABLE table_info;
+	static CUSTOMERTABLE send_in;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -567,7 +534,9 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			int screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
 			int screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
 			MoveWindow(hwnd, (screen_width - width) / 2, (screen_height - height) / 2, width, height, TRUE);
+			PCUSTOMERTABLE table_info;
 			table_info = (PCUSTOMERTABLE)lParam;
+			send_in.customer_no = table_info->customer_no;
 			CEdit cus_no(hwnd, IDC_CUSTOM_NUM_CHECKOUT);
 			cus_no.SetEditText(table_info->customer_no);   // 显示顾客编号
 			
@@ -582,6 +551,28 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			HWND edit = GetDlgItem(hwnd, IDC_PAIDIN_CHECKOUT);
 			SetFocus(edit);
 			g_checkout_edit_proc = (WNDPROC)SetWindowLong(edit, GWL_WNDPROC, (LONG)EditProc);
+			float totle_cash = 0;
+			try {
+				CCustomerMenuForm consumer_menu;
+				consumer_menu.GetCustomerMenuSet(table_info->customer_no.c_str());
+				int i = 0;
+				while (!consumer_menu.IsEOF()) {
+					float price = consumer_menu.commodity_price();
+					short quantity = consumer_menu.quantity();
+					custom_list.InsertItem(i, consumer_menu.commodity_name());
+					custom_list.SetItem(i, 1, price);
+					custom_list.SetItem(i, 2, quantity);
+					totle_cash += quantity * price;
+					i++;
+				}
+			} catch (Err &err) {
+				MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
+				return FALSE;
+			}
+			CEdit totle(hwnd, IDC_RECEIVALBE_CHECKOUT);
+			char temp[64];
+			sprintf(temp, "%0.2f", totle_cash);
+			totle.SetEditText(temp);
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -590,21 +581,35 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_SAVE_CHECKOUT: 
 				{
+					HWND pad_hwnd = GetDlgItem(hwnd, IDC_PAIDIN_CHECKOUT);
+					PostMessage(pad_hwnd, WM_KEYDOWN, VK_F5, 1);
 					TCHAR totle[64] = "\0", more[64] = "\0";
-					int ret1 = GetDlgItemText(hwnd, IDC_RECEIVALBE_CHECKOUT, totle, 64);
+					int ret1 = GetDlgItemText(hwnd, IDC_RECEIVALBE_CHECKOUT, totle, 64);  // 获取收入
 					int ret2 = GetDlgItemText(hwnd, IDC_GIVECHANGE_CHECKOUT, more, 64);
 					float check_in = atof(totle);
 					float check_out = atof(more);
 					if (!ret1 || !ret2) {
-						MessageBox(hwnd, TEXT("输入有误！"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						MessageBox(hwnd, TEXT("输入有误！"), TEXT("前台管理"), MB_OK | MB_ICONINFORMATION);
 						return FALSE;
 					} 
 					if (check_out < 0) {
 						TCHAR info[128] = "\0";
 						sprintf(info, "还差 %0.2f 元", fabs(check_out));
-						MessageBox(hwnd, info, TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						MessageBox(hwnd, info, TEXT("前台管理"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					} else if (check_out > 0) {
+						TCHAR info[128] = "\0";
+						sprintf(info, "找零 %0.2f 元",check_out);
+						MessageBox(hwnd, info, TEXT("前台管理"), MB_OK | MB_ICONINFORMATION);
+					}
+					try {   // 更新数据
+						CCustomer consumer;
+						consumer.CheckOut(send_in.customer_no.c_str() ,g_login_name.c_str(), check_in);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
 						return FALSE;
 					}
+					MessageBox(hwnd, TEXT("结帐成功！"), TEXT("前台管理"), MB_ICONINFORMATION);
 				}
 			case IDC_CANCEL_CHECKOUT:
 				{
@@ -628,6 +633,7 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
  **/
 BOOL CALLBACK ChangeTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static CUSTOMERTABLE recive;  // 接收到的顾客信息
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -645,11 +651,11 @@ BOOL CALLBACK ChangeTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			MoveWindow(hwnd, (screen_width - width) / 2,
 				(screen_height - height) / 2,
 				width, height, TRUE);
-	
-			PCUSTOMERTABLE table_info = (PCUSTOMERTABLE)lParam;
-			SetDlgItemText(hwnd, IDC_TABLE_NUM_OLD, table_info->table_no.c_str());
-			
-			SetDlgItemText(hwnd, IDC_TABLE_TIME_OLD, table_info->start_time.c_str());
+			ReciveConsumerTableInfo((PCUSTOMERTABLE)lParam, &recive);
+			SetDlgItemText(hwnd, IDC_OLD_FLOOR, recive.floor_name.c_str());  // 楼层信息
+			SetDlgItemText(hwnd, IDC_OLD_ROOM, recive.room_name.c_str());    // 房间信息
+			SetDlgItemText(hwnd, IDC_TABLE_NUM_OLD, recive.table_no.c_str());// 台号信息
+			SetDlgItemText(hwnd, IDC_OLD_PEOPLE_NUM, recive.customer_num.c_str());  // 顾客人数
 			CListView table;
 			table.Initialization(hwnd, IDC_TABLE_AVAILABLE);
 			table.InsertColumn(0, 100, "房间");
@@ -681,7 +687,47 @@ BOOL CALLBACK ChangeTableProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_SAVE_CHANGE:
 				{
-					break;
+					CEdit edit(hwnd, IDC_NEW_FLOOR);
+					std::string floor_name, room_name, table_no;
+					edit.GetEditText(floor_name);
+					edit.Initialization(hwnd, IDC_NEW_ROOM);
+					edit.GetEditText(room_name);
+					edit.Initialization(hwnd, IDC_NEW_TABLE_NO);
+					edit.GetEditText(table_no);
+					std::string old_floor_name, old_room_name, old_table_no;
+					edit.Initialization(hwnd, IDC_OLD_FLOOR);
+					edit.GetEditText(old_floor_name);
+					edit.Initialization(hwnd, IDC_OLD_ROOM);
+					edit.GetEditText(old_room_name);
+					edit.Initialization(hwnd, IDC_OLD_TABLE_NO);
+					edit.GetEditText(old_table_no);
+					BOOL is_ok;
+					int people_num = GetDlgItemInt(hwnd, IDC_NEW_PEOPLE_NUM, &is_ok, FALSE);
+					if (!is_ok) {
+						MessageBox(hwnd, TEXT("获取人数失败！"), TEXT("前台管理"), MB_ICONINFORMATION);
+						return FALSE;
+					}
+					int payable = GetDlgItemInt(hwnd, IDC_NEW_PEOPLE_NUM2, &is_ok, FALSE);
+					if (people_num > payable) {
+						MessageBox(hwnd, TEXT("人数超过限制！"), TEXT("前台管理"), MB_ICONINFORMATION);
+						return FALSE;
+					}
+					int table_state;
+					if (recive.table_state == "已开台") {
+						table_state = 1;
+					} else {
+						table_state = 2;
+					}
+					try {
+						CCustomer consumer;
+						consumer.ChangeTable(old_floor_name.c_str(), old_room_name.c_str(), old_table_no.c_str(),\
+							                 floor_name.c_str(), room_name.c_str(), table_no.c_str(),\
+											 recive.customer_no.c_str(), people_num, table_state);
+					} catch(Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
+						return FALSE;
+					}
+					MessageBox(hwnd, TEXT("换台成功"), TEXT("前台管理"), MB_ICONINFORMATION);
 				}
 			case IDC_CANCLE_CHANGE:
 				{
@@ -1001,10 +1047,15 @@ LRESULT CALLBACK ChangeTableListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 	case WM_LBUTTONUP:
 		{  
 			HWND parent = GetParent(hwnd);
+			CComboBox combo(parent, IDC_FLOOR);
+			std::string floor_name;
+			combo.GetComboBoxText(floor_name);
+			SetDlgItemText(parent, IDC_NEW_FLOOR, floor_name.c_str());
 			CListView list_view(parent, IDC_TABLE_AVAILABLE);
 			int select = list_view.GetSelectionMark();
-			SetDlgItemText(parent, IDC_TABLE_NUM_NEW, list_view.GetItem(select, 0).c_str());
-			SetDlgItemText(parent, IDC_PAYABLE_NUM_NEW, list_view.GetItem(select, 1).c_str());
+			SetDlgItemText(parent, IDC_NEW_ROOM, list_view.GetItem(select, 0).c_str());
+			SetDlgItemText(parent, IDC_NEW_TABLE_NO, list_view.GetItem(select, 1).c_str());
+			SetDlgItemInt(parent, IDC_NEW_PEOPLE_NUM2, atoi(list_view.GetItem(select, 2).c_str()), FALSE);
 			break;
 		}
 	}
@@ -1038,4 +1089,20 @@ bool ShowConsumerTableInfo(const HWND hwnd, const UINT id, const char *floor_nam
 		return false;
 	}
 	return true;
+}
+
+/*
+ * @ brief: 接收父窗口传来的顾客台号信息
+ * @ param: send_in [in] 传进的顾客台号信息
+ * @ param: revice [out] 接收的顾客台号信息
+ **/
+void ReciveConsumerTableInfo(PCUSTOMERTABLE send_in, PCUSTOMERTABLE revice) {
+	revice->customer_no = send_in->customer_no;
+	revice->customer_num = send_in->customer_num;
+	revice->floor_name = send_in->floor_name;
+	revice->menu_id = send_in->menu_id;
+	revice->room_name = send_in->room_name;
+	revice->start_time = send_in->start_time;
+	revice->table_no =send_in->table_no;
+	revice->table_state =send_in->table_state;
 }

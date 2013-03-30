@@ -4,7 +4,6 @@
  **/
 #include "resource.h"
 #include "LoginForm.h"
-#include "childwindowid.h"
 
 std::string g_login_name;  // 登陆用户名
 
@@ -82,7 +81,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message,
                             MessageBox(hwnd, error_information.c_str(), TEXT("LOGIN"), MB_OK | MB_ICONINFORMATION);
                             return FALSE;
                         }
-						g_login_name = name;	
+						g_login_name = name;	// 保存用户登录名
                     }
                     EndDialog(hwnd, return_value);
                     break;
