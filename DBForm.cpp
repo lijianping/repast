@@ -176,7 +176,7 @@ bool CDBForm::ReportError(SQLHSTMT &hdbc, int handle_type, std::string &error_in
 	{
 	case 2627:
 		{
-			LTHROW(INPUT_EXIST_ERROR)
+		//	LTHROW(INPUT_EXIST_ERROR)
 			error_info +=  TEXT("不能输入重复的编号");
 	    	break;
 		}
@@ -679,7 +679,7 @@ bool CDBForm::IsSQLProcRetRight(std::string &error)
  /*
   * 说明：（换为抛出异常）
   *      判断存储过程执行是否成功
-         若是存储过程的返回值和其他数据记录集一起返回，
+  *      若是存储过程的返回值和其他数据记录集一起返回，
   *      请先取数据记录集里的数据，再调用此函数判断存储过程的执行是否成功
   * 参数：
   *      error    [out] 记录错误信息
@@ -688,19 +688,20 @@ bool CDBForm::IsSQLProcRetRight(std::string &error)
   */
 bool CDBForm::IsSQLProcRetRight()
 {
+// 	std::string err_info;
+// 	ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);   // HIT: 调试用
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
 	{
 	}
-	if (0 == m_pro_ret)
-	{
+	if (0 == m_pro_ret) {
 		return true;
-	}
-	else if (2627 == m_pro_ret )
-	{
+	} else if (2627 == m_pro_ret ) {
 		LTHROW(INPUT_EXIST_ERROR)
-	}
-	else
-	{
+	} else if (-1 == m_pro_ret) {   // 房间名称重复
+		LTHROW(NAME_EXIST_ERROR)
+	} else if (-2 == m_pro_ret) {   // 房间下有台号正在使用
+		LTHROW(TABLE_IN_ROOM_USER_ERROR)
+	} else {
 		LTHROW(EXEC_SQL_PROC_ERROR)
 	}
 	return true;
@@ -712,8 +713,8 @@ bool CDBForm::IsSQLProcRetRight()
  *           当执行失败时，可立即通过ReportError函数获取错误信息
  **/
 bool CDBForm::BindReturn() {
-	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SHORT,\
-		                              SQL_INTEGER, 0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
+	m_return_code_ = SQLBindParameter(m_hstmt_, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT,\
+		                              SQL_SMALLINT, 0, 0, &m_pro_ret, 0, &m_sql_pro_ret);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
 		LTHROW(BIND_RETURN_ERROR)
 	return true;

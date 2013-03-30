@@ -7,6 +7,8 @@
 #include "TableInfo.h"
 
 extern HINSTANCE g_hinstance;
+extern bool InitFloorName(const HWND hwnd, int id);
+extern bool InitTableList(const HWND hwnd, int id, const char *floor_name, short status);
 
 BOOL CALLBACK TableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -108,6 +110,11 @@ BOOL CALLBACK TableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	        		DialogBox(hInstance,MAKEINTRESOURCE(IDD_EDIT_FLOOR),hwnd,(DLGPROC)FloorInfoProc);
 					break;
 				}
+			case IDC_B_ROOM:
+				{
+					DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_ROOM), hwnd, (DLGPROC)RoomInfoProc);
+					break;
+				}
 			}
 			return TRUE;
 		}
@@ -125,7 +132,12 @@ BOOL CALLBACK FloorInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			floor_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 			floor_list.InsertColumn(1,100,"楼层编号");
 			floor_list.InsertColumn(2,100,"楼层名称");
-			ShowFloorList(hwnd);
+			try {
+			    ShowFloorList(hwnd);
+			} catch (Err &err) {
+				MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+				return FALSE;
+			}
 			return TRUE;
 		}
 	case  WM_NOTIFY:
@@ -157,20 +169,35 @@ BOOL CALLBACK FloorInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_B_FLOOR_ADD:
 				{
-					AddFloor(hwnd);
-			    	ShowFloorList(hwnd);
+					try {
+						AddFloor(hwnd);
+						ShowFloorList(hwnd);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
 					break;
 				}
 			case IDC_B_FLOOR_MODIFY:
 				{
-					UpdateFloor(hwnd);
-					ShowFloorList(hwnd);
+					try {
+						UpdateFloor(hwnd);
+						ShowFloorList(hwnd);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
 					break;
 				}
 			case IDC_B_FLOOR_DELETE:
 				{
-					DeleteFloor(hwnd);
-					ShowFloorList(hwnd);
+					try {
+						DeleteFloor(hwnd);
+						ShowFloorList(hwnd);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
 					break;
 				}
 			case IDC_B_FLOOR_CANCEL:
@@ -190,51 +217,192 @@ BOOL CALLBACK FloorInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+BOOL CALLBACK RoomInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	static std::string old_room_no;   // 原房间编号
+	switch(msg)
+	{
+	case WM_INITDIALOG:
+		{
+			CListView floor_list(hwnd, IDC_L_ROOM_INFO);
+			floor_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			floor_list.InsertColumn(1,80,"房间编号");
+			floor_list.InsertColumn(2,100,"房间名称");
+			try {
+				InitFloorName(hwnd, IDC_FLOOR_COMBO);
+				CComboBox combo(hwnd, IDC_FLOOR_COMBO);
+				std::string floor_name;
+				combo.GetComboBoxText(floor_name);
+				ShowRoomInfo(hwnd, IDC_L_ROOM_INFO, floor_name.c_str());
+			} catch (Err &err) {
+				MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+				return FALSE;
+			}
+			return TRUE;
+		}
+	case  WM_NOTIFY:
+		{
+			switch(LOWORD(wParam))
+			{
+			case IDC_L_ROOM_INFO:
+				{
+					if (((LPNMHDR)lParam)->code == NM_CLICK)/*点击列表中的一项*/
+					{
+						int index=0;
+						CEdit e_name,e_id;
+						CListView room_list;
+						room_list.Initialization(hwnd, IDC_L_ROOM_INFO);
+						e_id.Initialization(hwnd, IDC_E_ROOM_NO);
+						e_name.Initialization(hwnd, IDC_E_ROOM_NAME);
+						index = room_list.GetSelectionMark();
+						old_room_no = room_list.GetItem(index,0);   // 获取点中的房间编号，修改时用
+						e_id.SetEditText(old_room_no);
+						e_name.SetEditText(room_list.GetItem(index,1));
+					}
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDC_B_ADD_ROOM:
+				{
+					CComboBox combo(hwnd, IDC_FLOOR_COMBO);
+					std::string floor_name, room_no, room_name;
+					combo.GetComboBoxText(floor_name);
+					CEdit edit(hwnd, IDC_E_ROOM_NO);
+					edit.GetEditText(room_no);
+					if (room_no.length() > 2) {
+						MessageBox(hwnd, TEXT("编号过长！\n仅允许两位！"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+						break;
+					}
+					edit.Initialization(hwnd, IDC_E_ROOM_NAME);
+					edit.GetEditText(room_name);
+					try {
+						RoomInfo room;
+						room.AddRoom(floor_name.c_str(), room_no.c_str(), room_name.c_str());
+						MessageBox(hwnd, TEXT("房间信息添加成功!"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
+					break;
+				}
+			case IDC_B_MODITY_ROOM:
+				{
+					CComboBox combo(hwnd, IDC_FLOOR_COMBO);
+					std::string floor_name, room_no, room_name;
+					combo.GetComboBoxText(floor_name);
+					CEdit edit(hwnd, IDC_E_ROOM_NO);
+					edit.GetEditText(room_no);       // 获取修改的房间编号
+					if (room_no.length() > 2) {
+						MessageBox(hwnd, TEXT("编号过长！\n仅允许两位！"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+						break;
+					}
+					edit.Initialization(hwnd, IDC_E_ROOM_NAME);
+					edit.GetEditText(room_name);   // 获取修改的房间名称
+					try {
+						RoomInfo room;
+						room.ModifyRoom(floor_name.c_str(), old_room_no.c_str(), room_no.c_str(), room_name.c_str());
+						MessageBox(hwnd, TEXT("房间信息修改成功!"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
+					break;
+				}
+			case IDC_B_DELETE_ROOM:
+				{
+					CListView room_list(hwnd, IDC_L_ROOM_INFO);
+					int select = room_list.GetSelectionMark();
+					if (-1 == select) {
+						MessageBox(hwnd, TEXT("请在左侧列表款选择要删除的房间编号!"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+						break;
+					}
+					std::string room_no, floor_name;
+					room_no = room_list.GetItem(select, 0);    // 获取房间编号
+					CComboBox combo(hwnd, IDC_FLOOR_COMBO);
+					combo.GetComboBoxText(floor_name);         // 获取楼层名称
+					try {
+						RoomInfo room;
+						room.DeleteRoom(floor_name.c_str(), room_no.c_str());
+						MessageBox(hwnd, TEXT("房间信息删除成功!"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
+					break;
+				}
+			case IDC_B_ROOM_CANCEL:
+				{
+					EndDialog(hwnd,0);
+					break;
+				}
+			case IDC_FLOOR_COMBO:
+				{
+					if (HIWORD(wParam) == CBN_SELCHANGE) {
+						try {
+							CComboBox combo(hwnd, IDC_FLOOR_COMBO);
+							std::string floor_name;
+							combo.GetComboBoxText(floor_name);
+							ShowRoomInfo(hwnd, IDC_L_ROOM_INFO, floor_name.c_str());
+						} catch (Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+							return FALSE;
+						}
+						CEdit edit(hwnd, IDC_E_ROOM_NO);   // 清空右侧编辑框数据
+						edit.Empty();
+						edit.Initialization(hwnd, IDC_E_ROOM_NAME);
+						edit.Empty();
+					}
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_CLOSE:
+		{
+			EndDialog(hwnd,0);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 void ShowFloorList(HWND hwnd)
 {
 	CListView floor_list(hwnd,IDC_L_FLOOR_INFO);
-	try
+	floor_list.DeleteAllItems();
+	FloorInfo floor_info;
+	floor_info.GetFloorSet();
+	int index = 0;
+	while(!floor_info.IsEOF())
 	{
-		floor_list.DeleteAllItems();
-		FloorInfo floor_info;
-		floor_info.GetFloorSet();
-		int index = 0;
-		while(!floor_info.IsEOF())
-		{
-			floor_list.InsertItem(index,floor_info.floor_no());
-			floor_list.SetItem(index,1,floor_info.floor_name());
-			index++;
-		}
-	}
-	catch (Err &err)
-	{
-		MessageBox(hwnd,err.what(),TEXT("编辑楼层初始化"),MB_OK);
+		floor_list.InsertItem(index,floor_info.floor_no());
+		floor_list.SetItem(index,1,floor_info.floor_name());
+		index++;
 	}
 }
 
 bool AddFloor(HWND hwnd)
 {
-	try
-	{	
-		FLOORINFO floor_info;
-		FloorInfo floor;
-		CEdit e_name,e_id;
-		e_id.Initialization(hwnd, IDC_E_FLOOR_ID);
-		e_name.Initialization(hwnd, IDC_E_FLOOR_NAME);
-		e_id.GetEditText(floor_info.no);
-		e_name.GetEditText(floor_info.name);
-		floor_info.old_no = floor_info.no;//设置"原来的编号相同",但"原来的编号"在执行"新增"功能时未用
-		if(floor.AddFloor(&floor_info))
-		{
-			MessageBox(hwnd,TEXT("添加楼层信息成功"),TEXT("添加成功"),MB_OK);
-			return true;
-		}
-	}
-	catch (Err &err)
+	FLOORINFO floor_info;
+	FloorInfo floor;
+	CEdit e_name,e_id;
+	e_id.Initialization(hwnd, IDC_E_FLOOR_ID);
+	e_name.Initialization(hwnd, IDC_E_FLOOR_NAME);
+	e_id.GetEditText(floor_info.no);
+	e_name.GetEditText(floor_info.name);
+	floor_info.old_no = floor_info.no;//设置"原来的编号相同",但"原来的编号"在执行"新增"功能时未用
+	if(floor.AddFloor(&floor_info))
 	{
-		MessageBox(hwnd, err.what(),TEXT("添加失败"),MB_ICONERROR);
-		return false;
+		MessageBox(hwnd,TEXT("添加楼层信息成功"),TEXT("添加成功"),MB_OK);
+		return true;
 	}
+	return false;
 }
 bool UpdateFloor(HWND hwnd)
 {
@@ -249,28 +417,22 @@ bool UpdateFloor(HWND hwnd)
 	int mb_ret=MessageBox(hwnd,TEXT("修改楼层信息同时会修改改楼层下的所有房间和台号！\n 请确认是否修改？"),TEXT("是否删除"),MB_YESNO);
 	if (IDYES == mb_ret)
 	{
-		try
-		{	
-			FLOORINFO floor_info;
-			FloorInfo floor;
-			CEdit e_name,e_id;
-			e_id.Initialization(hwnd, IDC_E_FLOOR_ID);
-			e_name.Initialization(hwnd, IDC_E_FLOOR_NAME);
-			e_id.GetEditText(floor_info.no);
-			e_name.GetEditText(floor_info.name);
-			floor_info.old_no = floor_list.GetItem(list_index,0);//获取列表中原来的楼层编号
-			if(floor.UpdateFloor(&floor_info))
-			{
-				MessageBox(hwnd,TEXT("修改楼层信息成功"),TEXT("修改成功"),MB_OK);
-				return true;
-			}
-		}
-		catch (Err &err)
+		
+		FLOORINFO floor_info;
+		FloorInfo floor;
+		CEdit e_name,e_id;
+		e_id.Initialization(hwnd, IDC_E_FLOOR_ID);
+		e_name.Initialization(hwnd, IDC_E_FLOOR_NAME);
+		e_id.GetEditText(floor_info.no);
+		e_name.GetEditText(floor_info.name);
+		floor_info.old_no = floor_list.GetItem(list_index,0);//获取列表中原来的楼层编号
+		if(floor.UpdateFloor(&floor_info))
 		{
-			MessageBox(hwnd, err.what(),TEXT("修改失败"),MB_ICONERROR);
-			return false;
+			MessageBox(hwnd,TEXT("修改楼层信息成功"),TEXT("修改成功"),MB_OK);
+			return true;
 		}
 	}
+	return false;
 }
 bool DeleteFloor(HWND hwnd)
 {
@@ -285,23 +447,35 @@ bool DeleteFloor(HWND hwnd)
 	int mb_ret=MessageBox(hwnd,TEXT("删除楼层也会删除改楼层下的所有房间和台号！\n 请确认是否删除？"),TEXT("是否删除"),MB_YESNO);
 	if (IDYES == mb_ret)
 	{
-		try
-		{	
-			FLOORINFO floor_info;
-			FloorInfo floor;
-			floor_info.no = floor_list.GetItem(list_index,0);//获取列表中原来的楼层编号
-			floor_info.name = floor_list.GetItem(list_index,1);
-			floor_info.old_no = floor_info.no;
-			if(floor.DeleteFloor(&floor_info))
-			{
-				MessageBox(hwnd,TEXT("删除楼层信息成功"),TEXT("删除成功"),MB_OK);
-				return true;
-			}
-		}
-		catch (Err &err)
+		FLOORINFO floor_info;
+		FloorInfo floor;
+		floor_info.no = floor_list.GetItem(list_index,0);//获取列表中原来的楼层编号
+		floor_info.name = floor_list.GetItem(list_index,1);
+		floor_info.old_no = floor_info.no;
+		if(floor.DeleteFloor(&floor_info))
 		{
-			MessageBox(hwnd, err.what(),TEXT("删除失败"),MB_ICONERROR);
-			return false;
+			MessageBox(hwnd,TEXT("删除楼层信息成功"),TEXT("删除成功"),MB_OK);
+			return true;
 		}
+	}
+	return false;
+}
+
+/*
+ * @ brief: 显示房间信息
+ * @ param: hwnd [in] 父窗口句柄
+ * @ param: id [in] list view id
+ * @ param: floor_name [in] 楼层名称
+ **/
+void ShowRoomInfo(HWND hwnd, UINT id, const char *floor_name) {
+	CListView room_list(hwnd, id);
+	room_list.DeleteAllItems();
+	RoomInfo room;
+	room.GetRoomInfo(floor_name);
+	int i = 0;
+	while (!room.IsEOF()) {
+		room_list.InsertItem(i, room.room_no());
+		room_list.SetItem(i, 1, room.room_name());
+		i++;
 	}
 }
