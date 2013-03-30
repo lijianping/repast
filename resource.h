@@ -243,11 +243,17 @@
 #define IDC_E_CATEGORY_NAME             1174
 #define IDC_CATEGORY_MODIFY             1175
 #define IDC_START_DATE                  1176
+#define IDC_S_CATEGORY_CATE             1176
 #define IDC_END_DATE                    1177
 #define IDC_E_START_TIME                1177
+#define IDC_E_CATEGORY_                 1177
+#define IDC_E_CATEGORY_CATE             1177
 #define IDC_E_USER_ID                   1178
+#define IDC_S_CATEGORY_CATE2            1178
 #define IDC_E_USER_PERMISSION           1179
 #define IDC_S_PERMISSION                1180
+#define IDC_E_CATEGORY_CATE2            1180
+#define IDC_E_PARENT_CATE_NAME          1180
 #define IDC_S_PERMISSION_NO             1181
 #define IDC_S_PERMISSION_NAME           1182
 #define IDC_E_PERMISSION_NO             1183

@@ -634,8 +634,10 @@ bool CDBForm::RollBack()
 	 if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
      {
 		 ReportError(m_hstmt_,SQL_HANDLE_STMT,error);
+		 LTHROW(EXEC_SQL_PROC_ERROR)
+			 return false;
 	 }
-//		 LTHROW(EXEC_SQL_PROC_ERROR)
+		
 		 return true;
  }
 

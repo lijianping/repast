@@ -15,6 +15,8 @@ public:
 	virtual ~ChildCateForm();
 	void Initialize();
 	bool GetChildCateName(const char *name, std::string &err_info);
+	bool GetChildCateByDname(const char *parent_name, const char *child_name);
+	inline short cate_no();
 	inline char *cate_name();
 
 private:
@@ -32,5 +34,9 @@ char* ChildCateForm::cate_name()
 {
 	DeleteSpace(cate_name_, cate_name_);
 	return cate_name_;
+}
+short ChildCateForm::cate_no()
+{
+	return cate_no_;
 }
 #endif

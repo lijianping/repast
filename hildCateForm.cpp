@@ -54,3 +54,36 @@ bool ChildCateForm::GetChildCateName(const char *name, std::string &err_info)
 	}
 	return false;
 }
+
+
+/*
+ * 说明:
+ *     根据主分类名称和子分类名称获取子分类的编号
+ */
+bool ChildCateForm::GetChildCateByDname(const char *main_name, const char *child_name)
+{
+	this->Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+		sizeof(main_cate_name_) - 1, 0, main_cate_name_, sizeof(main_cate_name_), &sql_main_cate_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_PARAM_ERROR)
+		return false;
+	}
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+		sizeof(cate_name_) - 1, 0, cate_name_, sizeof(cate_name_), &sql_cate_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_PARAM_ERROR)
+			return false;
+	}
+	strcpy(main_cate_name_, main_name);
+	strcpy(cate_name_,child_name);
+	ExecSQLProc("{?=call GetChildCateByDname(?,?)}");
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_SSHORT, &cate_no_, 0, &sql_cate_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_RECODE_ERROR)
+		return false;
+	}
+	this->IsEOF();
+	return true;
+}
