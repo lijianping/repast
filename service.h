@@ -3,11 +3,23 @@
 
 #include "resource.h"
 #include "StaffForm.h"
-#include "childwindowid.h"
 #include "Static.h"
 #include "Button.h"
 #include "ComboBox.h"
 #include "ListView.h"
+
+/* 台号信息 */
+typedef struct CustomerTable {
+	UINT menu_id;
+	std::string customer_no;
+	std::string table_no;
+	std::string room_name;
+	std::string table_state;
+	std::string customer_num;
+	std::string start_time;
+	std::string floor_name;
+}CUSTOMERTABLE, *PCUSTOMERTABLE;
+
 
 LRESULT CALLBACK ListProcesses(HWND hwnd, UINT message,
                                WPARAM wParam, LPARAM lParam);
@@ -41,15 +53,6 @@ LRESULT CALLBACK OrderMenuListProc(HWND hwnd, UINT message, WPARAM wParam, LPARA
 LRESULT CALLBACK ChangeTableListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 /* struct define */
 
-/* 台号信息 */
-typedef struct CustomerTable {
-	UINT menu_id;
-	std::string customer_no;
-	std::string table_no;
-	std::string room_name;
-	std::string table_state;
-	std::string customer_num;
-	std::string start_time;
-	std::string floor_name;
-}CUSTOMERTABLE, *PCUSTOMERTABLE;
+void ReciveConsumerTableInfo(PCUSTOMERTABLE send_in, PCUSTOMERTABLE revice);
+
 #endif  

@@ -35,7 +35,6 @@ bool CCustomerMenuForm::GetCustomerMenuSet(const char *customer_no) {
 	strcpy(customer_no_, customer_no);
 	std::string err_info;	
 	// 执行存储过程
-	// TODO: 添加获取用户菜单存储过程
 	ExecSQLProc("{? = call GetConsumerMenuSet(?)}", err_info);
 	BindingParameter();   // 绑定返回记录集
 	return true;
@@ -58,7 +57,6 @@ bool CCustomerMenuForm::DeleteCustomerMenu(const char *customer_no) {
 	strcpy(customer_no_, customer_no);
 	std::string err_info;	
 	// 执行存储过程
-	// TODO: 添加获取用户菜单存储过程
 	ExecSQLProc("{? = call DeleteCustomerMenuAll(?)}", err_info);
 	return true;
 }
@@ -104,8 +102,7 @@ bool CCustomerMenuForm::AddCustomerMenu(const char *customer_no,
  * @ return: 成功返回true
  */
 bool CCustomerMenuForm::CreateTempTable() {
-	ExecSQLProc("{exec CreateTempTable}");
-	return true;
+	return ExecSQLProc("{exec CreateTempTable}");
 }
 
 /*
@@ -113,8 +110,11 @@ bool CCustomerMenuForm::CreateTempTable() {
  * @ return: 成功返回true
  */
 bool CCustomerMenuForm::DropTempTable() {
-	ExecSQLProc("{exec DropTempTable}");
-	return true;
+	return ExecSQLProc("{exec DropTempTable}");
+}
+
+bool CCustomerMenuForm::CopyCustomerMenu() {
+	return ExecSQLProc("{exec DropTempTable}");
 }
 /*
  * @ brief: 初始化相关数据

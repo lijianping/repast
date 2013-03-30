@@ -7,7 +7,6 @@
 #include "ComboBox.h"
 #include "Edit.h"
 #include "StaffForm.h"
-#include "childwindowid.h"
 #include "resource.h"
 #include "Department.h"
 

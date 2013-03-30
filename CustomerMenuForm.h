@@ -19,6 +19,7 @@ public:
 						 int quantity);
 	bool CreateTempTable();
 	bool DropTempTable();
+	bool CopyCustomerMenu();
 
 protected:
 	void Initialize();

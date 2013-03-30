@@ -2,7 +2,6 @@
 #define REPAST_MANAGER_H_
 
 #include "resource.h"
-#include "childwindowid.h"
 #include "LoginForm.h"
 #include "Static.h"
 #include "Button.h"
