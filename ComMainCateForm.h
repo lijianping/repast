@@ -7,6 +7,12 @@
 
 #include "DBForm.h"
 
+struct COMMAINCATE 
+{
+	std::string old_no;
+	std::string no;
+	std::string name;
+};
 class ComMainCateForm : public CDBForm {
 public:
 	ComMainCateForm();
@@ -17,6 +23,11 @@ public:
 	bool GetMainCateName();
 	bool GetMainCateByName(const char* name);
 	void Initialize();
+	bool CheckMainCate(COMMAINCATE *main_cate);
+	void SetMainCate(COMMAINCATE *main_cate);
+	bool AddMainCate(COMMAINCATE *main_cate);
+	bool UpdateMainCate(COMMAINCATE *main_cate);
+	bool DeleteMainCate(const char *main_cate_no);
 
 private:
 	char name_[33];   // 主分类名称

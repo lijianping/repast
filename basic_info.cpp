@@ -407,11 +407,12 @@ bool ShowCategoryList(HWND hwnd, UINT id)
 bool RespondTreeDBClick(HWND hwnd)
 {
 	char category_name[33];
-	CEdit e_name,e_id,e_cate_cate;
+	CEdit e_name,e_id,e_cate_cate,e_paren_cate_name;
 	TreeCtrl category_tree(hwnd,IDC_E_COMMODITY_CATEGORY);
 	e_id.Initialization(hwnd, IDC_E_CATEGORY_ID);
 	e_name.Initialization(hwnd, IDC_E_CATEGORY_NAME);
 	e_cate_cate.Initialization(hwnd, IDC_E_CATEGORY_CATE);
+	e_paren_cate_name.Initialization(hwnd, IDC_E_PARENT_CATE_NAME);
 	HTREEITEM select = category_tree.GetSelectedItem();
 	if (!select) {   // 为空，退出
 		return false;
@@ -424,8 +425,9 @@ bool RespondTreeDBClick(HWND hwnd)
 		{
 			char category_id[17];
 			char category_main_name[33];
-			e_cate_cate.SetEditText("子分类");
+			e_cate_cate.SetEditText("子分类");	
 			category_tree.GetItem(parent_node,sizeof(category_main_name),category_main_name);//获取主分类名称
+			e_paren_cate_name.SetEditText(category_main_name);
 			ChildCateForm child_cate;
 			child_cate.GetChildCateByDname(category_main_name,category_name);
 			e_id.SetEditText(itoa(child_cate.cate_no(),category_id,10));
@@ -442,6 +444,7 @@ bool RespondTreeDBClick(HWND hwnd)
 		{
 			char main_no[17];
 			e_cate_cate.SetEditText("主分类");
+			e_paren_cate_name.SetEditText("无");
 			ComMainCateForm main_cate;
 			main_cate.GetMainCateByName(category_name);
 			e_id.SetEditText(itoa(main_cate.no(),main_no,10));
@@ -467,21 +470,27 @@ bool RespondTreeDBClick(HWND hwnd)
  **/
 bool AddComCategory(HWND hwnd)
 {
-	char cate_name[33];
 	std::string cate_cate_name;
-	CEdit e_name,e_id,e_cate_cate;
-	TreeCtrl category_tree(hwnd,IDC_E_COMMODITY_CATEGORY);
+	std::string parent_cate_no;
+	std::string parent_cate_name;
+	std::string chile_cate_no;
+	std::string chile_cate_name;
+	CEdit e_name,e_id,e_cate_cate,e_parent_cate_name;
+//	TreeCtrl category_tree(hwnd,IDC_E_COMMODITY_CATEGORY);
 	e_id.Initialization(hwnd, IDC_E_CATEGORY_ID);
 	e_name.Initialization(hwnd, IDC_E_CATEGORY_NAME);
 	e_cate_cate.Initialization(hwnd, IDC_E_CATEGORY_CATE);
+	e_parent_cate_name.Initialization(hwnd,IDC_E_PARENT_CATE_NAME);
 	e_cate_cate.GetEditText(cate_cate_name);
 	if (cate_cate_name=="主分类")
 	{
-
+		e_id.GetEditText(parent_cate_no);
+		e_name.GetEditText(parent_cate_name);
+		
 	}
 	else
 	{
-
+		e_parent_cate_name.GetEditText(parent_cate_name);
 	}
 	return true;
 }

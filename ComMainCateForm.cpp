@@ -66,3 +66,96 @@ bool ComMainCateForm::GetMainCateByName(const char* name)
 	this->IsEOF();
 	return true;
 }
+
+
+/*
+ * 说明：
+ *     检查主分类信息的正确性；
+ * 参数：
+ *     main_cate [in] 指向主分类结构体的指针
+ * 返回值：
+ *     成功返回true, 否则返回false;
+ *
+ */
+bool ComMainCateForm::CheckMainCate(COMMAINCATE *main_cate)
+{
+	unsigned int length;
+	length = main_cate->no.length();
+	if (0==length)
+	{
+		LTHROW(INPUT_NULL_ERROR)
+	}
+	if (length>16)
+	{
+		LTHROW(INPUT_TOO_LONG_ERROR)
+	}
+	length = main_cate->name.length();
+	if (0==length)
+	{
+		LTHROW(INPUT_NULL_ERROR);
+	}
+	if (length>sizeof(name_)-1)
+	{
+		LTHROW(INPUT_TOO_LONG_ERROR)
+	}
+	return true;
+}
+
+/*
+ * 说明：
+ *     检查主分类信息的正确性；
+ * 参数：
+ *     main_cate [in] 指向主分类结构体的指针
+ * 返回值：
+ *    无
+ *
+ */
+void ComMainCateForm::SetMainCate(COMMAINCATE *main_cate)
+{
+	no_ = atoi(main_cate->no.c_str());
+	strcpy(name_ , main_cate->name.c_str());
+	old_no_ = atoi(main_cate->old_no.c_str());
+}
+/*
+ * 说明：
+ *     添加主分类信息
+ * 参数：
+ *     main_cate [in] 指向主分类结构体的指针
+ * 返回值：
+ *     成功返回true, 否则返回false;
+ *
+ */
+bool ComMainCateForm::AddMainCate(COMMAINCATE *main_cate)
+{
+	this->Initialize();
+	this->BindReturn();
+	return true;
+}
+
+/*
+ * 说明：
+ *     更新主分类信息
+ * 参数：
+ *     main_cate [in] 指向主分类结构体的指针
+ * 返回值：
+ *     成功返回true, 否则返回false;
+ *
+ */
+bool ComMainCateForm::UpdateMainCate(COMMAINCATE *main_cate)
+{
+	return true;
+}
+
+/*
+ * 说明：
+ *     删除主分类信息
+ * 参数：
+ *     main_cate_no [in] 主分类的编号
+ * 返回值：
+ *     成功返回true, 否则返回false;
+ *
+ */
+bool ComMainCateForm::DeleteMainCate(const char *main_cate_no)
+{
+	return true;
+}
