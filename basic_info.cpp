@@ -482,7 +482,12 @@ bool AddComCategory(HWND hwnd)
 			e_cate_cate.Empty();
 			e_id.Empty();
 			e_name.Empty();
-
+			CButton add_child;
+			add_child.Initialization(hwnd,IDC_C_ADD_CHILD);
+			if (add_child.IsChecked())
+			{
+				add_child.SetChecked(FALSE);
+			}
 		}	
 	return true;
 }
@@ -519,12 +524,13 @@ bool UpdateComCategory(HWND hwnd)
 		if (parent_node)//有父节点，则当前选择的是次分类
 		{
 			char main_cate_name[33];
+			char tmp[17];
 			category_tree.GetItem(parent_node,sizeof(main_cate_name),main_cate_name);//获取主分类名称
 			ChildCateForm child_cate_form;
 			child_cate_form.GetChildCateByDname(main_cate_name,category_name);//根据主分类和子分类名称获取子分类编号
 			COMCHILDCATE struct_child_cate;
 			struct_child_cate.main_name=main_cate_name;//保存主分类名称
-			struct_child_cate.old_child_no = child_cate_form.cate_no();//保存原来的子分类编号
+			struct_child_cate.old_child_no = itoa(child_cate_form.cate_no(),tmp,10);//保存原来的子分类编号
 			child_cate_form.CloseCursor();//关闭游标，以便下一次语句执行
 			e_id.GetEditText(struct_child_cate.child_no);//获取子分类编号
 			e_name.GetEditText(struct_child_cate.child_name);//获取子分类名称

@@ -27,6 +27,7 @@ void ChildCateForm::Initialize()
 	this->sql_cate_name_ = SQL_NTS;
 	this->sql_main_cate_no_ = SQL_NTS;
 	this->sql_main_cate_name_ = SQL_NTS;
+	this->sql_old_cate_no_ = SQL_NTS;
 }
 
 
@@ -220,9 +221,10 @@ bool ChildCateForm::AddChildCate(COMCHILDCATE *child_cate)
 bool ChildCateForm::UpdateChildCate(COMCHILDCATE *child_cate)
 {
 	CheckChildCate(child_cate);
-	Bind(ADDCHILDCATE);
+	Bind(UPDATECHILECATE);
 	SetChildCate(child_cate);
-	ExecSQLProc("{?=call UpdateChildCate(?,?,?,?)}");
+	ExecSQLProc("{?=call UpdateChildComCate(?,?,?,?)}");
+//	ExecSQLProc("exec UpdateChildComCate 222,'222','222',55");
 	IsSQLProcRetRight();
 	return true;
 }
@@ -237,7 +239,7 @@ bool ChildCateForm::UpdateChildCate(COMCHILDCATE *child_cate)
  */
 bool ChildCateForm::DeleteChildCate(const char *child_no)
 {
-	Bind(ADDCHILDCATE);
+	Bind(DELETECHILDCATE);
     old_cate_no_ = atoi(child_no);
 	ExecSQLProc("{?=call DeleteChildCate(?)}");
 	IsSQLProcRetRight();

@@ -40,7 +40,10 @@ enum RepastErr {
 
 	TABLE_IN_ROOM_USER_ERROR,        // 房间下有台号正在使用
 
-	NAME_EXIST_ERROR                // 名称已存在
+	NAME_EXIST_ERROR,                // 名称已存在
+
+	OPERATION_REFUSE_ERRORR          //拒绝操作，该项正在被使用，请稍后再试
+
 };
 class Err : public std::exception {
 public:

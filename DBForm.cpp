@@ -715,7 +715,11 @@ bool CDBForm::IsSQLProcRetRight()
 		LTHROW(NAME_EXIST_ERROR)
 	} else if (-2 == m_pro_ret) {   // 房间下有台号正在使用
 		LTHROW(TABLE_IN_ROOM_USER_ERROR)
-	} else {
+	} else if (-111 == m_pro_ret)
+	{
+		LTHROW(OPERATION_REFUSE_ERRORR)//拒绝操作，该项正在被使用，请稍后再试
+	}
+	else {
 		LTHROW(EXEC_SQL_PROC_ERROR)
 	}
 	return true;
