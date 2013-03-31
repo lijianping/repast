@@ -89,7 +89,9 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case IDC_BASIC_INFO_ADD:
 				{
-                    DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY),hwnd,EditCommodityProc);
+					CommodityInfo commodity_info;
+					commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
+                    DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY),hwnd,EditCommodityProc, (long)&commodity_info);
 					break;
 				}
 			case IDC_BASIC_INFO_MODIFY:
@@ -163,6 +165,20 @@ BOOL CALLBACK EditCategoryProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
 		{
+
+		case IDC_C_ADD_CHILD:
+			{
+				try
+				{
+					RespondTreeDBClick(hwnd);
+				}
+				catch (Err &err)
+				{
+					MessageBox(hwnd, err.what(), TEXT("点击树形控件出错"), MB_ICONINFORMATION);
+					return false;
+				}
+				break;
+			}
 		case IDC_CATEGORY_ADD:
 			{
 				try
@@ -240,14 +256,14 @@ BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		{
 			CommodityInfo *info = (CommodityInfo *)lParam;
 			commodity_info.menu_id = info->menu_id;
-			commodity_info.commodity_no = info->commodity_no;
-			commodity_info.commodity_name = info->commodity_name;
-			commodity_info.commodity_category = info->commodity_category;
-			commodity_info.commodity_purchase = info->commodity_purchase;
-			commodity_info.commodity_sale = info->commodity_sale;
-			commodity_info.commodity_sum = info->commodity_sum;
-			commodity_info.commodity_unit = info->commodity_unit;
 			if (info->menu_id == IDC_BASIC_INFO_MODIFY) {
+				commodity_info.commodity_no = info->commodity_no;
+				commodity_info.commodity_name = info->commodity_name;
+				commodity_info.commodity_category = info->commodity_category;
+				commodity_info.commodity_purchase = info->commodity_purchase;
+				commodity_info.commodity_sale = info->commodity_sale;
+				commodity_info.commodity_sum = info->commodity_sum;
+				commodity_info.commodity_unit = info->commodity_unit;
 				SetDlgItemText(hwnd, IDC_E_COMMODITY_ID, info->commodity_no.c_str());
 				SetDlgItemText(hwnd, IDC_E_COMMODITY_NAME, info->commodity_name.c_str());
 				SetDlgItemText(hwnd, IDC_E_COMMODITY_PURCHASE, info->commodity_purchase.c_str());
@@ -367,6 +383,8 @@ bool RespondTreeDBClick(HWND hwnd)
 {
 	char category_name[33];
 	CEdit e_name,e_id,e_cate_cate,e_paren_cate_name;
+	CButton add_child;
+	add_child.Initialization(hwnd,IDC_C_ADD_CHILD);
 	TreeCtrl category_tree(hwnd,IDC_E_COMMODITY_CATEGORY);
 	e_id.Initialization(hwnd, IDC_E_CATEGORY_ID);
 	e_name.Initialization(hwnd, IDC_E_CATEGORY_NAME);
@@ -374,23 +392,35 @@ bool RespondTreeDBClick(HWND hwnd)
 	e_paren_cate_name.Initialization(hwnd, IDC_E_PARENT_CATE_NAME);
 	HTREEITEM select = category_tree.GetSelectedItem();
 	if (!select) {   // 为空，退出
+		MessageBox(hwnd, TEXT("请选中树形控件中的一项"), TEXT("提示"), MB_ICONINFORMATION);
 		return false;
 	}
 	category_tree.GetItem(select,sizeof(category_name),category_name);
 	HTREEITEM parent_node=category_tree.GetParent(select);//获取父节点
 	if (parent_node)//有父节点，则当前选择的是次分类
 	{
+		add_child.EnableWindow(false);//禁用
 			char category_id[17];
+			e_cate_cate.SetEditText("子分类");
 			char category_main_name[33];
-			e_cate_cate.SetEditText("子分类");	
 			category_tree.GetItem(parent_node,sizeof(category_main_name),category_main_name);//获取主分类名称
 			e_paren_cate_name.SetEditText(category_main_name);
 			ChildCateForm child_cate;
-			child_cate.GetChildCateByDname(category_main_name,category_name);
+			child_cate.GetChildCateByDname(category_main_name,category_name);//根据主分类和子分类名称获取子分类编号
 			e_id.SetEditText(itoa(child_cate.cate_no(),category_id,10));
 	}
 	else//是父节点,显示主分类信息
 	{
+		add_child.EnableWindow(true);//起用
+		 if (true == add_child.IsChecked())
+		 {
+			 e_cate_cate.SetEditText("子分类");
+			 e_paren_cate_name.SetEditText(category_name);
+			 e_id.Empty();
+			 e_name.Empty();
+			 return true;
+
+		 }
 			char main_no[17];
 			e_cate_cate.SetEditText("主分类");
 			e_paren_cate_name.SetEditText("无");
@@ -413,7 +443,7 @@ bool RespondTreeDBClick(HWND hwnd)
  **/
 bool AddComCategory(HWND hwnd)
 {
-		COMMAINCATE main_cate;
+		
 		std::string cate_cate_name;
 		CEdit e_name,e_id,e_cate_cate,e_parent_cate_name;
 		e_id.Initialization(hwnd, IDC_E_CATEGORY_ID);
@@ -428,20 +458,31 @@ bool AddComCategory(HWND hwnd)
 		}
 		if (cate_cate_name=="主分类")
 		{
+			COMMAINCATE main_cate;
 			e_id.GetEditText(main_cate.no);
 			main_cate.old_no=main_cate.no;
 			e_name.GetEditText(main_cate.name);
-			ComMainCateForm main_cate_info;
-			main_cate_info.AddMainCate(&main_cate);
+			ComMainCateForm main_cate_form;
+			main_cate_form.AddMainCate(&main_cate);
 			e_parent_cate_name.Empty();
 			e_cate_cate.Empty();
 			e_id.Empty();
 			e_name.Empty();
 		}
-		else
+		else//子分类
 		{
-			//TODO:添加次分类
-		//	e_parent_cate_name.GetEditText();
+			COMCHILDCATE child_cate;
+			e_id.GetEditText(child_cate.child_no);
+			e_parent_cate_name.GetEditText(child_cate.main_name);
+			child_cate.old_child_no=child_cate.child_no;
+			e_name.GetEditText(child_cate.child_name);
+			ChildCateForm child_cate_form;
+			child_cate_form.AddChildCate(&child_cate);
+			e_parent_cate_name.Empty();
+			e_cate_cate.Empty();
+			e_id.Empty();
+			e_name.Empty();
+
 		}	
 	return true;
 }
@@ -477,15 +518,28 @@ bool UpdateComCategory(HWND hwnd)
 		HTREEITEM parent_node=category_tree.GetParent(select);//获取父节点
 		if (parent_node)//有父节点，则当前选择的是次分类
 		{
-			MessageBox(hwnd, "尚未添加","提示", 0);
-			//TODO:添加处理
+			char main_cate_name[33];
+			category_tree.GetItem(parent_node,sizeof(main_cate_name),main_cate_name);//获取主分类名称
+			ChildCateForm child_cate_form;
+			child_cate_form.GetChildCateByDname(main_cate_name,category_name);//根据主分类和子分类名称获取子分类编号
+			COMCHILDCATE struct_child_cate;
+			struct_child_cate.main_name=main_cate_name;//保存主分类名称
+			struct_child_cate.old_child_no = child_cate_form.cate_no();//保存原来的子分类编号
+			child_cate_form.CloseCursor();//关闭游标，以便下一次语句执行
+			e_id.GetEditText(struct_child_cate.child_no);//获取子分类编号
+			e_name.GetEditText(struct_child_cate.child_name);//获取子分类名称
+			child_cate_form.UpdateChildCate(&struct_child_cate);//执行更新操作
+			e_parent_cate_name.Empty();
+			e_cate_cate.Empty();
+			e_id.Empty();
+			e_name.Empty();
 		}
 		else
 		{
 			char tmp[33];
 			ComMainCateForm main_category;
 			main_category.GetMainCateByName(category_name);
-			main_category.CloseCursor();//关闭游标，在执行下一条语句
+			main_category.CloseCursor();//关闭游标，再执行下一条语句
 			COMMAINCATE st_main_cate;
 			st_main_cate.old_no = itoa(main_category.no(),tmp,10);
 			e_id.GetEditText(st_main_cate.no);
@@ -531,12 +585,21 @@ bool DeleteComCategory(HWND hwnd)
 			HTREEITEM parent_node=category_tree.GetParent(select);//获取父节点
 			if (parent_node)//有父节点，则当前选择的是次分类
 			{
-					MessageBox(hwnd, "尚未添加","提示", 0);
-				//TODO:添加处理
+				char main_cate_name[33];
+				char tmp[17];
+				category_tree.GetItem(parent_node,sizeof(main_cate_name),main_cate_name);//获取主分类名称
+				ChildCateForm child_cate_form;
+				child_cate_form.GetChildCateByDname(main_cate_name,category_name);//根据主分类和子分类名称获取子分类编号
+				child_cate_form.CloseCursor();//关闭游标，以便下一次语句执行
+				child_cate_form.DeleteChildCate(itoa(child_cate_form.cate_no(),tmp,10));//执行删除操作
+				e_parent_cate_name.Empty();
+				e_cate_cate.Empty();
+				e_id.Empty();
+				e_name.Empty();
 			}
 			else
 			{
-				char tmp[33];
+				char tmp[17];
 				ComMainCateForm main_category;
 				main_category.GetMainCateByName(category_name);
 				main_category.CloseCursor();//关闭游标，在执行下一条语句

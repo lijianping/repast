@@ -15,7 +15,7 @@ struct COMCHILDCATE
 	std::string child_no;
 	std::string old_child_no;
 	std::string child_name;
-	std::string main_no;
+	std::string main_name;
 };
 
 // 商品类别子分类
@@ -41,7 +41,7 @@ public:
 
 private:
 	short cate_no_;      // 商品子分类编号
-	short old_cate_no;   // 原来的子分类编号
+	short old_cate_no_;   // 原来的子分类编号
 	short main_cate_no_; // 商品主分类编号
     char cate_name_[33]; // 商品子分类名称
     char main_cate_name_[33];      // 商品主分类名称

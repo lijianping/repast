@@ -22,12 +22,11 @@ enum RepastErr {
 
 	CONNECT_ERROR,                   // 连接数据源失败
 
-
 	INPUT_NULL_ERROR,                // 输入为空
 	
-	INPUT_TOO_LONG_ERROR,           // 输入过长
+	INPUT_TOO_LONG_ERROR,            // 输入过长
 
-	INPUT_EXIST_ERROR,              //输入的值已存在
+	INPUT_EXIST_ERROR,               // 输入的值已存在
 	
 	ALLOCATE_STATEMENT_HANDLE_ERROR, // 分配语句句柄失败
 
@@ -37,8 +36,11 @@ enum RepastErr {
 
 	RESTORE_DATABASE_ERROR,          // 数据库恢复失败
   
-	CLOSE_CURSOR_ERROR               //关闭游标失败
+	CLOSE_CURSOR_ERROR ,              //关闭游标失败
 
+	TABLE_IN_ROOM_USER_ERROR,        // 房间下有台号正在使用
+
+	NAME_EXIST_ERROR                // 名称已存在
 };
 class Err : public std::exception {
 public:

@@ -24,8 +24,8 @@ ChildCateForm::~ChildCateForm()
 void ChildCateForm::Initialize()
 {
 	this->sql_cate_no_ = SQL_NTS;
-	this->sql_main_cate_no_ = SQL_NTS;
 	this->sql_cate_name_ = SQL_NTS;
+	this->sql_main_cate_no_ = SQL_NTS;
 	this->sql_main_cate_name_ = SQL_NTS;
 }
 
@@ -69,13 +69,13 @@ bool ChildCateForm::GetChildCateByDname(const char *main_name, const char *child
 {
 	this->Initialize();
 	BindReturn();
-	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
 		sizeof(main_cate_name_) - 1, 0, main_cate_name_, sizeof(main_cate_name_), &sql_main_cate_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
 		LTHROW(BIND_PARAM_ERROR)
 		return false;
 	}
-	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_CHAR, SQL_C_CHAR,\
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR,SQL_CHAR,\
 		sizeof(cate_name_) - 1, 0, cate_name_, sizeof(cate_name_), &sql_cate_name_);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
 		LTHROW(BIND_PARAM_ERROR)
@@ -104,6 +104,25 @@ bool ChildCateForm::GetChildCateByDname(const char *main_name, const char *child
  */
 bool ChildCateForm::CheckChildCate(COMCHILDCATE *child_cate)
 {
+	unsigned int length;
+	length = child_cate->child_no.length();
+	if (0 == length)
+	{
+		LTHROW(INPUT_NULL_ERROR)
+	}
+	if (length > 17)
+	{
+		LTHROW(INPUT_TOO_LONG_ERROR)
+	}
+	length = child_cate->child_name.length();
+	if (0==length)
+	{
+		LTHROW(INPUT_NULL_ERROR)
+	}
+	if (length > sizeof(cate_name_)-1)
+	{
+		LTHROW(INPUT_TOO_LONG_ERROR)
+	}
 	return true;
 }
 
@@ -118,7 +137,10 @@ bool ChildCateForm::CheckChildCate(COMCHILDCATE *child_cate)
  */
 void ChildCateForm::SetChildCate(COMCHILDCATE *child_cate)
 {
-
+	strcpy(cate_name_,child_cate->child_name.c_str());
+	cate_no_ = atoi(child_cate->child_no.c_str());
+	strcpy(main_cate_name_,child_cate->main_name.c_str());
+	old_cate_no_= atoi(child_cate->old_child_no.c_str());
 }
 
 /*
@@ -131,6 +153,39 @@ void ChildCateForm::SetChildCate(COMCHILDCATE *child_cate)
  */
 bool ChildCateForm::Bind(int bind_type)
 {
+	this->Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
+		0, 0, &cate_no_, 0, &sql_cate_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_PARAM_ERROR)
+	}
+	if (bind_type==DELETECHILDCATE)//若是"删除"绑定
+	{
+		return true;
+	}
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		sizeof(main_cate_name_) - 1, 0, main_cate_name_, sizeof(main_cate_name_), &sql_main_cate_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_PARAM_ERROR)
+			return false;
+	}
+	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		sizeof(cate_name_) - 1, 0, cate_name_, sizeof(cate_name_), &sql_cate_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_PARAM_ERROR)
+			return false;
+	}
+	if (bind_type == ADDCHILDCATE)//若是"添加"绑定
+	{
+		return true;
+	}
+	//若是“更新”绑定
+	m_return_code_ = SQLBindParameter(m_hstmt_, 5, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
+		0, 0, &old_cate_no_, 0, &sql_old_cate_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_PARAM_ERROR)
+	}
 	return true;
 }
 
@@ -145,6 +200,11 @@ bool ChildCateForm::Bind(int bind_type)
  */
 bool ChildCateForm::AddChildCate(COMCHILDCATE *child_cate)
 {
+	CheckChildCate(child_cate);
+	Bind(ADDCHILDCATE);
+	SetChildCate(child_cate);
+	ExecSQLProc("{?=call AddChildCate(?,?,?)}");
+	IsSQLProcRetRight();
 	return true;
 }
 
@@ -159,6 +219,11 @@ bool ChildCateForm::AddChildCate(COMCHILDCATE *child_cate)
  */
 bool ChildCateForm::UpdateChildCate(COMCHILDCATE *child_cate)
 {
+	CheckChildCate(child_cate);
+	Bind(ADDCHILDCATE);
+	SetChildCate(child_cate);
+	ExecSQLProc("{?=call UpdateChildCate(?,?,?,?)}");
+	IsSQLProcRetRight();
 	return true;
 }
 
@@ -172,5 +237,9 @@ bool ChildCateForm::UpdateChildCate(COMCHILDCATE *child_cate)
  */
 bool ChildCateForm::DeleteChildCate(const char *child_no)
 {
+	Bind(ADDCHILDCATE);
+    old_cate_no_ = atoi(child_no);
+	ExecSQLProc("{?=call DeleteChildCate(?)}");
+	IsSQLProcRetRight();
 	return true;
 }
