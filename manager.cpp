@@ -20,6 +20,19 @@ BOOL CALLBACK UserManagementProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 	        ShowLoginUser(hwnd);
 			return TRUE;
 		}
+	case WM_CTLCOLORDLG:
+		{
+			return (LONG)CreateSolidBrush(RGB(38, 39,39));
+		}
+	case WM_CTLCOLORSTATIC:
+		{
+			HWND hwndStatic = (HWND)lParam;
+			HDC hdc = (HDC)wParam;
+			SetBkColor(hdc, RGB(255, 0, 128));
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(0, 0, 255));
+			return (LONG)CreateSolidBrush(RGB(38, 39,39));
+		}
 	case WM_COMMAND:
 		{
 			switch (LOWORD(wParam))

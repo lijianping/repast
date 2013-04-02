@@ -27,6 +27,12 @@ BOOL CALLBACK FloorInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
  **/
 BOOL CALLBACK RoomInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+/*
+ * @ brief: 台号信息管理处理过程函数
+ **/
+BOOL CALLBACK ChildTableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
 void ShowFloorList(HWND hwnd);
 bool AddFloor(HWND hwnd);
 bool UpdateFloor(HWND hwnd);

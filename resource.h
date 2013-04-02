@@ -41,6 +41,7 @@
 #define IDD_FLOOR_MANAGEMENT            127
 #define IDD_EDIT_FLOOR                  127
 #define IDD_EDIT_ROOM                   128
+#define IDD_EDIT_TABLE                  129
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -113,6 +114,7 @@
 #define IDC_B_UTENSIL_ADD               1063
 #define IDC_B_FLOOR_ADD                 1063
 #define IDC_B_ADD_ROOM                  1063
+#define IDC_B_ADD_TABLE                 1063
 #define IDC_BUTTON2                     1064
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
@@ -124,6 +126,7 @@
 #define IDC_B_UTENSIL_MODIFY            1064
 #define IDC_B_FLOOR_MODIFY              1064
 #define IDC_B_MODITY_ROOM               1064
+#define IDC_B_DISHPATCH_TABLE           1064
 #define IDC_COMBO1                      1065
 #define IDC_DELETE_USER                 1065
 #define ID_SERVICE_ORDER                1065
@@ -134,6 +137,7 @@
 #define IDC_B_FLOOR_DELETE              1065
 #define IDC_B_DELETE_ROOM1              1065
 #define IDC_B_DELETE_ROOM               1065
+#define IDC_B_DELETE_TABLE              1065
 #define IDC_CHOICE_DAY                  1066
 #define ID_SERVICE_CHECKOUT             1066
 #define IDC_BASIC_EDIT_CATEGORY         1066
@@ -144,6 +148,7 @@
 #define IDC_B_FLOOR_CANCEL              1066
 #define IDC_BUTTON4                     1066
 #define IDC_B_ROOM_CANCEL               1066
+#define IDC_B_TABLE_CANCLE              1066
 #define ID_SERVICE_BOOK                 1067
 #define IDC_EDIT_PERMISSION2            1067
 #define IDC_DATA_BACKUP                 1067
@@ -283,6 +288,12 @@
 #define IDC_FLOOR_COMBO                 1198
 #define IDC_E_ROOM_NO                   1199
 #define IDC_E_ROOM_NAME                 1200
+#define IDC_TABLE_FLOOR_COMBO           1202
+#define IDC_E_TABLE_NO                  1203
+#define IDC_E_TABLE_NUM                 1204
+#define IDC_STATIC_USERNAME             1205
+#define IDC_STATIC_PASSWORD             1206
+#define ID_USER_LOGIN                   1207
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -291,9 +302,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        129
+#define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1201
+#define _APS_NEXT_CONTROL_VALUE         1208
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

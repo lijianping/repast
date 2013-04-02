@@ -10,6 +10,7 @@ extern HINSTANCE g_hinstance;
 extern bool InitFloorName(const HWND hwnd, int id);
 extern bool InitTableList(const HWND hwnd, int id, const char *floor_name, short status);
 
+
 BOOL CALLBACK TableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hInstance;
@@ -56,7 +57,6 @@ BOOL CALLBACK TableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							char item_text[512];
 							info_tree.GetItem(select, 512, item_text);
 							if (info_tree.GetParent(select)) {
-//								MessageBox(hwnd, TEXT("has parent!"), TEXT("TABLE INFOR"), MB_ICONINFORMATION);
 								char parent_item_text[512];
 								info_tree.GetItem(info_tree.GetParent(select), 512, parent_item_text); // 获取父节点信息
 								try {
@@ -76,7 +76,6 @@ BOOL CALLBACK TableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									return FALSE;
 								}
 							} else {
-//								MessageBox(hwnd, TEXT("no parent!"), TEXT("TABLE INFOR"), MB_ICONINFORMATION);
 								try {
 									CTableInfo table_info;
 									table_info.GetTableInfoSet(item_text);
@@ -113,6 +112,11 @@ BOOL CALLBACK TableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			case IDC_B_ROOM:
 				{
 					DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_ROOM), hwnd, (DLGPROC)RoomInfoProc);
+					break;
+				}
+			case IDC_B_TABLE:
+				{
+					DialogBox(hInstance, MAKEINTRESOURCE(IDD_EDIT_TABLE), hwnd, (DLGPROC)ChildTableInfoProc);
 					break;
 				}
 			}
@@ -248,7 +252,7 @@ BOOL CALLBACK RoomInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					if (((LPNMHDR)lParam)->code == NM_CLICK)/*点击列表中的一项*/
 					{
-						int index=0;
+						int index = -1;
 						CEdit e_name,e_id;
 						CListView room_list;
 						room_list.Initialization(hwnd, IDC_L_ROOM_INFO);
@@ -372,6 +376,163 @@ BOOL CALLBACK RoomInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+/*
+ * @ brief: 台号信息处理函数
+ * @ param: hwnd [in] 窗口句柄
+ * @ param: msg [in] 消息类型
+ **/
+BOOL CALLBACK ChildTableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch(msg)
+	{
+	case WM_INITDIALOG:
+		{
+			CListView table_list(hwnd, IDC_L_TABLE_INFO);
+			table_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+			table_list.InsertColumn(1,80,"房间名称");
+			table_list.InsertColumn(2,100,"台    号");
+			table_list.InsertColumn(2,60,"人    数");
+			try {
+				InitFloorName(hwnd, IDC_TABLE_FLOOR_COMBO);
+				CComboBox combo(hwnd, IDC_TABLE_FLOOR_COMBO);
+				std::string floor_name;
+				combo.GetComboBoxText(floor_name);
+			    InitTableList(hwnd, IDC_L_TABLE_INFO, floor_name.c_str(), 0);
+			} catch (Err &err) {
+				MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+				return FALSE;
+			}
+			return TRUE;
+		}
+	case  WM_NOTIFY:
+		{
+			switch(LOWORD(wParam))
+			{
+			case IDC_L_TABLE_INFO:
+				{
+					if (((LPNMHDR)lParam)->code == NM_CLICK){      // 点击列表中的一项
+						int index = -1;
+						CEdit num, no, room_name, floor_name;
+						CListView table_list;
+						table_list.Initialization(hwnd, IDC_L_TABLE_INFO);
+						index = table_list.GetSelectionMark();
+						if (-1 == index) {
+							MessageBox(hwnd, TEXT("请先在左侧选择一个台号！"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+							break;
+						}
+						floor_name.Initialization(hwnd, IDC_E_FLOOR_NAME);
+						room_name.Initialization(hwnd, IDC_E_ROOM_NAME);
+						no.Initialization(hwnd, IDC_E_TABLE_NO);
+						num.Initialization(hwnd, IDC_E_TABLE_NUM);
+						CComboBox combo(hwnd, IDC_TABLE_FLOOR_COMBO);
+						std::string name;
+						combo.GetComboBoxText(name);
+						floor_name.SetEditText(name.c_str());
+						room_name.SetEditText(table_list.GetItem(index, 0).c_str());
+						no.SetEditText(table_list.GetItem(index, 1).c_str());
+						num.SetEditText(table_list.GetItem(index, 2).c_str());
+					}
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDC_B_ADD_TABLE:
+				{
+					std::string floor, room, table_no, sum_str;
+					CEdit edit(hwnd, IDC_E_FLOOR_NAME);
+					edit.GetEditText(floor);
+					edit.Initialization(hwnd, IDC_E_ROOM_NAME);
+					edit.GetEditText(room);
+					edit.Initialization(hwnd, IDC_E_TABLE_NO);
+					edit.GetEditText(table_no);
+					edit.Initialization(hwnd, IDC_E_TABLE_NUM);
+					edit.GetEditText(sum_str);
+					try {
+						CTableInfo table;
+						table.AddTable(floor.c_str(), room.c_str(), table_no.c_str(), atoi(sum_str.c_str()));
+						MessageBox(hwnd, TEXT("添加台号信息成功"), TEXT("基础信息管理 "), MB_ICONINFORMATION);
+						InitTableList(hwnd, IDC_L_TABLE_INFO, floor.c_str(), 0);  // 更新
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理 "), MB_ICONERROR);
+						return FALSE;
+					}
+					break;
+				}
+			case IDC_B_DISHPATCH_TABLE:
+				{
+				    MessageBox(hwnd, TEXT("尚未实现"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+					// TODO: 修改台号信息
+					break;
+				}
+			case IDC_B_DELETE_TABLE:
+				{
+					CListView table_list(hwnd, IDC_L_TABLE_INFO);
+					int select = table_list.GetSelectionMark();
+					if (-1 == select) {
+						MessageBox(hwnd, TEXT("请在左侧列表款选择要删除的房间编号!"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+						break;
+					}
+					std::string floor, room, table_no;
+					CComboBox combo(hwnd, IDC_TABLE_FLOOR_COMBO);
+					combo.GetComboBoxText(floor);              // 获取楼层名
+					room = table_list.GetItem(select, 0);      // 获取房间名
+					table_no = table_list.GetItem(select, 1);  // 获取台号
+					try {
+						CTableInfo table;
+						table.DeleteTable(floor.c_str(), room.c_str(), table_no.c_str());
+						MessageBox(hwnd, TEXT("台号信息删除成功!"), TEXT("基础信息管理"), MB_ICONINFORMATION);
+						InitTableList(hwnd, IDC_L_TABLE_INFO, floor.c_str(), 0);  // 更新
+					} catch (Err &err) {
+						MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+						return FALSE;
+					}
+					break;
+				}
+			case IDC_B_TABLE_CANCLE:
+				{
+					EndDialog(hwnd,0);
+					break;
+				}
+			case IDC_TABLE_FLOOR_COMBO:
+				{
+					if (HIWORD(wParam) == CBN_SELCHANGE) {
+						try {
+							CComboBox combo(hwnd, IDC_TABLE_FLOOR_COMBO);
+							std::string floor_name;
+							combo.GetComboBoxText(floor_name);
+							InitTableList(hwnd, IDC_L_TABLE_INFO, floor_name.c_str(), 0);
+						} catch (Err &err) {
+							MessageBox(hwnd, err.what(), TEXT("基础信息管理"), MB_ICONERROR);
+							return FALSE;
+						}
+						CEdit edit(hwnd, IDC_E_FLOOR_NAME);   // 清空右侧编辑框数据
+						edit.Empty();
+						edit.Initialization(hwnd, IDC_E_ROOM_NAME);
+						edit.Empty();
+						edit.Initialization(hwnd, IDC_E_TABLE_NO);
+						edit.Empty();
+						edit.Initialization(hwnd, IDC_E_TABLE_NUM);
+						edit.Empty();
+					}
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_CLOSE:
+		{
+			EndDialog(hwnd,0);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 void ShowFloorList(HWND hwnd)
 {
 	CListView floor_list(hwnd,IDC_L_FLOOR_INFO);
@@ -479,3 +640,5 @@ void ShowRoomInfo(HWND hwnd, UINT id, const char *floor_name) {
 		i++;
 	}
 }
+
+

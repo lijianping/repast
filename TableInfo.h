@@ -15,16 +15,20 @@ public:
 	virtual ~CTableInfo();
 	
 	bool UpdateForm(std::string sql, std::string &error);
-	virtual bool BindingParameter();
-
 	bool GetTableInfoSet(const char *floor_name);
 	bool GetTableInfoSet(const char *floor_name, const char *room_name);
 	bool GetStartTableSet(const char *floor_name, short status);
-	void Initialize();
+	bool AddTable(const char *floor_name, const char *room_name,
+		          const char *table_no, short payable);
+	bool DeleteTable(const char *floor_name, const char *room_name, const char *table_no);
 	inline char* table_no();
 	inline short status();
 	inline short payable();
 	inline char* room_name();
+
+protected:
+	void Initialize();
+	virtual bool BindingParameter();
 
 private:
 	char table_no_[5];             // Ì¨ºÅ

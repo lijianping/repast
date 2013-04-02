@@ -38,7 +38,11 @@ enum RepastErr {
 
 	TABLE_IN_ROOM_USER_ERROR,        // 房间下有台号正在使用
 
-	NAME_EXIST_ERROR                // 名称已存在
+	NAME_EXIST_ERROR,                // 名称已存在  
+
+	FLOOR_NOT_EXIST_ERROR,           // 楼层不存在  sql返回值为 -3
+	 
+	ROOM_NOT_EXIST_ERROR            // 房间不存在 sql返回值为 -4
 };
 class Err : public std::exception {
 public:

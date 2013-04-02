@@ -50,11 +50,24 @@ BOOL CALLBACK ManagerProcesses(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			tab.Initialization(hwnd, IDC_TAB_MAIN);
 			tab.GetClientRect(&tab_rect);
 			tab_rect.top += 25;
-			tab_rect.bottom -= 20;
+			//tab_rect.bottom -= 20;
 			tab_rect.left += 1;
 			tab_rect.right -= 2;
 			CreateSysManagement(&tab, tab_hwnd, tab_rect);/*系统管理*/
 			return TRUE;
+		}
+	case WM_CTLCOLORDLG:
+		{
+			return (LONG)CreateSolidBrush(RGB(192, 201, 217));
+		}
+	case WM_CTLCOLORSTATIC:
+		{
+			HWND hwndStatic = (HWND)lParam;
+			HDC hdc = (HDC)wParam;
+			SetBkColor(hdc, RGB(255, 0, 0));
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(0, 0, 255));
+			return (LONG)CreateSolidBrush(RGB(36,36,36));
 		}
 	case WM_NOTIFY:
 		{

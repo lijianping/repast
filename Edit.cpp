@@ -94,6 +94,22 @@ bool CEdit::GetEditText(std::string &text)
 }
 
 /*
+ * @ brief: 获取编辑框中的数字型数据
+ * @ param: data [out] 获取的值
+ * @ param: is_signed [in] 是否为有符号数 若为true则表示是
+ * @ return: 若成功返回true
+ **/
+bool CEdit::GetEidtInt(int &data, bool is_signed /* = true */) {
+	BOOL is_ok;
+	int temp = ::GetDlgItemInt(m_hwnd_, m_id_, &is_ok, is_signed);
+	if (is_ok == TRUE) {
+		data = temp;
+		return true;
+	}
+	return false;
+}
+
+/*
  * @ Description: This method used to set the text of edit control.
  * @ Parameters:
  *       text [in] Specifies the text that used as new edit text.
@@ -154,4 +170,12 @@ void CEdit::Empty() {
 bool CEdit::SetReadOnly(bool read_only /* = true */) {
 	int ret = ::SendMessage(m_hwnd_, EM_SETREADONLY, (WPARAM)&read_only, 0);
 	return (ret != 0);
+}
+
+bool CEdit::SetV(int x /* = 5*/) {
+	RECT rect;
+	GetClientRect(m_hwnd_, &rect);
+	::OffsetRect(&rect,0, x); 
+	::SendMessage(m_hwnd_,EM_SETRECT,0,(LPARAM)&rect);
+	return true;
 }

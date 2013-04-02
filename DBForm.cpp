@@ -688,8 +688,8 @@ bool CDBForm::IsSQLProcRetRight(std::string &error)
   */
 bool CDBForm::IsSQLProcRetRight()
 {
-// 	std::string err_info;
-// 	ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);   // HIT: 调试用
+ //	std::string err_info;
+ //	ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);   // HIT: 调试用
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
 	{
 	}
@@ -701,6 +701,10 @@ bool CDBForm::IsSQLProcRetRight()
 		LTHROW(NAME_EXIST_ERROR)
 	} else if (-2 == m_pro_ret) {   // 房间下有台号正在使用
 		LTHROW(TABLE_IN_ROOM_USER_ERROR)
+	} else if (-3 == m_pro_ret) {
+		LTHROW(FLOOR_NOT_EXIST_ERROR)
+	} else if (-4 == m_pro_ret) {
+		LTHROW(ROOM_NOT_EXIST_ERROR)
 	} else {
 		LTHROW(EXEC_SQL_PROC_ERROR)
 	}
