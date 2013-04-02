@@ -232,6 +232,7 @@
 #define IDC_E_S_COMMODITY_PURCHASE      1149
 #define IDC_E_S_COMMODITY_SUM           1150
 #define IDC_E_S_COMMODITY_CATEGORY      1151
+#define IDC_E_S_COM_MAIN_CATE           1151
 #define IDC_E_S_COMMODITY_UNIT          1152
 #define IDC_E_S_COMMODITY_SALE          1154
 #define IDC_E_COMMODITY_ID              1155
@@ -240,6 +241,8 @@
 #define IDC_E_COMMODITY_CATEGORY        1158
 #define IDC_E_COMMODITY_UNIT            1159
 #define IDC_E_COMMODITY_SALE            1160
+#define IDC_E_COM_CHILD_CATE            1161
+#define IDC_E_COM_REGISTER_DATE         1162
 #define IDC_CATEGORY_DELETE             1167
 #define IDC_CATEGORY_ADD                1168
 #define IDC_CATEGORY_CANCEL             1169
@@ -283,8 +286,15 @@
 #define IDC_FLOOR_COMBO                 1198
 #define IDC_E_ROOM_NO                   1199
 #define IDC_E_ROOM_NAME                 1200
-#define IDC_CHECK1                      1201
 #define IDC_C_ADD_CHILD                 1201
+#define IDC_E_COM_MAIN_CATE             1202
+#define IDC_S_CHILD_CATE                1203
+#define IDC_S_REGISTER_DATE             1204
+#define IDC_S_COM_YUAN1                 1205
+#define IDC_S_COM_YUAN2                 1206
+#define IDC_E_COM_ADD                   1207
+#define IDC_E_COM_ADD2                  1208
+#define IDC_E_COM_MODIFY                1208
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -295,7 +305,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1202
+#define _APS_NEXT_CONTROL_VALUE         1208
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -25,23 +25,15 @@ bool InitBasicInfoList(HWND parent_hwnd, UINT id);
 bool InitCommodityTree(HWND parent_hwnd, UINT id);
 bool ShowCommodityTree(HWND paren_hwnd, UINT id);
 bool ShowCommodity(HWND hwnd);
-bool ShowCategoryList(HWND hwnd, UINT id);
 bool RespondTreeDBClick(HWND hwnd);
 bool AddComCategory(HWND hwnd);
 bool UpdateComCategory(HWND hwnd);
 bool DeleteComCategory(HWND hwnd);
+bool GetCommodityInfoFromList(HWND hwnd,CommodityInfo &commodity_info);
+bool InitMainCateComBox(HWND hwnd);
+bool IsEnableWndChildCate(HWND hwnd);
+bool ShowCommodityInfo(HWND hwnd,CommodityInfo &commodity_info);
+bool GetComInfoFromDlg(HWND hwnd, CommodityInfo &com_info);
 
-
-/* 商品信息 */
-struct CommodityInfo {
-	UINT menu_id;   // 按钮id
-	std::string commodity_no;    // 商品编号
-	std::string commodity_name;  // 商品名称
-	std::string commodity_purchase; // 商品进价
-	std::string commodity_sum;    // 商品总量
-	std::string commodity_category; // 商品类别
-	std::string commodity_unit;   // 商品单位
-	std::string commodity_sale;   // 商品卖价
-};
 
 #endif

@@ -129,6 +129,31 @@ bool CComboBox::DeleteString(int index)
 }
 
 /*
+ * 说明：
+ *    删除下拉列表中的所有数据
+ * 返回：
+ *    成功返回true,失败返回false
+ */
+bool CComboBox::DeleteAllString()
+{
+	int count = SendMessage(m_hwnd_, CB_GETCOUNT, 0, 0);
+	if (CB_ERR == count)
+	{
+		return false;
+	}
+	int i=0;
+	while (count)
+	{
+		if(CB_ERR == SendMessage(m_hwnd_, CB_DELETESTRING, 0, 0))//删除一项后，其他项的编号会发生变化
+		{
+			return false;
+		}
+		count--;
+	}
+	return true;
+}
+
+/*
  * @ Description: This method enables or disables mouse and keyboard
  *                input. When input is disabled, input such as mouse
  *                clicks and keystrokes is ignored. When input is 

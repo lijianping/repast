@@ -64,6 +64,7 @@ public:
 	void ProcessLogMessages(SQLSMALLINT plm_handle_type,
 		SQLHANDLE plm_handle,
 		char *logstring, int ConnInd);
+	char *GetServerDateTime();
 
 
 protected:
@@ -72,6 +73,7 @@ protected:
     inline SQLHDBC hdbc() const;
 	int GetDatePart(char* datepart);
 	char *GetDatePartString(const char *datepart);
+
 
 protected:
 	ULONG m_auto_commit_;      /* 事务自动提交指针*/

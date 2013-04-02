@@ -19,6 +19,7 @@ public:
     bool AddString(const std::string item);
 	bool InsertString(const int index, const std::string item);
     bool DeleteString(int index);
+	bool DeleteAllString();
     bool EnableWindow(BOOL enable = TRUE);
     bool GetComboBoxText(std::string &text);
 	bool SetCurSel(const int index);

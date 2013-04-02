@@ -87,28 +87,60 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch(LOWORD(wParam))
 			{
-			case IDC_BASIC_INFO_ADD:
+			case IDC_BASIC_INFO_ADD://“添加”操作
 				{
 					CommodityInfo commodity_info;
-					commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
+					commodity_info.menu_id = IDC_BASIC_INFO_ADD;
                     DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY),hwnd,EditCommodityProc, (long)&commodity_info);
 					break;
 				}
-			case IDC_BASIC_INFO_MODIFY:
+			case IDC_BASIC_INFO_MODIFY://“修改”操作
 				{
-					CListView commodity_list(hwnd, IDC_BASIC_INFO);
-					int select = commodity_list.GetSelectionMark();
-					CommodityInfo commodity_info;
-					commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
-					commodity_info.commodity_no = commodity_list.GetItem(select, 0);
-					commodity_info.commodity_name = commodity_list.GetItem(select, 1);
-					commodity_info.commodity_purchase = commodity_list.GetItem(select, 2);
-					commodity_info.commodity_sum = commodity_list.GetItem(select, 3);
-					commodity_info.commodity_unit = commodity_list.GetItem(select, 4);
-					commodity_info.commodity_category = commodity_list.GetItem(select, 5);
-					commodity_info.commodity_sale = commodity_list.GetItem(select, 6);
-					DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY), hwnd, \
-						           EditCommodityProc, (long)&commodity_info);
+					CListView com_list;
+					com_list.Initialization(hwnd,IDC_BASIC_INFO);
+					int index=com_list.GetSelectionMark();
+					if(-1==index)
+					{
+						MessageBox(hwnd,TEXT("请选中列表中的一项！"),TEXT("提示！"), MB_ICONINFORMATION);
+					}
+					else
+					{
+						CommodityInfo commodity_info;
+						commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
+						GetCommodityInfoFromList(hwnd,commodity_info);
+						DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_EDIT_COMMODITY), hwnd, \
+									   EditCommodityProc, (long)&commodity_info);
+					}
+					break;
+				}
+			case IDC_BASIC_INFO_DELETE://"删除"操作
+				{
+					try
+					{
+						if (MessageBox(hwnd,TEXT("将要进行删除操作，请确认是否删除?"),TEXT("删除确认"),MB_YESNO)
+							==IDYES)
+						{
+							CListView com_list;
+							com_list.Initialization(hwnd,IDC_BASIC_INFO);
+							int index=com_list.GetSelectionMark();
+							if(-1==index)
+							{
+								MessageBox(hwnd,TEXT("请选中列表中的一项！"),TEXT("提示！"), MB_ICONINFORMATION);
+							}
+							else
+							{
+								std::string com_no;
+								com_no = com_list.GetItem(index,0);
+								CCommodity commodity;
+								commodity.DeleteCom(com_no);
+								MessageBox(hwnd,TEXT("删除该商品信息成功"), TEXT("删除成功"), MB_ICONINFORMATION);
+							}
+						}		
+					}	
+					catch (Err &err)
+					{
+						MessageBox(hwnd,err.what(),TEXT("删除失败"),MB_ICONINFORMATION);
+					}
 					break;
 				}
 			case IDC_BASIC_EDIT_CATEGORY:
@@ -129,6 +161,115 @@ BOOL CALLBACK BasicInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return false;
 }
 
+
+
+BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	static CommodityInfo commodity_info;
+	switch(msg)
+	{
+	case WM_INITDIALOG:
+		{
+			std::string main_cate_name,child_cate_name;
+			InitMainCateComBox(hwnd);//初始化商品分类对话框	
+			EnableWindow(GetDlgItem(hwnd,IDC_E_COM_REGISTER_DATE),false);//禁用“登记日期”编辑框
+			CommodityInfo *info = (CommodityInfo *)lParam;
+			CCommodity com_from;
+			com_from.GetCategoryByComNO(info->commodity_no.c_str());//根据商品编号获取所属的分类信息
+			main_cate_name = com_from.main_name();
+			child_cate_name = com_from.child_name();
+			commodity_info.menu_id = info->menu_id;
+			commodity_info.commodity_no = info->commodity_no;
+			commodity_info.com_old_no = info->com_old_no;
+			commodity_info.commodity_name = info->commodity_name;
+			commodity_info.commodity_purchase = info->commodity_purchase;
+			commodity_info.commodity_sum = info->commodity_sum;
+			commodity_info.commodity_main_category =main_cate_name;
+			commodity_info.commodity_child_category = child_cate_name;
+			commodity_info.commodity_unit = info->commodity_unit;
+			commodity_info.commodity_sale = info->commodity_sale;
+			commodity_info.commodity_register_date = info->commodity_register_date;
+			ShowCommodityInfo(hwnd,commodity_info);
+			IsEnableWndChildCate(hwnd);//是否禁用“子分类下拉列表”
+			return TRUE;
+		}
+	case WM_COMMAND:
+		{
+			switch(LOWORD(wParam))
+			{
+			case IDC_E_COM_ADD:
+				{
+					try
+					{
+						CommodityInfo com_info;
+						GetComInfoFromDlg(hwnd,com_info);
+						CCommodity commodity;
+						commodity.AddCom(&com_info);
+						MessageBox(hwnd,TEXT("添加商品信息成功"),TEXT("添加成功"),MB_ICONINFORMATION);
+					}
+					catch (Err &err)
+					{
+						MessageBox(hwnd,err.what(),TEXT("添加商品信息失败"),MB_ICONINFORMATION);
+					}
+					break;
+				}
+			case  IDC_E_COM_MODIFY:
+				{
+					try
+					{
+						CommodityInfo com_info;
+						com_info.com_old_no=commodity_info.com_old_no;//保存商品原来的编号
+						GetComInfoFromDlg(hwnd,com_info);
+						CCommodity commodity;
+						commodity.UpdateCom(&com_info);
+						MessageBox(hwnd,TEXT("修改商品信息成功"),TEXT("修改成功"),MB_ICONINFORMATION);
+					}
+					catch (Err &err)
+					{
+						MessageBox(hwnd,err.what(),TEXT("修改商品信息失败"),MB_ICONINFORMATION);
+					}
+					break;
+				}
+			case IDC_E_COM_MAIN_CATE://主分类
+				{
+					if (HIWORD(wParam)==CBN_SELCHANGE)//点击主分类下拉列表
+					{
+						IsEnableWndChildCate(hwnd);//是否禁用子分类下拉列表
+						CComboBox main_cate,child_cate;
+						std::string main_name,error;
+						main_cate.Initialization(hwnd, IDC_E_COM_MAIN_CATE);
+						child_cate.Initialization(hwnd, IDC_E_COM_CHILD_CATE);
+						main_cate.GetComboBoxText(main_name);
+						ChildCateForm form_child_cate;
+						child_cate.DeleteAllString();//删除下拉列表中的所有项
+						child_cate.AddString("");//添加空项
+						child_cate.SetCurSel(0);//选择空项，清空下拉列表的edit
+						child_cate.DeleteString(0);//再删除空项
+						form_child_cate.GetChildCateName(main_name.c_str(),error);//查询当前主分类下的子分类
+						while(!form_child_cate.IsEOF())
+						{
+							child_cate.AddString(form_child_cate.cate_name());
+						}
+					}
+					break;
+				}
+			case IDC_COMMODITY_CANCEL:
+				{
+					EndDialog(hwnd, HIWORD(wParam));
+					return TRUE;
+				}
+			}
+			return TRUE;
+		}
+	case WM_CLOSE:
+		{
+			EndDialog(hwnd, HIWORD(wParam));
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 BOOL CALLBACK EditCategoryProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg)
@@ -139,7 +280,6 @@ BOOL CALLBACK EditCategoryProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		}
 	case  WM_NOTIFY:
 		{
-			//TODO:响应树形控件
 			switch(LOWORD(wParam))
 			{
 			case IDC_E_COMMODITY_CATEGORY:
@@ -246,44 +386,6 @@ BOOL CALLBACK EditCategoryProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	}
 	return FALSE;
 }
-
-BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	static CommodityInfo commodity_info;
-	switch(msg)
-	{
-	case WM_INITDIALOG:
-		{
-			CommodityInfo *info = (CommodityInfo *)lParam;
-			commodity_info.menu_id = info->menu_id;
-			if (info->menu_id == IDC_BASIC_INFO_MODIFY) {
-				commodity_info.commodity_no = info->commodity_no;
-				commodity_info.commodity_name = info->commodity_name;
-				commodity_info.commodity_category = info->commodity_category;
-				commodity_info.commodity_purchase = info->commodity_purchase;
-				commodity_info.commodity_sale = info->commodity_sale;
-				commodity_info.commodity_sum = info->commodity_sum;
-				commodity_info.commodity_unit = info->commodity_unit;
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_ID, info->commodity_no.c_str());
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_NAME, info->commodity_name.c_str());
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_PURCHASE, info->commodity_purchase.c_str());
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_SUM, info->commodity_sum.c_str());
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_CATEGORY, info->commodity_category.c_str());
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_UNIT, info->commodity_unit.c_str());
-				SetDlgItemText(hwnd, IDC_E_COMMODITY_SALE, info->commodity_sale.c_str());
-			}
-			return TRUE;
-		}
-	case WM_CLOSE:
-		{
-			EndDialog(hwnd, HIWORD(wParam));
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-
 bool InitCommodityTree(HWND parent_hwnd, UINT id)
 {
 	return true;
@@ -353,22 +455,7 @@ bool ShowCommodityTree(HWND hwnd, UINT id)
 	return true;
 }
 
-bool ShowCategoryList(HWND hwnd, UINT id)
-{
-	CListView category_list;
-	category_list.Initialization(hwnd, IDC_E_COMMODITY_CATEGORY);
-	category_list.DeleteAllItems();
-	CCommodityCategoryForm comodity_category;/*商品分类*/
-	comodity_category.GetRecordSet();
-	int item=0;
-	while(!comodity_category.IsEOF())
-	{
-		category_list.InsertItem(item, comodity_category.no());
-		category_list.SetItem(item, 1, comodity_category.name());
-		item++;
-	}
-	return true;
-}
+
 
 
 /*
@@ -558,6 +645,9 @@ bool UpdateComCategory(HWND hwnd)
 			e_name.Empty();
 		}
 	}
+	else{
+		return false;
+	}
 	return true;
 }
 
@@ -616,5 +706,179 @@ bool DeleteComCategory(HWND hwnd)
 			e_id.Empty();
 			e_name.Empty();
 		}
+		else{
+			return false;
+		}
 	return true;
+}
+
+
+/*
+ * 说明：
+ *     从ListView中获取商品的详细信息
+ * 参数：
+ *     commodigy_info  [out] 商品信息的引用
+ * 返回值：
+ *     成功返回true, 否则返回false
+ */
+bool GetCommodityInfoFromList(HWND hwnd,CommodityInfo &commodity_info)
+{
+	CListView commodity_list(hwnd, IDC_BASIC_INFO);
+	int select = commodity_list.GetSelectionMark();
+	commodity_info.menu_id = IDC_BASIC_INFO_MODIFY;
+	commodity_info.commodity_no = commodity_list.GetItem(select, 0);
+	commodity_info.com_old_no=commodity_info.commodity_no;
+	commodity_info.commodity_name = commodity_list.GetItem(select, 1);
+	commodity_info.commodity_purchase = commodity_list.GetItem(select, 2);
+	commodity_info.commodity_sum = commodity_list.GetItem(select, 3);
+	commodity_info.commodity_unit = commodity_list.GetItem(select, 4);
+	commodity_info.commodity_sale = commodity_list.GetItem(select, 5);
+	commodity_info.commodity_register_date = commodity_list.GetItem(select, 6);
+	return true;
+}
+
+
+/*
+ * 说明：
+ *     初始化主分类下拉列表
+ * 参数；
+ *     hwnd  [in]窗口句柄
+ * 返回值：
+ *     成功返回true,失败返回false
+ */
+bool InitMainCateComBox(HWND hwnd)
+{
+	CComboBox main_cate,child_cate;
+	main_cate.Initialization(hwnd,IDC_E_COM_MAIN_CATE);
+	ComMainCateForm form_main_cate;
+	form_main_cate.GetMainCateName();//查询所有的商品主分类信息
+	while (!form_main_cate.IsEOF())
+	{
+		main_cate.AddString(form_main_cate.name());
+	}
+	return true;
+}
+
+/*
+ * 说明：
+ *     根据主分类下拉列表的选择，判断是否禁用子分类下拉列表
+ *     若主分类为空，则禁用；否则，起用
+ * 参数；
+ *     hwnd  [in]窗口句柄
+ * 返回值：
+ *     成功返回true,失败返回false
+ */
+bool IsEnableWndChildCate(HWND hwnd)
+{
+	CComboBox main_cate,child_cate;
+	std::string main_name;
+	main_cate.Initialization(hwnd,IDC_E_COM_MAIN_CATE);
+	child_cate.Initialization(hwnd,IDC_E_COM_CHILD_CATE);
+	main_cate.GetComboBoxText(main_name);
+	if (main_name=="")
+	{
+		if(!child_cate.EnableWindow(false))//禁用子分类下拉框，
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if(!child_cate.EnableWindow(true))//起用子分类下拉框，
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+/*
+ * 说明：
+ *     显示商品信息
+ * 参数；
+ *     hwnd  [in]窗口句柄
+ *     commodity_info [out] 商品信息的引用
+ * 返回值：
+ *     成功返回true,失败返回false
+ */
+bool ShowCommodityInfo(HWND hwnd,CommodityInfo &commodity_info)
+{
+	HWND com_add,com_modity;
+	com_add=GetDlgItem(hwnd,IDC_E_COM_ADD);
+	com_modity=GetDlgItem(hwnd,IDC_E_COM_MODIFY);
+	if (commodity_info.menu_id == IDC_BASIC_INFO_MODIFY)
+	{
+		ShowWindow(com_add,SW_HIDE);//隐藏“添加”按钮
+		ShowWindow(com_modity,SW_NORMAL);
+		SetDlgItemText(hwnd, IDC_E_COMMODITY_ID, commodity_info.commodity_no.c_str());
+		SetDlgItemText(hwnd, IDC_E_COMMODITY_NAME, commodity_info.commodity_name.c_str());
+		SetDlgItemText(hwnd, IDC_E_COMMODITY_PURCHASE, commodity_info.commodity_purchase.c_str());
+		SetDlgItemText(hwnd, IDC_E_COMMODITY_SUM, commodity_info.commodity_sum.c_str());
+		CComboBox main_cate,child_cate;
+		main_cate.Initialization(hwnd, IDC_E_COM_MAIN_CATE);
+		child_cate.Initialization(hwnd, IDC_E_COM_CHILD_CATE);
+		int index;
+	    index = main_cate.FindString(commodity_info.commodity_main_category.c_str());//在下拉列表中查找到对应的字符串
+		ChildCateForm form_child_cate;
+		std::string error;
+		form_child_cate.GetChildCateName(commodity_info.commodity_main_category.c_str(),error);//查询当前主分类下的子分类
+		while(!form_child_cate.IsEOF())
+		{
+			child_cate.AddString(form_child_cate.cate_name());
+		}
+		main_cate.SetCurSel(index);//选择相应的主分类
+		index = child_cate.FindString(commodity_info.commodity_child_category.c_str());
+		child_cate.SetCurSel(index);//选择相应的子分类
+		SetDlgItemText(hwnd, IDC_E_COMMODITY_UNIT, commodity_info.commodity_unit.c_str());
+		SetDlgItemText(hwnd, IDC_E_COMMODITY_SALE, commodity_info.commodity_sale.c_str());
+		SetDlgItemText(hwnd, IDC_E_COM_REGISTER_DATE,commodity_info.commodity_register_date.c_str());
+	}
+	else if (commodity_info.menu_id == IDC_BASIC_INFO_ADD)
+	{
+		ShowWindow(com_add,SW_NORMAL);
+		ShowWindow(com_modity,SW_HIDE);//隐藏“修改”按钮
+		CDBForm server_time;
+		SetDlgItemText(hwnd, IDC_E_COM_REGISTER_DATE,server_time.GetServerDateTime());//通过获取服务器时间来显示默认的时间
+	}
+	return true;
+}
+
+/*
+ * 说明：
+ *    从对话框中获取商品的详细信息
+ * 参数：
+ *    hwnd     [in] 编辑商品信息对话框句柄
+ *    com_info [out] 商品信息的引用
+ * 返回值；
+ *    成功返回true,否则返回false
+ */
+bool GetComInfoFromDlg(HWND hwnd, CommodityInfo &com_info)
+{
+	CEdit no,name,purchase_price,quantity,unit,sale_price,register_date;
+	CComboBox main_name,child_name;
+	if(!no.Initialization(hwnd,IDC_E_COMMODITY_ID)||
+	!name.Initialization(hwnd,IDC_E_COMMODITY_NAME)||
+	!purchase_price.Initialization(hwnd,IDC_E_COMMODITY_PURCHASE)||
+	!quantity.Initialization(hwnd,IDC_E_COMMODITY_SUM)||
+	!unit.Initialization(hwnd,IDC_E_COMMODITY_UNIT)||
+	!sale_price.Initialization(hwnd,IDC_E_COMMODITY_SALE)||
+	!main_name.Initialization(hwnd,IDC_E_COM_MAIN_CATE)||
+	!child_name.Initialization(hwnd,IDC_E_COM_CHILD_CATE)||
+	!register_date.Initialization(hwnd,IDC_E_COM_REGISTER_DATE))
+	{
+		return false;
+	}
+	if(no.GetEditText(com_info.commodity_no)&&
+	name.GetEditText(com_info.commodity_name)&&
+	purchase_price.GetEditText(com_info.commodity_purchase)&&
+	quantity.GetEditText(com_info.commodity_sum)&&
+	unit.GetEditText(com_info.commodity_unit)&&
+	sale_price.GetEditText(com_info.commodity_sale)&&
+	main_name.GetComboBoxText(com_info.commodity_main_category)&&
+	child_name.GetComboBoxText(com_info.commodity_child_category)&&
+	register_date.GetEditText(com_info.commodity_register_date))
+	{
+		return true;
+	}
+	return false;
 }

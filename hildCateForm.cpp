@@ -224,7 +224,6 @@ bool ChildCateForm::UpdateChildCate(COMCHILDCATE *child_cate)
 	Bind(UPDATECHILECATE);
 	SetChildCate(child_cate);
 	ExecSQLProc("{?=call UpdateChildComCate(?,?,?,?)}");
-//	ExecSQLProc("exec UpdateChildComCate 222,'222','222',55");
 	IsSQLProcRetRight();
 	return true;
 }

@@ -381,10 +381,43 @@ int CDBForm::GetDatePart(char *sql_selectdate)
 	return m_datepart_;
 }
 
-char *CDBForm::GetDatePartString(const char *datepart) {
+
+/*
+ * 说明：
+ *    获取服务器日期时间
+ * 返回值：
+ *    指向获取服务器日期时间字符串的指针
+ */
+char *CDBForm::GetServerDateTime()
+{
 	std::string error;
 	/*分配语句句柄*/
     if (false == AllocHandleStmt())
+	{
+		return NULL;
+	}
+	if (false==this->ExecuteSQL("select getdate()", error))
+	{
+		LTHROW(EXEC_SQL_PROC_ERROR)
+		return NULL;
+	}
+	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_datetime_, 
+		                        sizeof(m_datetime_), &m_server_datetime_len_);
+    if ((m_return_code_ != SQL_SUCCESS) &&
+        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
+    {
+		LTHROW(BIND_RECODE_ERROR)
+		return NULL;
+	}
+	FetchData();
+	return m_datetime_;
+}
+
+
+char *CDBForm::GetDatePartString(const char *datepart) {
+	std::string error;
+	/*分配语句句柄*/
+	if (false == AllocHandleStmt())
 	{
 		return NULL;
 	}
@@ -394,10 +427,10 @@ char *CDBForm::GetDatePartString(const char *datepart) {
 		return NULL;
 	}
 	m_return_code_ = SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, &m_server_datatime, 
-		                        sizeof(m_server_datatime), &m_server_datetime_len_);
-    if ((m_return_code_ != SQL_SUCCESS) &&
-        (m_return_code_ != SQL_SUCCESS_WITH_INFO))
-    {
+		sizeof(m_server_datatime), &m_server_datetime_len_);
+	if ((m_return_code_ != SQL_SUCCESS) &&
+		(m_return_code_ != SQL_SUCCESS_WITH_INFO))
+	{
 		error = "绑定参数出错：";
 		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);
 		MessageBox(NULL, error.c_str(), TEXT("绑定错误"), MB_OK);
