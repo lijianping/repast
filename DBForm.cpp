@@ -330,6 +330,23 @@ void CDBForm::Disconnect()
     }
 }
 
+/*
+ *  说明:
+ *      关闭游标，用于在同一个连接上多次执行语句。
+ *      执行完一条语句后需要关闭游标，否则可能会出现“无效的游标状态”        
+ *  参数：
+ *      无
+ *  返回值:
+ *      成功返回true,失败返回false;
+**/
+bool CDBForm::CloseCursor()
+{
+	m_return_code_ = SQLCloseCursor(m_hstmt_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
+		LTHROW(CLOSE_CURSOR_ERROR)
+		return true;
+}
+
 
 
 /*
@@ -572,7 +589,6 @@ bool CDBForm::SetAutoCommit(bool is_auto_commit)
   */
 bool CDBForm::Commit()
 {
-	
 	m_return_code_ = SQLEndTran(SQL_HANDLE_DBC, m_hdbc_, SQL_COMMIT);
 	if ((m_return_code_ != SQL_SUCCESS) &&
         (m_return_code_ != SQL_SUCCESS_WITH_INFO))
@@ -618,8 +634,8 @@ bool CDBForm::RollBack()
 	// 执行存储过程
 	m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS);
 	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
-		ReportError(m_hstmt_, SQL_HANDLE_STMT, error);   // TODO: 调试用，完成后
-	    LTHROW(EXEC_SQL_PROC_ERROR)
+		ReportError(m_hstmt_, SQL_HANDLE_STMT);  
+	  //  LTHROW(EXEC_SQL_PROC_ERROR)
 	}
  	return true;
  }
@@ -629,11 +645,9 @@ bool CDBForm::RollBack()
 	 // 执行存储过程
 	 std::string error;
 	 m_return_code_ = SQLExecDirect(m_hstmt_, (unsigned char *)sql_proc, SQL_NTS); 
-	
-	
 	 if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO)
      {
-		 ReportError(m_hstmt_,SQL_HANDLE_STMT,error);
+		 ReportError(m_hstmt_,SQL_HANDLE_STMT);//ReportError有抛出异常
 		 LTHROW(EXEC_SQL_PROC_ERROR)
 			 return false;
 	 }
@@ -779,4 +793,98 @@ bool CDBForm::Restore(const char *file_path) {
 	if (!ExecuteSQL(restore_statement, err_info))
 		LTHROW(RESTORE_DATABASE_ERROR)
 	return true;
+}
+
+
+
+#define MAXBUFLEN 256
+
+
+/*
+ * 说明：
+ *     获取更详细的错误信息
+ * 参数：
+ *     plm_handle_type [in] 句柄类型
+ *     plm_handle      [in] 句柄
+ *     logstring       [out] 可用于存储错误信息，暂时没有使用
+ *     ConnInd         [in] 标志：是否获取具体错误消息
+ * 返回值：
+ *     无
+ */
+void CDBForm::ProcessLogMessages(SQLSMALLINT plm_handle_type,
+	SQLHANDLE plm_handle,
+	char *logstring, int ConnInd)
+{
+	RETCODE      plm_retcode = SQL_SUCCESS;
+	UCHAR      plm_szSqlState[MAXBUFLEN] = "",
+		plm_szErrorMsg[MAXBUFLEN] = "";
+	SDWORD      plm_pfNativeError = 0L;
+	SWORD      plm_pcbErrorMsg = 0;
+	SQLSMALLINT   plm_cRecNmbr = 1;
+	SDWORD      plm_SS_MsgState = 0, plm_SS_Severity = 0;
+	SQLINTEGER   plm_Rownumber = 0;
+	USHORT      plm_SS_Line;
+	SQLSMALLINT   plm_cbSS_Procname, plm_cbSS_Srvname;
+	SQLCHAR      plm_SS_Procname[MAXNAME], plm_SS_Srvname[MAXNAME];
+
+
+	while (plm_retcode != SQL_NO_DATA_FOUND) {
+		plm_retcode = SQLGetDiagRec(plm_handle_type, plm_handle,
+			plm_cRecNmbr, plm_szSqlState, &plm_pfNativeError,
+			plm_szErrorMsg, MAXBUFLEN - 1, &plm_pcbErrorMsg);
+
+		// Note that if the application has not yet made a
+		// successful connection, the SQLGetDiagField
+		// information has not yet been cached by ODBC
+		// Driver Manager and these calls to SQLGetDiagField
+		// will fail.
+		if (plm_retcode != SQL_NO_DATA_FOUND) {
+			if (ConnInd) {
+				plm_retcode = SQLGetDiagField(
+					plm_handle_type, plm_handle, plm_cRecNmbr,
+					SQL_DIAG_ROW_NUMBER, &plm_Rownumber,
+					SQL_IS_INTEGER,
+					NULL);
+				plm_retcode = SQLGetDiagField(
+					plm_handle_type, plm_handle, plm_cRecNmbr,
+					SQL_DIAG_SS_LINE, &plm_SS_Line,
+					SQL_IS_INTEGER,
+					NULL);
+				plm_retcode = SQLGetDiagField(
+					plm_handle_type, plm_handle, plm_cRecNmbr,
+					SQL_DIAG_SS_MSGSTATE, &plm_SS_MsgState,
+					SQL_IS_INTEGER,
+					NULL);
+				plm_retcode = SQLGetDiagField(
+					plm_handle_type, plm_handle, plm_cRecNmbr,
+					SQL_DIAG_SS_SEVERITY, &plm_SS_Severity,
+					SQL_IS_INTEGER,
+					NULL);
+				plm_retcode = SQLGetDiagField(
+					plm_handle_type, plm_handle, plm_cRecNmbr,
+					SQL_DIAG_SS_PROCNAME, &plm_SS_Procname,
+					sizeof(plm_SS_Procname),
+					&plm_cbSS_Procname);
+				plm_retcode = SQLGetDiagField(
+					plm_handle_type, plm_handle, plm_cRecNmbr,
+					SQL_DIAG_SS_SRVNAME, &plm_SS_Srvname,
+					sizeof(plm_SS_Srvname),
+					&plm_cbSS_Srvname);
+			}
+			//just for test
+			char m1[1024];
+			sprintf(m1,"szSqlState = %s\n,pfNativeError = %d\n,szErrorMsg = %s\n,pcbErrorMsg = %d\n",\
+				plm_szSqlState,plm_pfNativeError,plm_szErrorMsg,plm_pcbErrorMsg);
+			MessageBox(NULL,m1,TEXT("m1"),0);
+			if (ConnInd) {
+				char m2[1024];
+				sprintf(m2,"ODBCRowNumber = %d\n,SSrvrLine = %d\n,SSrvrMsgState = %d\n,\
+						   SSrvrSeverity = %d\n,SSrvrProcname = %s\n,SSrvrSrvname = %s\n",\
+						   plm_Rownumber, plm_Rownumber,plm_SS_MsgState,\
+						   plm_SS_Severity,plm_SS_Procname,plm_SS_Srvname);
+				MessageBox(NULL,m2,TEXT("m1"),0);
+			}
+		}
+		plm_cRecNmbr++; //Increment to next diagnostic record.
+	} // End while.
 }

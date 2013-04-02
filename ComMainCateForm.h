@@ -7,6 +7,9 @@
 
 #include "DBForm.h"
 
+#define ADDMAINCATE    0
+#define UPDATEMAINCATE 1
+#define DELETEMAINCATE 2
 struct COMMAINCATE 
 {
 	std::string old_no;
@@ -23,6 +26,7 @@ public:
 	bool GetMainCateName();
 	bool GetMainCateByName(const char* name);
 	void Initialize();
+	bool Bind(unsigned int bind_type);
 	bool CheckMainCate(COMMAINCATE *main_cate);
 	void SetMainCate(COMMAINCATE *main_cate);
 	bool AddMainCate(COMMAINCATE *main_cate);

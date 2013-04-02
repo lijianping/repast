@@ -12,6 +12,10 @@
 #include <SQLEXT.H>
 #include <SQLTYPES.H>
 #include <string>
+#include <sql.h>
+#include <odbcss.h>
+
+
 
 class CDBForm  
 {
@@ -53,9 +57,13 @@ public:
 	bool IsSQLProcRetRight();
 	bool BindReturn();
 	bool FetchData();
+	bool CloseCursor();
 	bool FreeStatemetHandle();
 	bool BackUp(const char *file_path);
 	bool Restore(const char *file_path);
+	void ProcessLogMessages(SQLSMALLINT plm_handle_type,
+		SQLHANDLE plm_handle,
+		char *logstring, int ConnInd);
 
 
 protected:

@@ -116,6 +116,44 @@ void ComMainCateForm::SetMainCate(COMMAINCATE *main_cate)
 	strcpy(name_ , main_cate->name.c_str());
 	old_no_ = atoi(main_cate->old_no.c_str());
 }
+
+/*
+ * 说明：
+ *     绑定输入参数，用于商品主分类的添加，修改，删除
+ * 参数：
+ *     bind_type  [in] 绑定类型，分别为ADD,UPDATE,DELETE
+ * 返回值：
+ *     成功返回true, 否则返回false;
+ */
+bool ComMainCateForm::Bind(unsigned int bind_type)
+{
+	this->Initialize();
+	this->BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
+		0,0, &no_, 0, &sql_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_RETURN_ERROR)
+	}
+	if (DELETEMAINCATE == bind_type)//绑定类型为“删除”
+	{
+		return true;
+	}
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		sizeof(name_)-1,0, name_, sizeof(name_), &sql_name_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_RETURN_ERROR)
+	}
+	if (ADDMAINCATE == bind_type)//绑定类型为“添加”
+	{
+		return true;
+	}
+	m_return_code_ = SQLBindParameter(m_hstmt_, 4, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,\
+		0,0, &old_no_, 0, &sql_old_no_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) {
+		LTHROW(BIND_RETURN_ERROR)
+	}
+	return true;
+}
 /*
  * 说明：
  *     添加主分类信息
@@ -127,8 +165,11 @@ void ComMainCateForm::SetMainCate(COMMAINCATE *main_cate)
  */
 bool ComMainCateForm::AddMainCate(COMMAINCATE *main_cate)
 {
-	this->Initialize();
-	this->BindReturn();
+	CheckMainCate(main_cate);
+	Bind(ADDMAINCATE);
+	SetMainCate(main_cate);
+	ExecSQLProc("{?=call AddMainComCate(?,?)}");
+	IsSQLProcRetRight();
 	return true;
 }
 
@@ -143,6 +184,11 @@ bool ComMainCateForm::AddMainCate(COMMAINCATE *main_cate)
  */
 bool ComMainCateForm::UpdateMainCate(COMMAINCATE *main_cate)
 {
+	CheckMainCate(main_cate);
+	Bind(UPDATEMAINCATE);
+	SetMainCate(main_cate);
+	ExecSQLProc("{?=call UpdateMainComCate(?,?,?)}");
+	IsSQLProcRetRight();
 	return true;
 }
 
@@ -157,5 +203,9 @@ bool ComMainCateForm::UpdateMainCate(COMMAINCATE *main_cate)
  */
 bool ComMainCateForm::DeleteMainCate(const char *main_cate_no)
 {
+	Bind(DELETEMAINCATE);
+	no_ = atoi(main_cate_no);
+	ExecSQLProc("{?=call DeleteMainComCate(?)}");
+	IsSQLProcRetRight();
 	return true;
 }

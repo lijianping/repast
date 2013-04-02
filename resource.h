@@ -294,6 +294,8 @@
 #define IDC_STATIC_USERNAME             1205
 #define IDC_STATIC_PASSWORD             1206
 #define ID_USER_LOGIN                   1207
+#define IDC_CHECK1                      1201
+#define IDC_C_ADD_CHILD                 1201
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -304,7 +306,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1208
+#define _APS_NEXT_CONTROL_VALUE         1202
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

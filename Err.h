@@ -35,6 +35,8 @@ enum RepastErr {
 	BACKUP_DATABASE_ERROR,           // 备份数据库失败
 
 	RESTORE_DATABASE_ERROR,          // 数据库恢复失败
+  
+	CLOSE_CURSOR_ERROR ,              //关闭游标失败
 
 	TABLE_IN_ROOM_USER_ERROR,        // 房间下有台号正在使用
 
