@@ -1,6 +1,6 @@
 #include "manager.h"
 #include "Button.h"
-
+#include "Customer.h"
 
 /*
  * @ brief: 系统管理tab页面处理过程
@@ -163,19 +163,24 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					memset(end_date, 0, sizeof(end_date));
 					GetDlgItemText(hwnd, IDC_START_DATE,start_date, 256);  // 获取时间
 					GetDlgItemText(hwnd, IDC_END_DATE, end_date, 256);
-					TCHAR date[256];
 					std::string start_date_str, end_date_str;
 					// 转换日期格式
 					int start_date_int = ConvertDate((const char *)start_date, start_date_str);
 					int end_date_int = ConvertDate((const char *)end_date, end_date_str);
-					sprintf(date, "start:%s--end:%s", start_date_str.c_str(), end_date_str.c_str());
-					MessageBox(hwnd, date, TEXT("time"), MB_OK | MB_ICONINFORMATION);
-					if (start_date_int > end_date_int) {  // 时间输入不合法
+					if (start_date_int > end_date_int)  // 时间输入不合法
+					{  
 						MessageBox(hwnd, TEXT("时间输入不合法"), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
 						break;
 					}
-					
-					// TODO: 查询数据库，显示时间段的消费者
+					try 
+					{
+						ShowConsumerRecord(hwnd, IDC_CONSUMPTION, start_date_str.c_str(), end_date_str.c_str());
+					}
+					catch (Err &err) 
+					{
+						MessageBox(hwnd, err.what(), TEXT("提示"), MB_OK | MB_ICONINFORMATION);
+						return FALSE;
+					}
 					break;
 				}
 				break;
@@ -458,20 +463,24 @@ int ConvertDate(const char *date, std::string &out_date) {
 	std::string month("月");
 	std::string day("日");
 	std::string data;
+	int digital_date;
 	size_t index = 0;
 	size_t pos = in_date.find(year);
 	data = in_date.substr(index, pos);
+	digital_date = atoi(data.c_str());
 	in_date.replace(pos, year.length(), "-");
 	index = pos + 1;
 	pos = in_date.find(month);
-	data += in_date.substr(index, pos - index);
+	data = in_date.substr(index, pos - index);
+	digital_date += atoi(data.c_str()) * 30;   // 以每个月30天计算
 	in_date.replace(pos, month.length(), "-");
 	index = pos + 1;
 	pos = in_date.find(day);
-	data += in_date.substr(index, pos - index);
+	data = in_date.substr(index, pos - index);
+	digital_date += atoi(data.c_str());
 	in_date.erase(pos, day.length());
 	out_date = in_date;
-	return atoi(data.c_str());
+	return digital_date;
 }
 
 bool InitStaffNo(HWND hwnd, UINT id) {
@@ -696,4 +705,29 @@ bool GetLoginUserInfo(HWND hwnd, LoginUser *user, std::string &err_info) {
 	}
 	user->password1 = p1;
 	return true;
+}
+
+/*
+ * @ brief: 显示顾客消费记录
+ * @ param: hwnd [in] 窗口句柄
+ * @ param: id [in] listview id
+ * @ param: start_time [in] 查询开始时间
+ * @ param: end_time [in] 查询结束时间
+ **/
+void ShowConsumerRecord(HWND hwnd, UINT id, const char *start_time, const char *end_time) 
+{
+	CListView consumer_list(hwnd, id);
+	consumer_list.DeleteAllItems();
+	CCustomer consumer;
+	consumer.GetConsumerRecord(start_time, end_time);
+	int i = 0;
+	while (!consumer.IsEOF()) 
+	{
+		consumer_list.InsertItem(i, consumer.customer_no());
+		consumer_list.SetItem(i, 1, consumer.money());
+		consumer_list.SetItem(i, 2, consumer.founding_time());
+		consumer_list.SetItem(i, 3, consumer.end_time());
+		consumer_list.SetItem(i, 4, consumer.clerk());
+		i++;
+	}
 }
