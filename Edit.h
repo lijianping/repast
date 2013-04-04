@@ -17,12 +17,14 @@ public:
                 HWND parent_hwnd, UINT id);
     bool Initialization(HWND parent_hwnd, UINT id);
     bool GetEditText(std::string &text);
+	bool GetEidtInt(int &data, bool is_signed = true);
     bool SetEditText(const std::string text);
     bool EnableWindow(BOOL enable = TRUE);
 	int CanUndo();
 	void EmptyUndoBuffer();
 	void Empty();
 	bool SetReadOnly(bool read_only = true);
+	bool SetV(int x = 5);
 
 private:
     UINT m_id_;

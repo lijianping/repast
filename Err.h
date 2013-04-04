@@ -42,8 +42,11 @@ enum RepastErr {
 
 	NAME_EXIST_ERROR,                // 名称已存在
 
-	OPERATION_REFUSE_ERRORR          //拒绝操作，该项正在被使用，请稍后再试
+	OPERATION_REFUSE_ERRORR ,         //拒绝操作，该项正在被使用，请稍后再试
 
+	FLOOR_NOT_EXIST_ERROR,           // 楼层不存在  sql返回值为 -3
+	 
+	ROOM_NOT_EXIST_ERROR            // 房间不存在 sql返回值为 -4
 };
 class Err : public std::exception {
 public:

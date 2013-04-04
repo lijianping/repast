@@ -684,7 +684,6 @@ bool CDBForm::RollBack()
 		 LTHROW(EXEC_SQL_PROC_ERROR)
 			 return false;
 	 }
-		
 		 return true;
  }
 
@@ -735,8 +734,8 @@ bool CDBForm::IsSQLProcRetRight(std::string &error)
   */
 bool CDBForm::IsSQLProcRetRight()
 {
-// 	std::string err_info;
-// 	ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);   // HIT: 调试用
+ //	std::string err_info;
+ //	ReportError(m_hstmt_, SQL_HANDLE_STMT, err_info);   // HIT: 调试用
 	while ( ( m_return_code_ = SQLMoreResults(m_hstmt_) ) != SQL_NO_DATA )
 	{
 	}
@@ -751,8 +750,11 @@ bool CDBForm::IsSQLProcRetRight()
 	} else if (-111 == m_pro_ret)
 	{
 		LTHROW(OPERATION_REFUSE_ERRORR)//拒绝操作，该项正在被使用，请稍后再试
-	}
-	else {
+	} else if (-3 == m_pro_ret) {
+		LTHROW(FLOOR_NOT_EXIST_ERROR)
+	} else if (-4 == m_pro_ret) {
+		LTHROW(ROOM_NOT_EXIST_ERROR)
+	} else {
 		LTHROW(EXEC_SQL_PROC_ERROR)
 	}
 	return true;

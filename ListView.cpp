@@ -226,9 +226,14 @@ bool CListView::SetItem(int item, int subitem, double item_text)
 
 std::string CListView::GetItem(int item, int subitem)
 {
-	char data[513] = "\0";
-	ListView_GetItemText(m_hwnd_, item, subitem, data, 512);
+	char data[1024];
+	memset(data, 0, sizeof(data));
+	ListView_GetItemText(m_hwnd_, item, subitem, data, 1024);
 	return std::string(data);
+}
+
+int CListView::GetNextSelected(int index) {
+	return ListView_GetNextItem(m_hwnd_, index, LVNI_SELECTED);
 }
 /*
  * @Description: Get the number of items in a list view control.

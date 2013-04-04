@@ -242,9 +242,6 @@ BOOL CALLBACK EditCommodityProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 						main_cate.GetComboBoxText(main_name);
 						ChildCateForm form_child_cate;
 						child_cate.DeleteAllString();//删除下拉列表中的所有项
-						child_cate.AddString("");//添加空项
-						child_cate.SetCurSel(0);//选择空项，清空下拉列表的edit
-						child_cate.DeleteString(0);//再删除空项
 						form_child_cate.GetChildCateName(main_name.c_str(),error);//查询当前主分类下的子分类
 						while(!form_child_cate.IsEOF())
 						{

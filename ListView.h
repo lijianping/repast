@@ -27,6 +27,7 @@ public:
 	bool SetItem(int item, int subitem, int item_text);
 	bool SetItem(int item, int subitem, double item_text);
 	std::string GetItem(int item, int subitem);
+	int GetNextSelected(int index);
     int GetItemCount();
     int GetColumnCount();
 	int GetSelectedCount();

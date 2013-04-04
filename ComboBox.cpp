@@ -150,6 +150,9 @@ bool CComboBox::DeleteAllString()
 		}
 		count--;
 	}
+	this->AddString("");//添加空项
+	this->SetCurSel(0);//选择空项，清空下拉列表的edit
+	this->DeleteString(0);//再删除空项
 	return true;
 }
 

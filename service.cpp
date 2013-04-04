@@ -31,6 +31,7 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
                                   WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hinstance;
+	static HBRUSH brush = NULL;
 	switch (message)
 	{
 	case WM_INITDIALOG:
@@ -58,13 +59,40 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 			if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, floor_name.c_str())) {
 				return FALSE;
 			}
+			brush = CreateSolidBrush(RGB(255,0,0));  
 			return TRUE;
+		}
+	case WM_CTLCOLORDLG:
+		{
+			return (LONG)CreateSolidBrush(RGB(213, 220, 232));
+		}
+	case WM_CTLCOLORSTATIC:   //设置静态文本框字体颜色
+		{
+			HWND child_hwnd = (HWND)lParam;
+			HDC hdc = (HDC)wParam;
+			SetTextColor(hdc, RGB(170,86,65));
+			SetBkMode(hdc, TRANSPARENT);
+			return (INT_PTR)CreateSolidBrush(RGB(213, 220, 232));//返回画刷设置按钮的背景色;
 		}
     case WM_SETFOCUS:
         {
             SetFocus(GetDlgItem(hwnd, ID_SERVICE_LIST));
             return TRUE;
         }
+	case WM_CTLCOLORBTN ://设置按钮的颜色
+		if ((HWND)lParam == GetDlgItem(hwnd, ID_SERVICE_START))
+		{
+			HWND hbn = (HWND)lParam;
+			HDC hdc = (HDC)wParam;
+			RECT rc;
+			TCHAR text[64];
+			GetWindowText(hbn, text, 63);
+			GetClientRect(hbn, &rc);
+			SetTextColor(hdc, RGB(255, 255, 255));//设置按钮上文本的颜色
+			SetBkMode(hdc, TRANSPARENT);
+			DrawText(hdc, text, strlen(text), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		}
+		return (INT_PTR)CreateSolidBrush(RGB(170,86,65));//返回画刷设置按钮的背景色
     case WM_COMMAND:
         {
 			switch (LOWORD(wParam))
@@ -85,6 +113,7 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					if (HIWORD(wParam) == CBN_SELCHANGE) {
 						CComboBox combo;
 						combo.Initialization(hwnd, ID_SERVICE_COMBO);
+						InitFloorName(hwnd, ID_SERVICE_COMBO); // 初始化楼层Combo box
 						std::string floor_name;
 						combo.GetComboBoxText(floor_name);
 						if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, floor_name.c_str())) {
@@ -229,7 +258,7 @@ bool InitFloorName(const HWND hwnd, int id)
 	while (!floor_name.IsEOF()) {
 		combo.AddString(floor_name.floor_name());
 	}
-	combo.SetCurSel(0);
+//	combo.SetCurSel(0);
 	return true;
 }
 
@@ -375,28 +404,31 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					// 初始化列表控件 
 					CListView menu_list(hwnd, IDC_REPAST_MENU), customer_list(hwnd, IDC_CUSTOM_MENU);
-					// 获取菜单列表中的项 
-					int select_row = menu_list.GetSelectionMark();
-					if (-1 == select_row) {
-						MessageBox(hwnd, TEXT("请先选择一个项！"), TEXT("点菜"), MB_ICONINFORMATION);
-						break;
-					}
-					BOOL is_ok;
+					// 获取菜单列表中的项  
+                    BOOL is_ok;
 					int num = GetDlgItemInt(hwnd, IDC_DISH_NUMBER, &is_ok, FALSE);
 					if (!is_ok) {
 						MessageBox(hwnd, TEXT("数量输入有误！"), TEXT("点菜"), MB_ICONINFORMATION);
 						break;
 					}
-					// 获取顾客点菜信息并放入顾客点菜列表 */
-					std::string dish_name = menu_list.GetItem(select_row, 0);
-					int ret = customer_list.FindItem(dish_name);
-					if (-1 == customer_list.FindItem(dish_name)) {
-						customer_list.InsertItem(0, dish_name);   // 获取名称
-						customer_list.SetItem(0, 1, menu_list.GetItem(select_row, 1)); // 获取单价
-						customer_list.SetItem(0, 2, num);  // 获取数量
-						is_change = true;   // 顾客菜单是否变化标志
-					} else {
-						MessageBox(hwnd, TEXT("您已经点过该商品！"), TEXT("前台管理"), MB_ICONINFORMATION);
+					int select = menu_list.GetNextSelected(-1);
+					if (-1 == select) {
+						MessageBox(hwnd, TEXT("请先选择一个项！"), TEXT("点菜"), MB_ICONINFORMATION);
+						break;
+					}
+					while (-1 != select) {
+						// 获取顾客点菜信息并放入顾客点菜列表 */
+						std::string dish_name = menu_list.GetItem(select, 0);
+						int ret = customer_list.FindItem(dish_name);
+						if (-1 == customer_list.FindItem(dish_name)) {
+							customer_list.InsertItem(0, dish_name);   // 获取名称
+							customer_list.SetItem(0, 1, menu_list.GetItem(select, 1)); // 获取单价
+							customer_list.SetItem(0, 2, num);  // 获取数量
+							is_change = true;   // 顾客菜单是否变化标志
+						} else {
+							MessageBox(hwnd, TEXT("您已经点过该商品！"), TEXT("前台管理"), MB_ICONINFORMATION);
+						}
+						select = menu_list.GetNextSelected(select);
 					}
 					break;
 				}
@@ -490,9 +522,9 @@ BOOL CALLBACK OrderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 LRESULT CALLBACK EditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 {
 	switch(msg) {
-	case WM_KEYDOWN:
+	case WM_CHAR:
 		{
-			if (wParam == VK_RETURN) {
+			if (wParam  == '\r') {
 				HWND parent = GetParent(hwnd);
 				char totle[64] = "\0", paidin[64] = "\0";
 				GetDlgItemText(parent, IDC_RECEIVALBE_CHECKOUT, totle, 64);
@@ -508,6 +540,7 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				sprintf(temp, "%0.2f", check);
 				SetDlgItemText(parent, IDC_GIVECHANGE_CHECKOUT, temp);
 				SetFocus(GetDlgItem(parent, IDC_SAVE_CHECKOUT));
+				PostMessage(parent, WM_COMMAND, IDC_SAVE_CHECKOUT, 0);   // 通知父窗口 三个数字是调试出来的
 			}
 		}
 	}
@@ -520,6 +553,7 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static CUSTOMERTABLE send_in;
+	static bool has_checkout = false;
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -579,19 +613,25 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
+			    
 			case IDC_SAVE_CHECKOUT: 
 				{
+					
 					HWND pad_hwnd = GetDlgItem(hwnd, IDC_PAIDIN_CHECKOUT);
-					PostMessage(pad_hwnd, WM_KEYDOWN, VK_F5, 1);
+					if (!has_checkout) {
+						has_checkout = true;
+						PostMessage(pad_hwnd, WM_KEYDOWN, 0x0d, 1);
+						break;
+					}
 					TCHAR totle[64] = "\0", more[64] = "\0";
 					int ret1 = GetDlgItemText(hwnd, IDC_RECEIVALBE_CHECKOUT, totle, 64);  // 获取收入
-					int ret2 = GetDlgItemText(hwnd, IDC_GIVECHANGE_CHECKOUT, more, 64);
 					float check_in = atof(totle);
-					float check_out = atof(more);
-					if (!ret1 || !ret2) {
+					if (!ret1) {
 						MessageBox(hwnd, TEXT("输入有误！"), TEXT("前台管理"), MB_OK | MB_ICONINFORMATION);
 						return FALSE;
-					} 
+					}
+					int ret2 = GetDlgItemText(hwnd, IDC_GIVECHANGE_CHECKOUT, more, 64);
+					float check_out = atof(more);
 					if (check_out < 0) {
 						TCHAR info[128] = "\0";
 						sprintf(info, "还差 %0.2f 元", fabs(check_out));
@@ -609,6 +649,7 @@ BOOL CALLBACK CheckOutProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						MessageBox(hwnd, err.what(), TEXT("前台管理"), MB_ICONERROR);
 						return FALSE;
 					}
+					has_checkout = false;
 					MessageBox(hwnd, TEXT("结帐成功！"), TEXT("前台管理"), MB_ICONINFORMATION);
 				}
 			case IDC_CANCEL_CHECKOUT:
