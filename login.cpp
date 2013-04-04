@@ -7,13 +7,14 @@
 #include "Edit.h"
 std::string g_login_name;  // 登陆用户名
 static WNDPROC g_button_proc = NULL;
+extern HINSTANCE g_hinstance;
 
 // 子类化button控件
 LRESULT CALLBACK ButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HINSTANCE hinstance = (HINSTANCE)lParam;  /* The program handle */
+    HINSTANCE hinstance;  /* The program handle */
   
     switch (message)
     {
@@ -26,6 +27,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
                            TEXT("ERROR"), MB_ICONINFORMATION | MB_OK);
                 return FALSE;
             }
+			hinstance = (HINSTANCE)lParam;
             int login_width = login_rect.right - login_rect.left;
             int login_height = login_rect.bottom - login_rect.top;
             int screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
@@ -69,14 +71,58 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		{
 			HWND child_hwnd = (HWND)lParam;
 			HDC hdc = (HDC)wParam;
-			TCHAR button_text[64];
-			GetWindowText(child_hwnd, button_text, 64);
-			RECT rect;
-			GetClientRect(child_hwnd, &rect);
-			SetTextColor(hdc, RGB(255, 255, 255)); //设置按钮上文本的颜色
-			SetBkMode(hdc, TRANSPARENT);
-			DrawText(hdc, button_text, strlen(button_text), &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			if (child_hwnd == GetDlgItem(hwnd, IDC_B_CLOSE)) {
+				RECT rect;
+				GetClientRect(child_hwnd, &rect);
+				SetBkMode(hdc, TRANSPARENT);
+				return (LONG)CreateSolidBrush(RGB(158,27,27));
+			} else if (child_hwnd == GetDlgItem(hwnd, IDOK)) {
+				TCHAR button_text[64];
+			    GetWindowText(child_hwnd, button_text, 64);
+			    RECT rect;
+			    GetClientRect(child_hwnd, &rect);
+			    SetTextColor(hdc, RGB(255, 255, 255)); //设置按钮上文本的颜色
+			    SetBkMode(hdc, TRANSPARENT);
+			    DrawText(hdc, button_text, strlen(button_text), &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			} else if (child_hwnd == GetDlgItem(hwnd, IDCANCEL)) {
+				TCHAR button_text[64];
+				GetWindowText(child_hwnd, button_text, 64);
+				RECT rect;
+				GetClientRect(child_hwnd, &rect);
+				SetTextColor(hdc, RGB(255, 255, 255)); //设置按钮上文本的颜色
+				SetBkMode(hdc, TRANSPARENT);
+				DrawText(hdc, button_text, strlen(button_text), &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			}
 		    return  (INT_PTR)CreateSolidBrush(RGB(35, 35, 35));//返回画刷设置按钮的背景色
+		}
+	case WM_DRAWITEM:
+		{
+			LPDRAWITEMSTRUCT draw_item = (LPDRAWITEMSTRUCT)lParam;
+			switch (draw_item->CtlID) {
+			case IDC_B_CLOSE:
+				{
+					HBITMAP hbitmap = LoadBitmap(g_hinstance, MAKEINTRESOURCE(IDB_BITMAP1));
+					HWND child_hwnd = GetDlgItem(hwnd, draw_item->CtlID);
+					HDC hdc = GetWindowDC(child_hwnd);
+					RECT rect;
+					GetClientRect(child_hwnd, &rect);
+					HDC hdc_mem = CreateCompatibleDC(hdc);
+					SelectObject(hdc_mem, hbitmap);
+					BitBlt(hdc, 0, 0, rect.right - rect.left, rect.bottom - rect.top, hdc_mem, 0, 0, SRCCOPY);
+					DeleteDC(hdc_mem);
+					SetBkMode(hdc, TRANSPARENT);
+					ReleaseDC(child_hwnd, hdc);
+					break;
+				}
+			}
+			return TRUE;
+		}
+	case WM_LBUTTONDOWN:
+		{
+			UpdateWindow(hwnd);
+			ReleaseCapture();
+			SendMessage(hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+			return TRUE;
 		}
     case WM_COMMAND:
         {
@@ -120,6 +166,7 @@ BOOL CALLBACK LoginProcesses(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
                     EndDialog(hwnd, return_value);
                     break;
                 }
+			case IDC_B_CLOSE:
             case IDCANCEL:
                 {
 					wParam = 0;

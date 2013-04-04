@@ -109,11 +109,17 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					break;
 				}
 			case ID_SERVICE_COMBO:
-				{
-					if (HIWORD(wParam) == CBN_SELCHANGE) {
+				{   
+					if (HIWORD(wParam) == CBN_DROPDOWN) {
 						CComboBox combo;
 						combo.Initialization(hwnd, ID_SERVICE_COMBO);
+						combo.DeleteAllString();    // 清空楼层信息
 						InitFloorName(hwnd, ID_SERVICE_COMBO); // 初始化楼层Combo box
+					}
+					if (HIWORD(wParam) == CBN_SELENDOK) {
+						
+                        CComboBox combo;
+					    combo.Initialization(hwnd, ID_SERVICE_COMBO);
 						std::string floor_name;
 						combo.GetComboBoxText(floor_name);
 						if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, floor_name.c_str())) {
@@ -130,6 +136,14 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					table_info.menu_id = ID_SERVICE_START;
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_START_TABLE),
 						           hwnd, (DLGPROC)StartTableProc, (long)&table_info);
+					// 更新前台管理的listview视图
+					CComboBox combo;   // 更新
+					combo.Initialization(hwnd, ID_SERVICE_COMBO);
+					std::string floor_name;
+					combo.GetComboBoxText(floor_name);
+					if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, floor_name.c_str())) {
+						return FALSE;
+					}
 					break;
 				}
 			case ID_SERVICE_BOOK:  // 预订管理
@@ -139,6 +153,14 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					table_info.menu_id = ID_SERVICE_BOOK;
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_START_TABLE),
 						hwnd, (DLGPROC)StartTableProc, (long)&table_info);
+					// 更新前台管理的listview视图
+					CComboBox combo;   // 更新
+					combo.Initialization(hwnd, ID_SERVICE_COMBO);
+					std::string floor_name;
+					combo.GetComboBoxText(floor_name);
+					if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, floor_name.c_str())) {
+						return FALSE;
+					}
 					break;
 				}
 			case ID_SERVICE_CHANGE:  // 换台管理
@@ -167,6 +189,10 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 				combo.GetComboBoxText(table_info.floor_name);                      // 获取楼层名称
 				DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CHANGE_TABLE),
 							   hwnd, (DLGPROC)ChangeTableProc, (long)&table_info);
+				// 更新前台管理的listview视图
+				if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, table_info.floor_name.c_str())) {
+					return FALSE;
+				}
 				break;
 			}
 			case ID_SERVICE_ORDER: // 点菜管理  
@@ -195,6 +221,10 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 				
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_ORDER),
 						           hwnd, (DLGPROC)OrderProc, (long)&table_info);
+					// 更新前台管理的listview视图
+					if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, table_info.floor_name.c_str())) {
+						return FALSE;
+					}
 					break;
 				}
 			case ID_SERVICE_CHECKOUT:   // 结账功能
@@ -222,22 +252,20 @@ BOOL CALLBACK ServiceProcesses(HWND hwnd, UINT message,
 					combo.GetComboBoxText(table_info.floor_name);                      // 获取楼层名称
 					DialogBoxParam(hinstance, MAKEINTRESOURCE(IDD_CUSTOM_CHECKOUT),
 						           hwnd, (DLGPROC)CheckOutProc, (long)&table_info);
+
+					// 更新前台管理的listview视图
+					if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, table_info.floor_name.c_str())) {
+						return FALSE;
+					}
 					break;
 				}
 			}  // end switch(LOWORD(wParam)
-			CComboBox combo;   // 更新
-			combo.Initialization(hwnd, ID_SERVICE_COMBO);
-			std::string floor_name;
-			combo.GetComboBoxText(floor_name);
-			if (!ShowConsumerTableInfo(hwnd, ID_SERVICE_LIST, floor_name.c_str())) {
-				return FALSE;
-			}
+			
           	return TRUE;
         }  // end WM_COMMAND
     case WM_CLOSE:
         {
 			EndDialog(hwnd, LOWORD(wParam));
-         //   PostQuitMessage(0);
            		return TRUE;
         }
     }

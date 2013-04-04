@@ -10,16 +10,16 @@
 class CComboBox  
 {
 public:
-	CComboBox();
-	CComboBox(HWND hwnd, UINT id);
-	virtual ~CComboBox();
+    CComboBox();
+    CComboBox(HWND hwnd, UINT id);
+    virtual ~CComboBox();
     bool Create(DWORD style, const RECT &rect,
                 HWND parent_hwnd, UINT id);
     bool Initialization(HWND parent_hwnd, UINT id);
     bool AddString(const std::string item);
-	bool InsertString(const int index, const std::string item);
+    bool InsertString(const int index, const std::string item);
     bool DeleteString(int index);
-	bool DeleteAllString();
+    bool DeleteAllString();
     bool EnableWindow(BOOL enable = TRUE);
     bool GetComboBoxText(std::string &text);
 	bool SetCurSel(const int index);

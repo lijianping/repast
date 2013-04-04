@@ -21,6 +21,8 @@ public:
 	inline short payablenum() const;
 	inline float money() const;
 	inline char* clerk();
+        inline char* commodity_name();
+        inline short quantity() const;
 	bool GetCustomerByName(const char *customer_no, const char* table_no, std::string &error);
 	bool AddCustomer(const char *customer_no);
 	
@@ -31,6 +33,8 @@ public:
 		             const char *new_floor_name, const char *new_room_name, const char *new_table_no,
 					 const char *consumer_no, short people_num, short table_state);
 	bool GetConsumerRecord(const char *start_time, const char *end_time);
+        bool GetConsumerMenuRecord(const char *consumer_no);
+        bool GetConsumerRecordBackup(const char *consumer_no);
 
 protected:
 	void Initialize();
@@ -53,8 +57,10 @@ private:
 	char m_old_floor_name_[17];      // 原楼层信息
 	char m_old_room_name_[33];       // 原房间信息
 	char m_old_table_no_[5];         // 原台号信息
-	char m_query_start_time_[20];
-	char m_query_end_time_[20];
+	char m_query_start_time_[20];    // 查询开始时间
+	char m_query_end_time_[20];      // 查询结束时间
+        char m_commodity_name_[257];     // 商品名称
+        short m_quantity_;
 
 	SQLINTEGER m_customer_no_len_;
 	SQLINTEGER m_customer_num_len_;
@@ -73,6 +79,8 @@ private:
 	SQLINTEGER m_old_table_no_len_;
 	SQLINTEGER m_query_start_time_len_;
 	SQLINTEGER m_query_end_time_len_;
+        SQLINTEGER m_commodity_name_len_;
+        SQLINTEGER m_quantity_len_;
 };
 
 char* CCustomer::customer_no() 
@@ -121,6 +129,25 @@ char* CCustomer::clerk()
 {
 	DeleteSpace(m_clerk_, m_clerk_);
 	return m_clerk_;
+}
+
+/*
+ * @ brief: 获取顾客所点商品名称
+ * @ return: 商品名称
+ **/
+char* CCustomer::commodity_name() 
+{
+    DeleteSpace(m_commodity_name_, m_commodity_name_);
+    return m_commodity_name_;
+}
+
+/*
+ * @ brief: 获取顾客所点商品数量
+ * @ return: 商品数量
+ **/
+short CCustomer::quantity() const
+{
+    return m_quantity_;
 }
 #endif 
 

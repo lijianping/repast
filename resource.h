@@ -42,6 +42,7 @@
 #define IDD_EDIT_FLOOR                  127
 #define IDD_EDIT_ROOM                   128
 #define IDD_EDIT_TABLE                  129
+#define IDB_BITMAP1                     130
 #define IDC_USERNAME                    1000
 #define IDC_PASSWORD                    1001
 #define ID_ADD_STAFF                    1001
@@ -115,6 +116,7 @@
 #define IDC_B_FLOOR_ADD                 1063
 #define IDC_B_ADD_ROOM                  1063
 #define IDC_B_ADD_TABLE                 1063
+#define IDC_B_CLOSE                     1063
 #define IDC_BUTTON2                     1064
 #define IDC_DELETE_TABLE                1064
 #define ID_SERVICE_CHANGE               1064
@@ -204,6 +206,7 @@
 #define IDC_EDIT2                       1112
 #define IDC_EDIT3                       1113
 #define IDC_EDIT4                       1114
+#define IDC_E_CLERK                     1114
 #define ID_PERSONNEL_QUERY              1117
 #define IDC_S_ID                        1119
 #define ID_PERSONNEL_STAFF_ID           1120
@@ -310,6 +313,8 @@
 #define IDC_C_FLOOR_NAME                1208
 #define IDC_C_FLOOR_NAME2               1209
 #define IDC_C_ROOM_NAME                 1209
+#define IDC_E_MONEY                     1209
+#define IDC_E_CONSUMER_NO               1210
 #define IDR_ADD                         40001
 #define IDR_DELETE                      40002
 #define IDR_MODIFY                      40003
@@ -318,9 +323,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1209
+#define _APS_NEXT_CONTROL_VALUE         1211
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

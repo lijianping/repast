@@ -193,89 +193,124 @@ BOOL CALLBACK FinanceProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 BOOL CALLBACK ConsumeDetailProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static ConsumerInfo consumer_info;
-	switch (msg)
+    static ConsumerInfo consumer_info;
+    switch (msg)
+    {
+        case WM_INITDIALOG:
 	{
-		case WM_INITDIALOG:
-			{
-				ConsumerInfo *info = (ConsumerInfo *)lParam;         // 接收数据,静态保存
-				consumer_info.consumer_id = info->consumer_id;
-				consumer_info.consumption_amount = info->consumption_amount;
-				consumer_info.start_time = info->start_time;
-				consumer_info.end_time = info->end_time;
-				consumer_info.clerk = info->clerk;
-				CListView custom_list(hwnd, IDC_LIST1);
-				custom_list.InsertColumn(0, 120, "名称");
-				custom_list.InsertColumn(1, 120, "单价");
-				custom_list.InsertColumn(2, 120, "数量");
-				custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-				return TRUE;
-			}
-		case WM_COMMAND:
-			{
-				
-				return TRUE;
-			}
-		case WM_CLOSE:
-			{
-				EndDialog(hwnd, HIWORD(wParam));
-				return TRUE;
-			}
+	    ConsumerInfo *info = (ConsumerInfo *)lParam;         // 接收数据,静态保存
+	    consumer_info.consumer_id = info->consumer_id;
+	    consumer_info.consumption_amount = info->consumption_amount;
+	    consumer_info.start_time = info->start_time;
+	    consumer_info.end_time = info->end_time;
+	    consumer_info.clerk = info->clerk;
+	    CEdit edit(hwnd, IDC_E_CONSUMER_NO);             // 初始化
+	    edit.SetEditText(info->consumer_id);
+	    edit.Initialization(hwnd, IDC_E_START_TIME);
+	    edit.SetEditText(info->start_time);
+	    edit.Initialization(hwnd, IDC_E_END_TIME);
+	    edit.SetEditText(info->end_time);
+	    edit.Initialization(hwnd, IDC_E_MONEY);
+	    edit.SetEditText(info->consumption_amount);
+	    edit.Initialization(hwnd, IDC_E_CLERK);
+	    edit.SetEditText(info->clerk);
+	    CListView custom_list(hwnd, IDC_LIST1);
+	    custom_list.InsertColumn(0, 120, "名称");
+	    custom_list.InsertColumn(1, 120, "单价");
+	    custom_list.InsertColumn(2, 120, "数量");
+	    custom_list.SetSelectAndGrid(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+            try 
+            {
+                CCustomer consumer;
+                consumer.GetConsumerMenuRecord(info->consumer_id.c_str());
+                int i = 0;
+                while (!consumer.IsEOF()) 
+                {
+                    custom_list.InsertItem(i, consumer.commodity_name());
+                    custom_list.SetItem(i, 1, consumer.money());
+                    custom_list.SetItem(i, 2, consumer.quantity());
+                    i++;
+                }
+                consumer.CloseCursor();
+                consumer.GetConsumerRecordBackup(info->consumer_id.c_str());
+                while (!consumer.IsEOF()) 
+                {
+                        custom_list.InsertItem(i, consumer.commodity_name());
+                        custom_list.SetItem(i, 1, consumer.money());
+                        custom_list.SetItem(i, 2, consumer.quantity());
+                        i++;
+                }
+            }
+            catch (Err &err)
+            {
+                MessageBox(hwnd, err.what(), TEXT("财务管理"), MB_ICONERROR);
+                return FALSE;
+            }
+	    return TRUE;
 	}
-	return FALSE;
+    case WM_COMMAND:
+        {
+	    return TRUE;
+	}
+    case WM_CLOSE:
+	{
+	    EndDialog(hwnd, HIWORD(wParam));
+	    return TRUE;
+	}
+    }
+    return FALSE;
 }
 
 
 BOOL CALLBACK EditUserProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static LoginUser login_user_info;
-	switch (msg)
-	{
-	case WM_INITDIALOG:
-		{
-			LoginUser *login_user = (LoginUser *)lParam;
-			login_user_info.menu_id = login_user->menu_id;  // 按钮id 不同的按钮初始值使用不同
-			CButton button;
-			CPermission all_permission;
-			CComboBox permission_combo;
-			permission_combo.Initialization(hwnd, IDC_E_USER_PERMISSION);
-			all_permission.SetSQLStatement("exec SelectPermissionAll");
-			all_permission.GetRecordSet();
-			int index = 0;
-			while(!all_permission.IsEOF())     // 初始化权限按钮
-			{
-				permission_combo.AddString(all_permission.name());
-				index++;
-			}
-			CEdit staff_name(hwnd, IDC_E_STAFF_NAME);
-			staff_name.SetReadOnly();                //  设置姓名编辑框为只读模式    
-			if (login_user_info.menu_id == IDC_ADD_USER) {  // 增加用户时显示所有员工编号
-				InitStaffNo(hwnd, IDC_E_USER_ID);
-				ShowWindow(GetDlgItem(hwnd, IDC_E_MODIFY_USER), SW_HIDE);  // 隐藏修改按钮
-				
-			} else {
-				login_user_info.staff_no = login_user->staff_no;    // 用户编号
-				login_user_info.new_login_name = login_user->new_login_name;  // 用户当前登录名
-				login_user_info.login_permission = login_user->login_permission;  // 用户当前登录权限
-				int index = permission_combo.FindString(login_user_info.login_permission.c_str());
-				if (-1 != index) {
-					permission_combo.SetCurSel(index);   // 显示用户权限
-				}
-				CComboBox staff_no(hwnd, IDC_E_USER_ID);    // 显示用户员工编号
-				staff_no.AddString(login_user_info.staff_no);
-				staff_no.SetCurSel(0);    // 默认选中
-				CStaffForm staff;
-				std::string err_info;   
-				// 获取员工姓名
-				if (staff.GetStaffName(login_user_info.staff_no.c_str(), err_info)) {	
-					staff_name.SetEditText(staff.name());  // 编号不重复，只有一条记录
-				}
-				CEdit login_name(hwnd, IDC_E_LOGIN_NAME);
-				login_name.SetEditText(login_user_info.new_login_name);  // 显示登陆用户名
-				ShowWindow(GetDlgItem(hwnd, IDC_E_ADD_USER), SW_HIDE); // 隐藏增加按钮
-			}
-			return TRUE;
+    static LoginUser login_user_info;
+    switch (msg)            
+    {
+    case WM_INITDIALOG:
+        {
+	    LoginUser *login_user = (LoginUser *)lParam;
+	    login_user_info.menu_id = login_user->menu_id;  // 按钮id 不同的按钮初始值使用不同
+	    CButton button;
+	    CPermission all_permission;
+	    CComboBox permission_combo;
+	    permission_combo.Initialization(hwnd, IDC_E_USER_PERMISSION);
+	    all_permission.SetSQLStatement("exec SelectPermissionAll");
+	    all_permission.GetRecordSet();
+	    int index = 0;
+	    while(!all_permission.IsEOF())     // 初始化权限按钮
+	    {
+	        permission_combo.AddString(all_permission.name());
+	        index++;
+	    }
+	    CEdit staff_name(hwnd, IDC_E_STAFF_NAME);
+	    staff_name.SetReadOnly();                //  设置姓名编辑框为只读模式    
+	    if (login_user_info.menu_id == IDC_ADD_USER) {  // 增加用户时显示所有员工编号
+	    InitStaffNo(hwnd, IDC_E_USER_ID);
+	    ShowWindow(GetDlgItem(hwnd, IDC_E_MODIFY_USER), SW_HIDE);  // 隐藏修改按钮
+            } else {
+                login_user_info.staff_no = login_user->staff_no;    // 用户编号
+		login_user_info.new_login_name = login_user->new_login_name;  // 用户当前登录名
+		login_user_info.login_permission = login_user->login_permission;  // 用户当前登录权限
+		int index = permission_combo.FindString(login_user_info.login_permission.c_str());
+		if (-1 != index) {
+		    permission_combo.SetCurSel(index);   // 显示用户权限
 		}
+		CComboBox staff_no(hwnd, IDC_E_USER_ID);    // 显示用户员工编号
+		staff_no.AddString(login_user_info.staff_no);
+		staff_no.SetCurSel(0);    // 默认选中
+		CStaffForm staff;
+		std::string err_info;   
+		// 获取员工姓名
+		if (staff.GetStaffName(login_user_info.staff_no.c_str(), err_info)) {	
+		    staff_name.SetEditText(staff.name());  // 编号不重复，只有一条记录
+		}
+		CEdit login_name(hwnd, IDC_E_LOGIN_NAME);
+		login_name.SetEditText(login_user_info.new_login_name);  // 显示登陆用户名
+		ShowWindow(GetDlgItem(hwnd, IDC_E_ADD_USER), SW_HIDE); // 隐藏增加按钮
+	    }
+	    return TRUE;
+	}
 	case WM_COMMAND:
 		{
 			switch(LOWORD(wParam))

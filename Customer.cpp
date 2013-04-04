@@ -253,6 +253,50 @@ bool CCustomer::GetConsumerRecord(const char *start_time, const char *end_time)
 }
 
 /*
+ * @ brief: 获取消费者消费记录
+ * @ param: consumer_no [in] 消费者编号
+ * @ return: 若成功返回true 
+ **/
+bool CCustomer::GetConsumerMenuRecord(const char *consumer_no)
+{
+    Initialize();
+    BindReturn();
+    m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+                                      sizeof(m_customer_no_) - 1, 0, m_customer_no_,\
+                                      sizeof(m_customer_no_), &m_customer_no_len_);
+    if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+            LTHROW(BIND_PARAM_ERROR)
+    strcpy(m_customer_no_, consumer_no);
+    ExecSQLProc("{? = call GetConsumerMenuRecord(?)}");
+    SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_commodity_name_, sizeof(m_commodity_name_), &m_commodity_name_len_);
+    SQLBindCol(m_hstmt_, 2, SQL_C_FLOAT, &m_money_, 0, &m_money_len_);   // 借用money来绑定单价
+    SQLBindCol(m_hstmt_, 3, SQL_C_SHORT, &m_quantity_, 0, &m_quantity_len_);
+    return true;
+}
+
+/*
+ * @ brief: 获取消费者消费记录
+ * @ param: consumer_no [in] 消费者编号
+ * @ return: 若成功返回true 
+ **/
+bool CCustomer::GetConsumerRecordBackup(const char *consumer_no)
+{
+    Initialize();
+    BindReturn();
+    m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+            sizeof(m_customer_no_) - 1, 0, m_customer_no_,\
+            sizeof(m_customer_no_), &m_customer_no_len_);
+    if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+            LTHROW(BIND_PARAM_ERROR)
+    strcpy(m_customer_no_, consumer_no);
+    ExecSQLProc("{? = call GetConsumerRecordBackup(?)}");
+    SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_commodity_name_, sizeof(m_commodity_name_), &m_commodity_name_len_);
+    SQLBindCol(m_hstmt_, 2, SQL_C_FLOAT, &m_money_, 0, &m_money_len_);   // 借用money来绑定单价
+    SQLBindCol(m_hstmt_, 3, SQL_C_SHORT, &m_quantity_, 0, &m_quantity_len_);
+    return true;
+}
+
+/*
  * @ brief: 初始化相关数据
  **/
 void CCustomer::Initialize() {
@@ -270,6 +314,8 @@ void CCustomer::Initialize() {
 	memset(m_old_table_no_, 0, sizeof(m_old_table_no_));
 	memset(m_query_start_time_, 0, sizeof(m_query_start_time_));
 	memset(m_query_end_time_, 0, sizeof(m_query_end_time_));
+        memset(m_commodity_name_, 0, sizeof(m_commodity_name_));
+        m_quantity_ = 0;
 	m_customer_no_len_ = SQL_NTS;
 	m_customer_num_len_ = SQL_NTS;
 	m_founding_time_len_ = SQL_NTS;
@@ -286,6 +332,8 @@ void CCustomer::Initialize() {
 	m_old_table_no_len_ = SQL_NTS;
 	m_query_start_time_len_ = SQL_NTS;
 	m_query_end_time_len_ = SQL_NTS;
+        m_commodity_name_len_ = SQL_NTS;
+        m_quantity_len_ = SQL_NTS;
 }
 
 /*

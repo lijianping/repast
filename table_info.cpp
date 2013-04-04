@@ -434,15 +434,18 @@ BOOL CALLBACK ChildTableInfoProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 							MessageBox(hwnd, TEXT("请先在左侧选择一个台号！"), TEXT("基础信息管理"), MB_ICONINFORMATION);
 							break;
 						}
-						floor_name.Initialization(hwnd, IDC_C_FLOOR_NAME);
+						
 						room_name.Initialization(hwnd, IDC_C_ROOM_NAME);
 						no.Initialization(hwnd, IDC_E_TABLE_NO);
 						num.Initialization(hwnd, IDC_E_TABLE_NUM);
 						CComboBox combo(hwnd, IDC_TABLE_FLOOR_COMBO);
 						std::string name;
 						combo.GetComboBoxText(name);
-					    floor_name.SetCurSel(floor_name.FindString(name.c_str()));
+						floor_name.Initialization(hwnd, IDC_C_FLOOR_NAME);
+						floor_name.DeleteAllString();
 						InitFloorName(hwnd,IDC_C_FLOOR_NAME);
+					    floor_name.SetCurSel(floor_name.FindString(name.c_str()));
+						
 						InitRoomCombo(hwnd,name.c_str(),IDC_C_ROOM_NAME);
 						room_name.SetCurSel(room_name.FindString(table_list.GetItem(index, 0).c_str()));
 						no.SetEditText(table_list.GetItem(index, 1).c_str());
