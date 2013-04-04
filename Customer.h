@@ -15,9 +15,12 @@ public:
 	inline char* customer_no();
 	inline short customer_num() const;
 	inline char* founding_time();
+	inline char* end_time();
 	inline char* table_no();
 	inline short table_state() const;
 	inline short payablenum() const;
+	inline float money() const;
+	inline char* clerk();
 	bool GetCustomerByName(const char *customer_no, const char* table_no, std::string &error);
 	bool AddCustomer(const char *customer_no);
 	
@@ -27,6 +30,7 @@ public:
 	bool ChangeTable(const char *old_floor_name, const char *old_room_name, const char *old_table_no,
 		             const char *new_floor_name, const char *new_room_name, const char *new_table_no,
 					 const char *consumer_no, short people_num, short table_state);
+	bool GetConsumerRecord(const char *start_time, const char *end_time);
 
 protected:
 	void Initialize();
@@ -49,6 +53,8 @@ private:
 	char m_old_floor_name_[17];      // 原楼层信息
 	char m_old_room_name_[33];       // 原房间信息
 	char m_old_table_no_[5];         // 原台号信息
+	char m_query_start_time_[20];
+	char m_query_end_time_[20];
 
 	SQLINTEGER m_customer_no_len_;
 	SQLINTEGER m_customer_num_len_;
@@ -65,10 +71,13 @@ private:
 	SQLINTEGER m_old_floor_name_len_;
 	SQLINTEGER m_old_room_name_len_;
 	SQLINTEGER m_old_table_no_len_;
+	SQLINTEGER m_query_start_time_len_;
+	SQLINTEGER m_query_end_time_len_;
 };
 
 char* CCustomer::customer_no() 
 {
+	DeleteSpace(m_customer_no_, m_customer_no_);
 	return m_customer_no_;
 }
 
@@ -79,11 +88,18 @@ short CCustomer::customer_num() const
 
 char* CCustomer::founding_time() 
 {
+	DeleteSpace(m_founding_time_, m_founding_time_);
 	return m_founding_time_;
 }
 
+char* CCustomer::end_time() 
+{
+	DeleteSpace(m_end_time_, m_end_time_);
+	return m_end_time_;
+}
 char* CCustomer::table_no()
 {
+	DeleteSpace(m_table_no_, m_table_no_);
 	return m_table_no_;
 }
 
@@ -91,9 +107,20 @@ short CCustomer::table_state() const
 {
 	return m_table_state_;
 }
-inline short CCustomer:: payablenum() const
+short CCustomer:: payablenum() const
 {
 	return m_payablenum_;
+}
+
+float CCustomer::money() const 
+{
+	return m_money_;
+}
+
+char* CCustomer::clerk() 
+{
+	DeleteSpace(m_clerk_, m_clerk_);
+	return m_clerk_;
 }
 #endif 
 

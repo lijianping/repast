@@ -222,6 +222,37 @@ bool CCustomer::ChangeTable(const char *old_floor_name, const char *old_room_nam
 }
 
 /*
+ * @ brief: 获取消费者记录开台时间、结帐时间收银员等
+ * @ param: start_time [in] 查询的开始时间
+ * @ param: end_time [in] 查询的结束时间
+ * @ return: 若成功返回true
+ **/
+bool CCustomer::GetConsumerRecord(const char *start_time, const char *end_time)
+{
+	Initialize();
+	BindReturn();
+	m_return_code_ = SQLBindParameter(m_hstmt_, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		                              sizeof(m_query_start_time_) - 1, 0, m_query_start_time_,\
+		                              sizeof(m_query_start_time_), &m_query_start_time_len_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	m_return_code_ = SQLBindParameter(m_hstmt_, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,\
+		                              sizeof(m_query_end_time_) - 1, 0, m_query_end_time_, 
+									  sizeof(m_query_end_time_), &m_query_end_time_len_);
+	if (m_return_code_ != SQL_SUCCESS && m_return_code_ != SQL_SUCCESS_WITH_INFO) 
+		LTHROW(BIND_PARAM_ERROR)
+	strcpy(m_query_start_time_, start_time);
+	strcpy(m_query_end_time_, end_time);
+	ExecSQLProc("{? = call GetConsumerRecord(?,?)}"); 
+	SQLBindCol(m_hstmt_, 1, SQL_C_CHAR, m_customer_no_, sizeof(m_customer_no_), &m_customer_no_len_);
+	SQLBindCol(m_hstmt_, 2, SQL_C_FLOAT, &m_money_, 0, &m_money_len_);
+	SQLBindCol(m_hstmt_, 3, SQL_C_CHAR, m_founding_time_, sizeof(m_founding_time_), &m_founding_time_len_);
+	SQLBindCol(m_hstmt_, 4, SQL_C_CHAR, m_end_time_, sizeof(m_end_time_), &m_end_time_len_);
+	SQLBindCol(m_hstmt_, 5, SQL_C_CHAR, m_clerk_, sizeof(m_clerk_), &m_clerk_len_);
+	return true;
+}
+
+/*
  * @ brief: 初始化相关数据
  **/
 void CCustomer::Initialize() {
@@ -237,6 +268,8 @@ void CCustomer::Initialize() {
 	memset(m_old_floor_name_, 0, sizeof(m_old_floor_name_));
 	memset(m_old_room_name_, 0, sizeof(m_old_room_name_));
 	memset(m_old_table_no_, 0, sizeof(m_old_table_no_));
+	memset(m_query_start_time_, 0, sizeof(m_query_start_time_));
+	memset(m_query_end_time_, 0, sizeof(m_query_end_time_));
 	m_customer_no_len_ = SQL_NTS;
 	m_customer_num_len_ = SQL_NTS;
 	m_founding_time_len_ = SQL_NTS;
@@ -251,6 +284,8 @@ void CCustomer::Initialize() {
 	m_old_floor_name_len_ = SQL_NTS;
 	m_old_room_name_len_ = SQL_NTS;
 	m_old_table_no_len_ = SQL_NTS;
+	m_query_start_time_len_ = SQL_NTS;
+	m_query_end_time_len_ = SQL_NTS;
 }
 
 /*

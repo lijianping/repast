@@ -51,4 +51,6 @@ bool ShowLoginUser(HWND hwnd);
 bool InitStaffNo(HWND hwnd, UINT id);
 
 bool GetLoginUserInfo(HWND hwnd, LoginUser *user, std::string &err_info);
+
+void ShowConsumerRecord(HWND hwnd, UINT id, const char *start_time, const char *end_time);
 #endif
